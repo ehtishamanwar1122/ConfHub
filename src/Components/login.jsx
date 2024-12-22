@@ -8,6 +8,9 @@ const Login = () => {
     const handleRegisterClick = () => {
     navigate("/register");
   };
+  const handleLoginClick = () => {
+    navigate('/OrganizerDashboard'); // Navigate to the Organizer Dashboard page
+  };
   return (
     <div className="container">
       <div className="image-section">
@@ -38,7 +41,9 @@ const Login = () => {
             <a href="#">Forgot Password?</a>
           </div>
 
-          <button className="btn-login">Login</button>
+          <button className="btn-login" onClick={handleLoginClick}>
+          Login
+         </button>
         </form>
       </div>
     </div>
