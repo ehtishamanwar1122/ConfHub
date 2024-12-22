@@ -1,0 +1,90 @@
+.dashboard-container {
+    padding: 20px;
+}
+
+.tab-container {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.tab {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    color: #333;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.tab.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.card-image {
+    width: 150px;
+    margin-right: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.card-content {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.card-title {
+    margin-top: 0;
+    color: #198754;
+}
+
+.status,.authors-invited {
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.authors-invited.no {
+    color: red;
+}
+
+.info-item {
+    color: #495057;
+    margin-bottom: 3px;
+    font-size: 1px !important;
+}
+
+.card-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    color: #ced4da;
+    cursor: pointer;
+    margin-left: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+}
