@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "organizers",
+  "info": {
+    "singularName": "organizer",
+    "pluralName": "organizers",
+    "displayName": "Organizer",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Organizer_FirstName": {
+      "type": "string"
+    },
+    "Organizer_Email": {
+      "type": "email"
+    },
+    "Affiliation": {
+      "type": "string"
+    },
+    "Department": {
+      "type": "string"
+    },
+    "Alternative_contact": {
+      "type": "string"
+    },
+    "Organizer_LastName": {
+      "type": "string"
+    },
+    "UserID": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+      
+    }
+  }
+}
