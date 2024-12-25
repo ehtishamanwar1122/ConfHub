@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from './Header'; // Relative import from the same folder
+import Header from './Header'; 
 import Footer from './Footer';
 import styled from 'styled-components';
 

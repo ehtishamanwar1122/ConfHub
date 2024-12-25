@@ -135,12 +135,12 @@ const Header = ({ role }) => {
                 </Logo>
                 <DropdownMenu visible={dropdownVisible}>
                     <DropdownItem to="/create-conference">
-                        Create New Conference
+                        Organzier List
                     </DropdownItem>
                     <DropdownItem to="/manage-conferences">
-                        Manage Conferences
+                        Pending Request
                     </DropdownItem>
-                    <DropdownItem to="/settings">Settings</DropdownItem>
+                    <DropdownItem to='/add-organzier'>Add Organzier</DropdownItem>
                     <DropdownItem to="/help">Help</DropdownItem>
                 </DropdownMenu>
                 {role && (
