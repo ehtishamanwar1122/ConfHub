@@ -134,7 +134,7 @@ const Header = ({ role }) => {
                     Conf<span>Hub</span>
                 </Logo>
                 <DropdownMenu visible={dropdownVisible}>
-                    <DropdownItem to="/create-conference">
+                    <DropdownItem to="/CreateConference">
                         Create New Conference
                     </DropdownItem>
                     <DropdownItem to="/manage-conferences">

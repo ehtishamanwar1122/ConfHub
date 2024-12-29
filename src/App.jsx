@@ -13,7 +13,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterOrganizer />} />
         <Route path="/OrganizerDashboard" element={<OrganizerDashboard />} />
-        <Route path="/Create?Conference" element={<CreateConference />} />
+        <Route path="/CreateConference" element={<CreateConference />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
     
       </Routes>
