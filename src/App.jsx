@@ -6,6 +6,7 @@ import OrganizerDashboard  from "./Components/OrganizerDashboard";
 import CreateConference from "./Components/CreateNewConference";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminConferenceManager from "./Components/Admin/AdminConferenceManager";
+import ConferenceDetails from "./Components/Conference/ConferenceDetails";
 function App() {
   return (
     <Router>
@@ -17,6 +18,7 @@ function App() {
         <Route path="/CreateConference" element={<CreateConference />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />
+        <Route path="/conference/:id" element={<ConferenceDetails />} />
       </Routes>
     </Router>
   );

@@ -1,49 +1,106 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { dashboard_img1 } from "../assets/Images";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [conferences, setConferences] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch conferences in progress and approved by admin
+  useEffect(() => {
+    const fetchConferences = async () => {
+      try {
+        const response = await axios.get("http://localhost:1337/api/conferences");
+        const approvedConferences = response.data.data.filter(
+          (conf) => conf.status === "approved" && conf.progress === "in-progress"
+        );
+        setConferences(approvedConferences);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching conferences:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchConferences();
+  }, []);
+
+  // Navigate to conference details
+  const handleConferenceClick = (conferenceId) => {
+    navigate(`/conference/${conferenceId}`);
+  };
 
   const handleLoginClick = () => {
     navigate("/login");
   };
+
   return (
     <>
-    <div className="hero-section">
-      <nav className="navbar">
-        <ul className="navbar-links">
-          <li><a href="#home" className="active">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Our Services</a></li>
-          <li><a href="#contact">Contact Us</a></li>
-        </ul>
-        <button className="login-button" onClick={handleLoginClick}>
+      <div className="hero-section">
+        <nav className="navbar">
+          <ul className="navbar-links">
+            <li><a href="#home" className="active">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Our Services</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+          </ul>
+          <button className="login-button" onClick={handleLoginClick}>
             Login
           </button>
-      </nav>
+        </nav>
 
-      <div className="hero-content">
-        <div className="hero-text">
-          <h1>
-            <span>Conference Management</span> System
-          </h1>
-          <p>
-            From managing program committees to publishing proceedings, our
-            ConfHub system has got you covered. Professionalism has perfected
-            managing a well-organized conference from scratch.
-          </p>
-          <button className="learn-more-button">Learn More →</button>
-        </div>
+        <div className="hero-content">
+          <div className="hero-text">
+            <h1>
+              <span>Conference Management</span> System
+            </h1>
+            <p>
+              From managing program committees to publishing proceedings, our
+              ConfHub system has got you covered. Professionalism has perfected
+              managing a well-organized conference from scratch.
+            </p>
+            <button className="learn-more-button">Learn More →</button>
+          </div>
 
-        <div className="hero-image">
-          <img src={dashboard_img1} alt="Conference illustration" />
+          <div className="hero-image">
+            <img src={dashboard_img1} alt="Conference illustration" />
+          </div>
         </div>
       </div>
-    </div>
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}> <h3 style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3> </div>
-    <div className="main-page">
+
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}>
+        <h3 style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3>
+      </div>
+
+      <div className="main-page">
+        {/* Conferences In Progress Section */}
+        <section className="conference-list">
+          <h2>Conferences In Progress</h2>
+          {loading ? (
+            <p>Loading conferences...</p>
+          ) : conferences.length > 0 ? (
+            <div className="conference-cards">
+              {conferences.map((conference) => (
+                <div
+                  key={conference.id}
+                  className="conference-card"
+                  onClick={() => handleConferenceClick(conference.id)}
+                >
+                  <h3>{conference.title}</h3>
+                  <p>{conference.description}</p>
+                  <p><strong>Start Date:</strong> {conference.startDate}</p>
+                  <p><strong>End Date:</strong> {conference.endDate}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No conferences in progress at the moment.</p>
+          )}
+        </section>
+
         {/* About Us Section */}
         <section className="about-us">
           <div className="about-content">
@@ -119,8 +176,8 @@ const Dashboard = () => {
         <footer className="footer">
           <p>&copy; 2024 ConfHub. All rights reserved.</p>
         </footer>
-      </div></>
-    
+      </div>
+    </>
   );
 };
 
