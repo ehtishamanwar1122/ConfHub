@@ -27,7 +27,7 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
         // Create the new organizer (you can hash the password before saving it)
        
         const fullName = `${firstName} ${lastName}`;
-      
+        let newOrganizer:any;
         const newUser = await strapi.entityService.create(
           'plugin::users-permissions.user',
           {
@@ -41,7 +41,7 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
             },
           }
         );
-        const newOrganizer = await strapi.entityService.create('api::organizer.organizer', {
+        newOrganizer = await strapi.entityService.create('api::organizer.organizer', {
           data: {
           Organizer_FirstName: firstName,
           Organizer_LastName: lastName,
@@ -53,6 +53,15 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           UserID: newUser.id,
         },
       });
+      await strapi.entityService.update(
+        'plugin::users-permissions.user',
+        newUser.id, // ID of the user to update
+        {
+          data: {
+            organizerId: newOrganizer.id, // Add the organizer ID to the user
+          },
+        }
+      );
         // Return the new organizer (without password)
         ctx.send({
           message: 'Organizer registered successfully!',
@@ -113,10 +122,16 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           return ctx.badRequest('Invalid credentials');
         }
     
-       
+        const completeUser = await strapi.entityService.findOne(
+          'plugin::users-permissions.user',
+          user.id, // User ID
+          {
+            populate: '*', // Populate all fields and relations (use specific fields for better performance)
+          }
+        );
         return ctx.send({
           message: 'Login successful',
-          user: user,
+          user: completeUser,
         });
       } catch (err) {
         console.error("Error during password validation:", err);

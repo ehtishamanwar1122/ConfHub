@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
-
+import { useNavigate } from 'react-router-dom';
 const HeaderContainer = styled.header`
     background-color: #f8f9fa;
     padding: 15px 20px;
@@ -100,6 +100,7 @@ const LogoutButton = styled.button`
 `;
 
 const Header = ({ role }) => {
+    const navigate = useNavigate();
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     const toggleDropdown = () => {
@@ -122,6 +123,10 @@ const Header = ({ role }) => {
         ],
         Reviewer: [{ name: 'Assigned Reviews', to: '/reviewer/reviews' }],
         Guest: [{ name: 'Conferences', to: '/conferences' }],
+    };
+    const handleLogout = () => {
+        localStorage.clear(); 
+        navigate('/'); 
     };
 
     return (
@@ -157,7 +162,7 @@ const Header = ({ role }) => {
                 <NotificationIcon>
                     <FaBell />
                 </NotificationIcon>
-                <LogoutButton>Logout</LogoutButton>
+                <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
             </RightSection>
         </HeaderContainer>
     );

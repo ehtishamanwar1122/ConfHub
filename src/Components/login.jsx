@@ -37,7 +37,11 @@ const Login = () => {
       // Organizer login
       try {
         const result = await loginOrganizer(formData); // Call loginOrganizer function
-        console.log("Organizer Login successful", result);
+        const loggedInUserData = result.user; // Assuming the response contains organizer details
+
+    // Save organizer details in local storage
+    localStorage.setItem("userDetails", JSON.stringify(loggedInUserData));
+        console.log("Organizer Login successful", result.user);
         navigate("/OrganizerDashboard"); // Navigate to the Organizer Dashboard
       } catch (error) {
         console.log("Organizer Login failed",  error.response?.data?.error?.message);

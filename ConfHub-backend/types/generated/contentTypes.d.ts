@@ -369,6 +369,53 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
+  collectionName: 'conferences';
+  info: {
+    displayName: 'Conference';
+    pluralName: 'conferences';
+    singularName: 'conference';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    Conference_location: Schema.Attribute.String & Schema.Attribute.Required;
+    Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Description: Schema.Attribute.Text & Schema.Attribute.Required;
+    End_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::conference.conference'
+    > &
+      Schema.Attribute.Private;
+    Organizer: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::organizer.organizer'
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    requestStatus: Schema.Attribute.Enumeration<
+      ['pending', 'approved', 'rejected']
+    >;
+    Review_deadline: Schema.Attribute.Date & Schema.Attribute.Required;
+    Session_title: Schema.Attribute.String & Schema.Attribute.Required;
+    Speaker_names: Schema.Attribute.String & Schema.Attribute.Required;
+    Start_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    Status: Schema.Attribute.Enumeration<['inProgress', 'completed']>;
+    Submission_deadline: Schema.Attribute.Date & Schema.Attribute.Required;
+    Track_description: Schema.Attribute.Text;
+    Track_title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiOrganizerOrganizer extends Struct.CollectionTypeSchema {
   collectionName: 'organizers';
   info: {
@@ -884,6 +931,10 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    organizerId: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::organizer.organizer'
+    >;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
@@ -919,6 +970,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::conference.conference': ApiConferenceConference;
       'api::organizer.organizer': ApiOrganizerOrganizer;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
