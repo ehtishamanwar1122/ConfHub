@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import Layout from './Layouts/Layout';
-import '../../styles/AdminDashboard.css'; 
+import '../../styles/AdminDashboard.css'; // Import your CSS file
 
-const AdminDashboard = () => {
-  const [organizers, setOrganizers] = useState([]);
+const AdminConferenceManager = () => {
+  const [conferences, setConferences] = useState([]);
   const [completedRequests, setCompletedRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('pending');
   const [loading, setLoading] = useState(true);
@@ -13,14 +13,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/organizers');
+        const response = await axios.get('http://localhost:1337/api/conferences');
         const allRequests = response.data.data;
 
         // Separate pending and completed requests
         const pending = allRequests.filter(req => req.status === 'pending');
         const completed = allRequests.filter(req => req.status === 'completed');
 
-        setOrganizers(pending);
+        setConferences(pending);
         setCompletedRequests(completed);
         setLoading(false);
       } catch (error) {
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const response = await axios.put('http://localhost:1337/api/organizers/update-status', {
+      const response = await axios.put('http://localhost:1337/api/conferences/update-status', {
         id,
         status,
       });
@@ -46,31 +46,31 @@ const AdminDashboard = () => {
   };
 
   const handleApprove = async (index) => {
-    const organizer = organizers[index];
+    const conference = conferences[index];
     try {
-      await updateRequestStatus(organizer.id, 'approved');
-      const updatedOrganizers = [...organizers];
-      updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
+      await updateRequestStatus(conference.id, 'approved');
+      const updatedConferences = [...conferences];
+      updatedConferences.splice(index, 1);
+      setConferences(updatedConferences);
     } catch (error) {
       console.error('Error approving request:', error);
     }
   };
 
   const handleReject = async (index) => {
-    const organizer = organizers[index];
+    const conference = conferences[index];
     try {
-      await updateRequestStatus(organizer.id, 'rejected');
-      const updatedOrganizers = [...organizers];
-      updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
+      await updateRequestStatus(conference.id, 'rejected');
+      const updatedConferences = [...conferences];
+      updatedConferences.splice(index, 1);
+      setConferences(updatedConferences);
     } catch (error) {
       console.error('Error rejecting request:', error);
     }
   };
 
   const renderRequests = () => {
-    const requestsToRender = activeTab === 'pending' ? organizers : completedRequests;
+    const requestsToRender = activeTab === 'pending' ? conferences : completedRequests;
 
     if (loading) {
       return <p>Loading requests...</p>;
@@ -80,15 +80,15 @@ const AdminDashboard = () => {
       return <p>No {activeTab === 'pending' ? 'pending' : 'completed'} requests.</p>;
     }
 
-    return requestsToRender.map((organizer, index) => (
-      <div className="request-card" key={organizer.id}>
+    return requestsToRender.map((conference, index) => (
+      <div className="request-card" key={conference.id}>
         <div className="avatar">
           <div className="avatar-circle"></div>
         </div>
         <div className="request-details">
-          <p>Organizer Name: {organizer.Organizer_FirstName} {organizer.Organizer_LastName}</p>
-          <p>Organizer Email: {organizer.Organizer_Email}</p>
-          <p>Affiliation: {organizer.Affiliation}</p>
+          <p>Conference Title: {conference.title}</p>
+          <p>Organizer: {conference.organizerName}</p>
+          <p>Submission Deadline: {conference.submissionDeadline}</p>
         </div>
         {activeTab === 'pending' && (
           <div className="request-actions">
@@ -96,13 +96,13 @@ const AdminDashboard = () => {
               className="approve-button"
               onClick={() => handleApprove(index)}
             >
-              Approve Request
+              Approve Conference
             </button>
             <button
               className="reject-button"
               onClick={() => handleReject(index)}
             >
-              Reject Request
+              Reject Conference
             </button>
           </div>
         )}
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <div className="main-content">
-        <h1>Welcome to Admin Dashboard</h1>
+        <h1>Approve and Disapprove Conference Request</h1>
 
         <TabContainer>
           <Tab active={activeTab === 'pending'} onClick={() => setActiveTab('pending')}>
@@ -132,7 +132,7 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminConferenceManager;
 
 // Styled Components
 const TabContainer = styled.div`
@@ -152,4 +152,3 @@ const Tab = styled.button`
   border-radius: 25px;
   margin-right: 10px;
 `;
-
