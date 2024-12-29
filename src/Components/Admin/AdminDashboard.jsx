@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import axios from 'axios';
+import axios from 'axios'; // Import axios for making API requests
+import '../../styles/AdminDashboard.css'; // Import your CSS file
 import Layout from './Layouts/Layout';
-import '../../styles/AdminDashboard.css'; 
+import styled from 'styled-components'; // Styled-components for tab styling
 
 const AdminDashboard = () => {
-  const [organizers, setOrganizers] = useState([]);
-  const [completedRequests, setCompletedRequests] = useState([]);
-  const [activeTab, setActiveTab] = useState('pending');
+  const [organizers, setOrganizers] = useState([]); // Pending organizers
+  const [completedRequests, setCompletedRequests] = useState([]); // Approved organizers
+  const [activeTab, setActiveTab] = useState('pending'); // Tracks the active tab
   const [loading, setLoading] = useState(true);
 
+  // Fetch organizers and categorize by status
   useEffect(() => {
-    const fetchRequests = async () => {
+    const fetchOrganizers = async () => {
       try {
         const response = await axios.get('http://localhost:1337/api/organizers');
         const allRequests = response.data.data;
 
         // Separate pending and completed requests
-        const pending = allRequests.filter(req => req.status === 'pending');
-        const completed = allRequests.filter(req => req.status === 'completed');
+        const pending = allRequests.filter(req => req.reqStatus === 'pending');
+        const completed = allRequests.filter(req => req.reqStatus === 'approved' || req.reqStatus === 'rejected'); // assuming approved requests are completed
 
         setOrganizers(pending);
         setCompletedRequests(completed);
@@ -29,7 +30,7 @@ const AdminDashboard = () => {
       }
     };
 
-    fetchRequests();
+    fetchOrganizers();
   }, []);
 
   const updateRequestStatus = async (id, status) => {
@@ -51,7 +52,8 @@ const AdminDashboard = () => {
       await updateRequestStatus(organizer.id, 'approved');
       const updatedOrganizers = [...organizers];
       updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
+      setOrganizers(updatedOrganizers); // Remove the approved organizer from pending
+      setCompletedRequests([...completedRequests, organizer]); // Add to completed requests
     } catch (error) {
       console.error('Error approving request:', error);
     }
@@ -63,7 +65,7 @@ const AdminDashboard = () => {
       await updateRequestStatus(organizer.id, 'rejected');
       const updatedOrganizers = [...organizers];
       updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
+      setOrganizers(updatedOrganizers); // Remove the rejected organizer
     } catch (error) {
       console.error('Error rejecting request:', error);
     }
@@ -89,6 +91,9 @@ const AdminDashboard = () => {
           <p>Organizer Name: {organizer.Organizer_FirstName} {organizer.Organizer_LastName}</p>
           <p>Organizer Email: {organizer.Organizer_Email}</p>
           <p>Affiliation: {organizer.Affiliation}</p>
+          {activeTab === 'completed' && (
+            <p>Status: {organizer.reqStatus || 'No status available'}</p>
+          )}
         </div>
         {activeTab === 'pending' && (
           <div className="request-actions">
@@ -152,4 +157,3 @@ const Tab = styled.button`
   border-radius: 25px;
   margin-right: 10px;
 `;
-
