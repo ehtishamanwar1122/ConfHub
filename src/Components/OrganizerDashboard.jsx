@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Layout from './Layouts/Layout';
-
+import axios from 'axios';
 const DashboardContainer = styled.div`
     padding: 20px;
 `;
@@ -26,52 +26,36 @@ const Tab = styled.button`
 
 const Card = styled.div`
     background-color: white;
-    border-radius: 15px; /* More rounded corners */
+    border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: flex-start;
-    overflow: hidden; /* Hide image overflow */
-    border: 1px solid #eee; /* Subtle border */
+    overflow: hidden;
+    border: 1px solid #eee;
 `;
 
 const CardImage = styled.div`
-    width: 150px; /* Increased width */
+    width: 150px;
     margin-right: 20px;
-    border-radius: 10px; /* Match card rounding */
-    overflow: hidden; /* Ensure image stays within rounded bounds */
+    border-radius: 10px;
+    overflow: hidden;
     img {
         width: 100%;
         height: auto;
-        display: block; /* Prevents small gap at bottom of image */
+        display: block;
     }
 `;
 
 const CardContent = styled.div`
     flex-grow: 1;
-    flex-start:left;
-    `;
+    text-align: left;
+`;
 
 const CardTitle = styled.h3`
     margin-top: 0;
     color: #198754;
-`;
-
-const Status = styled.p`
-    color: #6c757d; 
-    margin-bottom: 5px;
-`;
-
-const AuthorsInvited = styled.p`
-    color: ${props => props.invited === 'NO' ? 'red' : '#6c757d'}; /* Red if NO */
-    margin-bottom: 5px;
-`;
-
-const InfoItem = styled.p`
-    color: #495057; /* Darker gray for other info */
-    margin-bottom: 3px;
-    font-size: 0.95rem; /* Slightly smaller font */
 `;
 
 const CardArrow = styled.div`
@@ -81,43 +65,78 @@ const CardArrow = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #f8f9fa; /
-    color: #ced4da; /* Light gray arrow */
+    background-color: #f8f9fa;
+    color: #ced4da;
     cursor: pointer;
     margin-left: 10px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05); /* Very Subtle shadow */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
 `;
-
 const OrganizerDashboard = () => {
-    const [activeTab, setActiveTab] = React.useState('inProgress');
-    const conferences = [
-        { title: 'Conference Title', status: 'inprogress', authorsInvited: 'YES', totalSubmissions: 'Display the total number of papers submitted.', pendingReviews: '10 reviews pending.', deadline: 'A date and time highlighted in a different color for visibility', image: 'https://via.placeholder.com/100' }, // Add image URL
-        { title: 'Conference Title', status: 'inprogress', authorsInvited: 'NO', totalSubmissions: 'Display the total number of papers submitted.', pendingReviews: '10 reviews pending.', deadline: 'A date and time highlighted in a different color for visibility', image: 'https://via.placeholder.com/100' }, // Add image URL
-    ];
+    const [activeTab, setActiveTab] = useState('inProgress');
+    const [conferences, setConferences] = useState([]);
+
+    // Fetch conferences
+    useEffect(() => {
+        const fetchConferences = async () => {
+            try {
+                const response = await axios.get('http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved');
+                const allRequests = response.data.data;
+                console.log('Conferences:', allRequests);
+
+                setConferences(allRequests); // Assuming `data` is an array of conferences
+            } catch (error) {
+                console.error('Error fetching conferences:', error);
+            }
+        };
+
+        fetchConferences();
+    }, []);
+
+    // Filter conferences based on active tab
+    const filteredConferences = conferences.filter(conference =>
+        activeTab === 'inProgress' ? conference.Status === 'inProgress' : conference.Status === 'completed'
+    );
 
     return (
         <Layout>
             <DashboardContainer>
                 <TabContainer>
-                    <Tab active={activeTab === 'inProgress'} onClick={() => setActiveTab('inProgress')}>In Progress conferences</Tab>
-                    <Tab active={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>Completed Conferences</Tab>
+                    <Tab active={activeTab === 'inProgress'} onClick={() => setActiveTab('inProgress')}>
+                        In Progress Conferences
+                    </Tab>
+                    <Tab active={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>
+                        Completed Conferences
+                    </Tab>
                 </TabContainer>
-                {conferences.map((conference, index) => (
-                    <Card key={index}>
-                        <CardImage>
-                            <img src={conference.image} alt="Conference" />
-                        </CardImage>
-                        <CardContent>
-                            <h3>{conference.title}</h3>
-                            <p>Status: {conference.status}</p>
-                            <p>Authors invited: {conference.authorsInvited}</p>
-                            <p>Total Submissions: {conference.totalSubmissions}</p>
-                            <p>Pending Reviews: {conference.pendingReviews}</p>
-                            <p>Deadline: {conference.deadline}</p>
-                        </CardContent>
-                        <CardArrow>&gt;</CardArrow>
-                    </Card>
-                ))}
+                {filteredConferences.length > 0 ? (
+                    filteredConferences.map((conference, index) => {
+                        const {
+                            Conference_title,
+                            Description,
+                            Submission_deadline,
+                            Review_deadline,
+                            Status,
+                            Start_date,
+                            Conference_location,
+                        } = conference;
+
+                        return (
+                            <Card key={index}>
+                                <CardContent>
+                                    <CardTitle>{Conference_title}</CardTitle>
+                                    <p><strong>Description:</strong> {Description}</p>
+                                    <p><strong>Submission Deadline:</strong> {Submission_deadline}</p>
+                                    <p><strong>Review Deadline:</strong> {Review_deadline}</p>
+                                    <p><strong>Status:</strong> {Status}</p>
+                                    <p><strong>Start Date:</strong> {Start_date}</p>
+                                    <p><strong>Location:</strong> {Conference_location}</p>
+                                </CardContent>
+                            </Card>
+                        );
+                    })
+                ) : (
+                    <p>No conferences found for this tab.</p>
+                )}
             </DashboardContainer>
         </Layout>
     );

@@ -1,0 +1,80 @@
+{
+  "kind": "collectionType",
+  "collectionName": "conferences",
+  "info": {
+    "singularName": "conference",
+    "pluralName": "conferences",
+    "displayName": "Conference"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Conference_title": {
+      "type": "string",
+      "required": true
+    },
+    "Description": {
+      "type": "text",
+      "required": true
+    },
+    "Start_date": {
+      "type": "date",
+      "required": true
+    },
+    "End_date": {
+      "type": "date",
+      "required": true
+    },
+    "Conference_location": {
+      "type": "string",
+      "required": true
+    },
+    "Track_title": {
+      "type": "string",
+      "required": true
+    },
+    "Track_description": {
+      "type": "text",
+      "required": false
+    },
+    "Session_title": {
+      "type": "string",
+      "required": true
+    },
+    "Speaker_names": {
+      "type": "string",
+      "required": true
+    },
+    "Submission_deadline": {
+      "type": "date",
+      "required": true
+    },
+    "Review_deadline": {
+      "type": "date",
+      "required": true
+    },
+    "requestStatus": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ]
+    },
+    "Status": {
+      "type": "enumeration",
+      "enum": [
+        "inProgress",
+        "completed"        
+      ]
+    },
+    "Organizer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::organizer.organizer",
+      "required": true
+    }
+  }
+}

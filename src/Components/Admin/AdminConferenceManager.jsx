@@ -13,12 +13,13 @@ const AdminConferenceManager = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/conferences');
+        const response = await axios.get('http://localhost:1337/api/conferences?populate=*');
         const allRequests = response.data.data;
-
+ console.log('conf',allRequests);
+ 
         // Separate pending and completed requests
-        const pending = allRequests.filter(req => req.status === 'pending');
-        const completed = allRequests.filter(req => req.status === 'completed');
+        const pending = allRequests.filter(req => req.requestStatus === 'pending');
+        const completed = allRequests.filter(req => req.requestStatus === 'approved' || req.requestStatus === 'rejected');
 
         setConferences(pending);
         setCompletedRequests(completed);
@@ -34,7 +35,7 @@ const AdminConferenceManager = () => {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const response = await axios.put('http://localhost:1337/api/conferences/update-status', {
+      const response = await axios.put('http://localhost:1337/api/conference/update-status', {
         id,
         status,
       });
@@ -86,9 +87,11 @@ const AdminConferenceManager = () => {
           <div className="avatar-circle"></div>
         </div>
         <div className="request-details">
-          <p>Conference Title: {conference.title}</p>
-          <p>Organizer: {conference.organizerName}</p>
-          <p>Submission Deadline: {conference.submissionDeadline}</p>
+          <p>Conference Title: {conference.Conference_title     }</p>
+          <p>Organizer Name: {conference.Organizer.Organizer_FirstName}  {conference.Organizer.Organizer_LastName}</p>
+          <p>Paper Submission Deadline: {conference.Submission_deadline}</p>
+          <p>Review Submission Deadline: {conference.Review_deadline}</p>
+          <p>Status: {conference.requestStatus}</p>
         </div>
         {activeTab === 'pending' && (
           <div className="request-actions">
@@ -113,7 +116,7 @@ const AdminConferenceManager = () => {
   return (
     <Layout>
       <div className="main-content">
-        <h1>Approve and Disapprove Conference Request</h1>
+        <h1>Approve and Reject Conference Request</h1>
 
         <TabContainer>
           <Tab active={activeTab === 'pending'} onClick={() => setActiveTab('pending')}>
