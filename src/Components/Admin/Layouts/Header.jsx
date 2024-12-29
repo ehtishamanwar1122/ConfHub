@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
-
+import { useNavigate } from 'react-router-dom';
 const HeaderContainer = styled.header`
     background-color: #f8f9fa;
     padding: 15px 20px;
@@ -101,11 +101,14 @@ const LogoutButton = styled.button`
 
 const Header = ({ role }) => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
-
+    const navigate = useNavigate();
     const toggleDropdown = () => {
         setDropdownVisible((prev) => !prev);
     };
-
+    const handleLogout = () => {
+        localStorage.clear(); // Clear local storage
+        navigate('/'); // Redirect to the home page
+    };
     const links = {
         Admin: [
             { name: 'Dashboard', to: '/admin/dashboard' },
@@ -157,7 +160,7 @@ const Header = ({ role }) => {
                 <NotificationIcon>
                     <FaBell />
                 </NotificationIcon>
-                <LogoutButton>Logout</LogoutButton>
+                <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
             </RightSection>
         </HeaderContainer>
     );

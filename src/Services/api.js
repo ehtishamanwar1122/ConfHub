@@ -23,7 +23,18 @@ export const loginOrganizer = async (data) => {
     const response = await axios.post(`${BASE_API_URL}/login`, data);
     return response.data; // Return the response data (e.g., success message, etc.)
   } catch (error) {
-    console.error("Error registering organizer", error);
+    console.error("Error login organizer", error);
+    throw error; // Handle error accordingly
+  }
+};
+export const loginAdmin = async (data) => {
+  try {
+    console.log('datta',data);
+    
+    const response = await axios.post(`${BASE_API_URL}/Adminlogin`, data);
+    return response.data; // Return the response data (e.g., success message, etc.)
+  } catch (error) {
+    console.error("Error login admin", error);
     throw error; // Handle error accordingly
   }
 };
