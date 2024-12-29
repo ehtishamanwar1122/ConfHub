@@ -106,8 +106,8 @@ const Header = ({ role }) => {
         setDropdownVisible((prev) => !prev);
     };
     const handleLogout = () => {
-        localStorage.clear(); // Clear local storage
-        navigate('/'); // Redirect to the home page
+        localStorage.clear(); 
+        navigate('/'); 
     };
     const links = {
         Admin: [
@@ -143,7 +143,7 @@ const Header = ({ role }) => {
                     <DropdownItem to="/manage-conferences">
                         Pending Request
                     </DropdownItem>
-                    <DropdownItem to='/add-organzier'>Add Organzier</DropdownItem>
+                    <DropdownItem to='/AdminConferenceManager'>Conference Management</DropdownItem>
                     <DropdownItem to="/help">Help</DropdownItem>
                 </DropdownMenu>
                 {role && (

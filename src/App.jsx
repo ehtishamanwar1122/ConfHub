@@ -5,6 +5,7 @@ import Dashboard from "./components/Dashboard";
 import OrganizerDashboard  from "./Components/OrganizerDashboard";
 import CreateConference from "./Components/CreateNewConference";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
+import AdminConferenceManager from "./Components/Admin/AdminConferenceManager";
 function App() {
   return (
     <Router>
@@ -15,7 +16,7 @@ function App() {
         <Route path="/OrganizerDashboard" element={<OrganizerDashboard />} />
         <Route path="/CreateConference" element={<CreateConference />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
-    
+        <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />
       </Routes>
     </Router>
   );
