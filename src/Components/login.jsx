@@ -1,73 +1,54 @@
-
-import React, { useState, useRef, useEffect } from "react";
-
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginPageImage } from "../assets/Images";
-import { loginOrganizer } from "../Services/api.js";
+import { loginOrganizer, loginAdmin } from "../Services/api.js"; // Import both services
 import "../styles/login.css";
 
 const Login = () => {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const navigate = useNavigate();
-
-  const handleLoginClick = (e) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
-===
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    role: "",
     username: "",
     password: "",
   });
-console.log('login--',formData);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
   };
 
   const handleRegisterClick = () => {
     navigate("/register");
   };
-
-
-  const handleDropdownSelect = (role) => {
-    setSelectedRole(role);
-    setIsDropdownOpen(false); 
-  };
-
-  const handleOutsideClick = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsDropdownOpen(false); 
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
-
-=======
   const handleLoginClick = async (e) => {
     e.preventDefault(); // Prevent form submission
-    try {
-      const result = await loginOrganizer(formData); // Use the service to send the request
   
-      console.log("Login successful", result);
-      navigate("/OrganizerDashboard"); // Navigate to the Organizer Dashboard
-    } catch (error) {
-      console.error("Login failed", error.response?.data?.message || error.message);
-      alert("Login failed: " + (error.response?.data?.message || "An error occurred during login"));
+    if (formData.role === "admin") {
+      // Admin login
+      try {
+        const result = await loginAdmin(formData); // Call adminLogin function
+        console.log("Admin Login successful", result);
+        navigate("/AdminDashboard"); // Navigate to the Admin Dashboard
+      } catch (error) {
+        console.error("Admin Login failed", error.response?.data?.message || error.message);
+        alert("Admin Login failed: " + (error.response?.data?.message || "An error occurred during login"));
+      }
+    } else if (formData.role === "organizer") {
+      // Organizer login
+      try {
+        const result = await loginOrganizer(formData); // Call loginOrganizer function
+        console.log("Organizer Login successful", result);
+        navigate("/OrganizerDashboard"); // Navigate to the Organizer Dashboard
+      } catch (error) {
+        console.log("Organizer Login failed",  error.response?.data?.error?.message);
+        alert("Organizer Login failed: " + (error.response?.data?.message || "An error occurred during login"));
+      }
+    } else {
+      // Handle unexpected roles
+      alert("Invalid role selected. Please select a valid role and try again.");
     }
   };
-
+  
 
   return (
     <div className="container">
@@ -83,6 +64,23 @@ console.log('login--',formData);
         </div>
         <h2>Login</h2>
         <form>
+          {/* Dropdown for selecting role */}
+          <label>Login As</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+          >
+            <option value="" disabled>
+              Select Role
+            </option>
+            <option value="admin">Admin</option>
+            <option value="organizer">Organizer</option>
+            <option value="reviewer">Reviewer</option>
+            <option value="author">Author</option>
+          </select>
+
+          {/* Username input */}
           <label>Username</label>
           <input
             type="text"
@@ -92,6 +90,7 @@ console.log('login--',formData);
             onChange={handleInputChange}
           />
 
+          {/* Password input */}
           <label>Password</label>
           <input
             type="password"
@@ -112,29 +111,6 @@ console.log('login--',formData);
             Login
           </button>
         </form>
-
-        <div className="dropdown-section" ref={dropdownRef}>
-          <h3>Select Your Role</h3>
-          <button
-            className="dropdown-btn"
-            onClick={() => setIsDropdownOpen((prev) => !prev)}
-          >
-            Select Role
-          </button>
-          {isDropdownOpen && (
-            <ul className="dropdown-menu">
-              <li onClick={() => handleDropdownSelect("Organizer")}>Organizer</li>
-              <li onClick={() => handleDropdownSelect("Admin")}>Admin</li>
-              <li onClick={() => handleDropdownSelect("Author")}>Author</li>
-              <li onClick={() => handleDropdownSelect("Reviewer")}>Reviewer</li>
-            </ul>
-          )}
-          {selectedRole && (
-            <p>
-              You selected: <strong>{selectedRole}</strong>
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );
