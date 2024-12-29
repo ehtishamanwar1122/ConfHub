@@ -16,5 +16,23 @@ export default {
           auth: false, // Disable authentication for this specific endpoint (if needed)
         },
       },
+      {
+        method: 'POST',
+        path: '/organizers/Adminlogin', // Custom endpoint for registration
+        handler: 'organizer.loginAdmin',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
+      {
+        method: 'PUT',
+        path: '/organizers/update-status',
+        handler: 'organizer.updateStatus',
+        config: {
+          auth: false, // Set to true if authentication is required
+          policies: [],
+        },
+      },
     ],
   };
