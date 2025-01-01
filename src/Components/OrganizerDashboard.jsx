@@ -79,7 +79,16 @@ const OrganizerDashboard = () => {
     useEffect(() => {
         const fetchConferences = async () => {
             try {
-                const response = await axios.get('http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved');
+                const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+                const organizerId = userDetails?.organizerId?.id;
+               console.log('idd',userDetails);
+               
+                if (!organizerId) {
+                    console.error('Organizer ID not found in local storage');
+                    return;
+                }
+        
+                const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[Organizer][$eq]=${organizerId}`);
                 const allRequests = response.data.data;
                 console.log('Conferences:', allRequests);
 
