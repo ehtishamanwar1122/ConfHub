@@ -1,58 +1,136 @@
 /* Reuse styles from login.css */
 .container {
-    display: flex;
-    height: 100vh;
-  }
-  
-  .image-section {
-    flex: 1;
-    background-color: #f5f5f5;
-  }
-  
-  .image-section img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .form-section {
-    flex: 1;
-    padding: 50px;
-  }
-  
-  h2 {
-    text-align: center;
-  }
-  
-  p {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  
-  input {
-    width: 48%;
-    padding: 10px;
-    border: 1px solid #ccc;
-  }
-  
-  .btn-register {
-    background-color: #0066ff;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    margin-top: 20px;
-    border-radius: 10px;
-  }
-  
+  display: flex;
+  height: 100vh;
+  flex-wrap: wrap; /* Allows the layout to adapt to smaller screens */
+}
+
+.image-section {
+  flex: 1;
+  background-color: #f5f5f5;
+  min-height: 300px; 
+}
+
+.image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.form-section {
+  flex: 1;
+  padding: 50px;
+  max-width: 600px; /* Limits form width on large screens */
+  margin: 0 auto; /* Centers form in the container */
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+p {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+input, textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Ensures padding doesn't affect width calculation */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  font-size: 16px;
+}
+
+textarea {
+  max-height: 40px; /* Adjust height for text areas */
+}
+
+/* Make each field 50% width on full screens */
+.form-row input, .form-row textarea {
+  width: 48%; 
+}
+/* Adjust dropdown styling */
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%; 
+  color: rgba(0, 0, 0, 0.564);
+}
+
+/* Button Styling */
+.btn-register {
+  background-color: #0066ff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.btn-register:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+/* Center the user-type-dropdown */
+.user-type-dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  margin: 20px auto; /* Center horizontally with spacing */
+}
+
+/* Label styling */
+.user-type-dropdown label {
+  font-size: 18px;
+  color: #333; /* Dark color for label */
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Dropdown styling */
+.user-type-dropdown select {
+  padding: 12px 20px;
+  border: 2px solid #4c68f5; /* Pinkish border */
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%; /* 100% of the parent width (50% of screen) */
+  background-color: #e0f7ff; /* Light bluish background */
+  color: #000000; 
+  transition: all 0.3s ease; 
+}
+
+
+.user-type-dropdown select:hover {
+  border-color: #6273cb; 
+  background-color: #f9f9f9; 
+  color: #000; 
+}
+
+
