@@ -24,7 +24,7 @@ function App() {
         <Route path="/conference/:id" element={<ConferenceDetails />} />
         <Route path="/registerAuthor" element={<RegisterAuthor />} />
         <Route path="/AuthorDashboard" element={<AuthorDashboard />} />
-        <Route path="/SubmitPaper" element={<PaperSubmissionForm />} />
+        <Route path="/SubmitPaper/:id" element={<PaperSubmissionForm />} />
       </Routes>
     </Router>
   );

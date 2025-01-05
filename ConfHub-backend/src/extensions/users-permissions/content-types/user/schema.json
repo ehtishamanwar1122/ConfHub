@@ -72,6 +72,11 @@
       "type": "relation",
       "relation": "oneToOne", 
       "target": "api::organizer.organizer"
+    },
+    "authorId": {
+      "type": "relation",
+      "relation": "oneToOne", 
+      "target": "api::author.author"
     }
   }
 }
