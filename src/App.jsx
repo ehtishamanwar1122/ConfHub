@@ -8,6 +8,8 @@ import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminConferenceManager from "./Components/Admin/AdminConferenceManager";
 import ConferenceDetails from "./Components/Conference/ConferenceDetails";
 import RegisterAuthor from "./Components/Author/AuthorRegistration";
+import AuthorDashboard from "./Components/Author/AuthorDashboard";
+import PaperSubmissionForm from "./Components/Author/SubmitPaper";
 function App() {
   return (
     <Router>
@@ -21,6 +23,8 @@ function App() {
         <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />
         <Route path="/conference/:id" element={<ConferenceDetails />} />
         <Route path="/registerAuthor" element={<RegisterAuthor />} />
+        <Route path="/AuthorDashboard" element={<AuthorDashboard />} />
+        <Route path="/SubmitPaper" element={<PaperSubmissionForm />} />
       </Routes>
     </Router>
   );

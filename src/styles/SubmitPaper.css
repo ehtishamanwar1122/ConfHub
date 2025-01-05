@@ -1,0 +1,129 @@
+/* PaperSubmissionForm.css */
+.paper-submission-container {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .back-button {
+    margin-bottom: 20px;
+  }
+  
+  .page-title {
+    color: blue;
+    font-size: 1.5rem;
+  }
+  
+  .subheading {
+    color: magenta;
+    font-size: 1.25rem;
+  }
+  
+  .form-container {
+    border: 1px dashed #ccc;
+    padding: 20px;
+    background-color: #fafafa;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .file-upload-container {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  .file-upload-container label {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    display: inline-block;
+  }
+  
+  .file-upload-container p {
+    margin-top: 10px;
+  }
+  
+  .submit-button {
+    background-color: rgb(115, 179, 243);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.25rem;
+    }
+  
+    .subheading {
+      font-size: 1.1rem;
+    }
+  
+    .form-container {
+      padding: 15px;
+    }
+  
+    .form-group input,
+    .form-group textarea {
+      padding: 8px;
+    }
+  
+    .file-upload-container {
+      padding: 15px;
+    }
+  
+    .submit-button {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .paper-submission-container {
+      padding: 15px;
+    }
+  
+    .page-title {
+      font-size: 1.1rem;
+    }
+  
+    .subheading {
+      font-size: 1rem;
+    }
+  
+    .form-group input,
+    .form-group textarea {
+      padding: 8px;
+    }
+  
+    .file-upload-container {
+      padding: 10px;
+    }
+  
+    .submit-button {
+      padding: 12px;
+      font-size: 1rem;
+    }
+  }
+  

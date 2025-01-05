@@ -1,0 +1,18 @@
+/* Example CSS */
+.conference-card, .paper-card {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .conference-card h3, .paper-card h3 {
+    margin: 0;
+    font-size: 1.2em;
+  }
+  
+  .content-container {
+    margin-top: 20px;
+  }
+  
