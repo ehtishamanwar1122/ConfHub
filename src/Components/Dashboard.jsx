@@ -13,11 +13,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchConferences = async () => {
       try {
-        const response = await axios.get("http://localhost:1337/api/conferences");
-        const approvedConferences = response.data.data.filter(
-          (conf) => conf.status === "approved" && conf.progress === "in-progress"
-        );
-        setConferences(approvedConferences);
+        const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved`);
+        const allConferences = response.data.data
+        console.log('conf',response);
+        console.log('aprconf',allConferences);
+        setConferences(allConferences);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching conferences:", error);
@@ -89,10 +89,10 @@ const Dashboard = () => {
                   className="conference-card"
                   onClick={() => handleConferenceClick(conference.id)}
                 >
-                  <h3>{conference.title}</h3>
-                  <p>{conference.description}</p>
-                  <p><strong>Start Date:</strong> {conference.startDate}</p>
-                  <p><strong>End Date:</strong> {conference.endDate}</p>
+                  <h4>{conference.Conference_title}</h4>
+                  <p>{conference.Description}</p>
+                  <p><strong>Start Date:</strong> {conference.Start_date}</p>
+                  <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
                 </div>
               ))}
             </div>

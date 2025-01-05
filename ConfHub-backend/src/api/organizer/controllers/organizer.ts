@@ -3,17 +3,17 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
     async registerOrganizer(ctx) {
       try {
         // Destructure the fields directly from the request body
-        const { firstName, lastName, email, alternativeContact, affiliation, department, password, confirmPassword } = ctx.request.body;
+        const { firstName, lastName, email, alternativeContact, affiliation, department, password } = ctx.request.body;
   
         // Validation (optional)
-        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        if (!firstName || !lastName || !email || !password ) {
           return ctx.badRequest('Missing required fields.');
         }
   
         // Check if the passwords match
-        if (password !== confirmPassword) {
-          return ctx.badRequest('Passwords do not match.');
-        }
+        // if (password !== confirmPassword) {
+        //   return ctx.badRequest('Passwords do not match.');
+        // }
   
         // Check if the organizer already exists by email
         const existingOrganizer = await strapi.query('api::organizer.organizer').findOne({

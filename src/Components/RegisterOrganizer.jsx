@@ -1,12 +1,16 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/registerOrganizer.css";
-import { LoginPageImage } from "../assets/Images";
-import { registerOrganizer } from "../Services/api.js";
-
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/registerOrganizer.css';
+import { LoginPageImage } from '../assets/Images';
+import {  registerOrganizer } from '../Services/api.js';
+import { registerAuthor } from '../Services/author.js';
 const RegisterOrganizer = () => {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState('organizer');
   const [formData, setFormData] = useState({
+    country: "",
+    biography: "",
+    researchInterests: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -15,21 +19,19 @@ const RegisterOrganizer = () => {
     department: "",
     password: "",
     confirmPassword: "",
-    // Author-specific fields
-    fullName: "", 
-    phoneNumber: "", 
-    orcidId: "", 
-    positionTitle: "", 
-    country: "", 
-    biography: "", 
-    researchInterests: "", 
   });
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState('organizer'); // 'author' or 'organizer'
 
-  // Handle form submission
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,27 +44,36 @@ const RegisterOrganizer = () => {
     setError(null);
 
     try {
-      const response = await registerOrganizer(formData);
-      console.log("Response:", response);
+      const response =
+        userType === 'author'
+          ? await registerAuthor({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            alternativeContact: formData.alternativeContact,
+              email: formData.email,
+              country: formData.country,
+              biography: formData.biography,
+              researchInterests: formData.researchInterests,
+              password: formData.password,
+            })
+          : await registerOrganizer({
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              alternativeContact: formData.alternativeContact,
+              affiliation: formData.affiliation,
+              department: formData.department,
+              password: formData.password,
+            });
+
+      console.log(`${userType.charAt(0).toUpperCase() + userType.slice(1)} Response:`, response);
       navigate("/login");
     } catch (err) {
-      console.error("Error during registration:", err);
+      console.error(`Error during ${userType} registration:`, err);
       setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleRegisterClick = () => {
-    navigate("/login");
   };
 
   return (
@@ -72,11 +83,10 @@ const RegisterOrganizer = () => {
       </div>
       <div className="form-section">
         <div className="switch-buttons">
-          <button onClick={handleRegisterClick}>Login</button>
+          <button onClick={() => navigate('/login')}>Login</button>
           <button className="active">Register</button>
         </div>
 
-        {/* Dropdown to switch between Organizer and Author registration */}
         <div className="user-type-dropdown">
           <label>Register as:</label>
           <select value={userType} onChange={(e) => setUserType(e.target.value)}>
@@ -93,98 +103,39 @@ const RegisterOrganizer = () => {
           }
         </p>
 
-        {error && <p className="error">{error}</p>}
-
         <form onSubmit={handleSubmit}>
-          {/* Common fields for both Author and Organizer */}
-          <div className="form-row">
-            <input
-              type="text"
-              placeholder="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-row">
-            <input
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              placeholder="Alternative Contact"
-              name="alternativeContact"
-              value={formData.alternativeContact}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          {/* Organizer-specific fields */}
-          {userType === 'organizer' && (
+          {userType === 'author' ? (
             <>
               <div className="form-row">
-                <input
+              <input
                   type="text"
-                  placeholder="Affiliation"
-                  name="affiliation"
-                  value={formData.affiliation}
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
                 />
                 <input
                   type="text"
-                  placeholder="Department"
-                  name="department"
-                  value={formData.department}
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleInputChange}
                 />
-              </div>
-            </>
-          )}
-
-          {/* Author-specific fields */}
-          {userType === 'author' && (
-            <>
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="text"
-                  placeholder="Phone Number"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                />
+                
               </div>
               <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="ORCID ID"
-                  name="orcidId"
-                  value={formData.orcidId}
+              <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleInputChange}
                 />
                 <input
                   type="text"
-                  placeholder="Position Title"
-                  name="positionTitle"
-                  value={formData.positionTitle}
+                  placeholder="Alternative Contact"
+                  name="alternativeContact"
+                  value={formData.alternativeContact}
                   onChange={handleInputChange}
                 />
               </div>
@@ -202,7 +153,8 @@ const RegisterOrganizer = () => {
                   value={formData.biography}
                   onChange={handleInputChange}
                 />
-                <div className="form-row">
+              </div>
+              <div className="form-row">
                   <select
                     name="researchInterests"
                     value={formData.researchInterests}
@@ -227,8 +179,56 @@ const RegisterOrganizer = () => {
                     />
                   )}
                 </div>
-
-
+            </>
+          ) : (
+            <>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Alternative Contact"
+                  name="alternativeContact"
+                  value={formData.alternativeContact}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="Affiliation"
+                  name="affiliation"
+                  value={formData.affiliation}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                />
               </div>
             </>
           )}
@@ -250,8 +250,9 @@ const RegisterOrganizer = () => {
             />
           </div>
 
+          {error && <p className="error">{error}</p>}
           <button className="btn-register" type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Registering..." : `Register as ${userType.charAt(0).toUpperCase() + userType.slice(1)}`}
           </button>
         </form>
       </div>
