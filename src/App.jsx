@@ -7,6 +7,7 @@ import CreateConference from "./Components/CreateNewConference";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminConferenceManager from "./Components/Admin/AdminConferenceManager";
 import ConferenceDetails from "./Components/Conference/ConferenceDetails";
+import RegisterAuthor from "./Components/Author/AuthorRegistration";
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />
         <Route path="/conference/:id" element={<ConferenceDetails />} />
+        <Route path="/registerAuthor" element={<RegisterAuthor />} />
       </Routes>
     </Router>
   );
