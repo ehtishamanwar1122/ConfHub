@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import './ConferenceDetails.css'
 import Header from "./Header";
 import Footer from "./Footer";
@@ -37,6 +38,11 @@ const ConferenceDetails = () => {
           }
           setLoading(false);
         }, 1000);
+
+        // Uncomment this block when the API is ready
+        // const response = await axios.get(`http://localhost:1337/api/conferences/${id}`);
+        // setConference(response.data);
+        // setLoading(false);
       } catch (error) {
         console.error("Error fetching conference details:", error);
         setLoading(false);
@@ -48,32 +54,33 @@ const ConferenceDetails = () => {
 
   const handleJoinConference = () => {
     alert("You have successfully joined the conference!");
-    
   };
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <>
-    <Header/>
-    <div className="conference-details">
-      {conference ? (
-        <>
-          <h1>{conference.title}</h1>
-          <p>{conference.description}</p>
-          <p><strong>Start Date:</strong> {conference.startDate}</p>
-          <p><strong>End Date:</strong> {conference.endDate}</p>
-          <p><strong>Location:</strong> {conference.location}</p>
-          <p><strong>Organizer:</strong> {conference.organizer}</p>
-          <button onClick={handleJoinConference} className="join-conference-button">
-            Join Conference
-          </button>
-        </>
-      ) : (
-        <p>Conference not found.</p>
-      )}
-    </div>
-    <Footer /></>
+      <Header />
+      <div className="conference-details">
+        {conference ? (
+          <>
+            <h1>{conference.title}</h1>
+            <p>{conference.description}</p>
+            <p><strong>Start Date:</strong> {conference.startDate}</p>
+            <p><strong>End Date:</strong> {conference.endDate}</p>
+            <p><strong>Location:</strong> {conference.location}</p>
+            <p><strong>Organizer:</strong> {conference.organizer}</p>
+
+            <button onClick={handleJoinConference} className="join-conference-button">
+              Join Conference
+            </button>
+          </>
+        ) : (
+          <p>Conference not found.</p>
+        )}
+      </div>
+      <Footer />
+    </>
   );
 };
 
