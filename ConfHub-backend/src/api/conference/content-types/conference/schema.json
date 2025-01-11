@@ -75,6 +75,13 @@
       "relation": "manyToOne",
       "target": "api::organizer.organizer",
       "required": true
+    },
+    "Papers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::paper.paper",
+      "mappedBy": "conference",
+      "required": false
     }
   }
 }

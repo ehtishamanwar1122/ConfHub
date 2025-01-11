@@ -436,6 +436,7 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
       'api::organizer.organizer'
     > &
       Schema.Attribute.Required;
+    Papers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
     publishedAt: Schema.Attribute.DateTime;
     requestStatus: Schema.Attribute.Enumeration<
       ['pending', 'approved', 'rejected']
@@ -508,6 +509,10 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Abstract: Schema.Attribute.Text;
+    conference: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::conference.conference'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

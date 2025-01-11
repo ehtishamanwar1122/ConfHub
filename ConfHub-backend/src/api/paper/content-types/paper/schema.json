@@ -38,6 +38,12 @@
     },
     "Abstract": {
       "type": "text"
+    },
+    "conference": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::conference.conference",
+      "inversedBy": "Papers"
     }
   }
 }
