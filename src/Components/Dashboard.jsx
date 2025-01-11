@@ -3,7 +3,8 @@ import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { dashboard_img1 } from "../assets/Images";
-
+import { Conference_Management_System } from "../assets/Images";
+import { ConfHub } from "../assets/Images";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [conferences, setConferences] = useState([]);
@@ -51,11 +52,18 @@ const Dashboard = () => {
             Login
           </button>
         </nav>
+        {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}>
+        <h3 class ='heading1' style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3>
+      </div> */}
+       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' ,marginTop:'10px' }}>
+        <h3 class ='heading1'> <img src={ConfHub} alt="Confhun" /></h3>
+      </div>
 
         <div className="hero-content">
           <div className="hero-text">
             <h1>
-              <span>Conference Management</span> System
+              {/* <span>Conference Management</span> System */}
+              <img src={Conference_Management_System} alt="Conference illustration" />
             </h1>
             <p>
               From managing program committees to publishing proceedings, our
@@ -71,10 +79,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}>
-        <h3 style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3>
-      </div>
-
+      
       <div className="main-page">
         {/* Conferences In Progress Section */}
         <section className="conference-list">
@@ -89,8 +94,8 @@ const Dashboard = () => {
                   className="conference-card"
                   onClick={() => handleConferenceClick(conference.id)}
                 >
-                  <h4>{conference.Conference_title}</h4>
-                  <p>{conference.Description}</p>
+                  <h3 class='conference-heading'><strong>Conference Title:</strong> {conference.Conference_title}</h3>
+                  <p><strong>Description:</strong>{conference.Description}</p>
                   <p><strong>Start Date:</strong> {conference.Start_date}</p>
                   <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
                 </div>

@@ -3,7 +3,10 @@ import Layout from './Layouts/Layout';
 import axios from 'axios';
 import '../../styles/SubmitPaper.css'; // Import the CSS file
 import { useParams } from "react-router-dom";
+import { submitPaper } from '../../Services/author.js';
+import { useNavigate } from "react-router-dom";
 const PaperSubmissionForm = () => {
+   const navigate = useNavigate();
   const { id } = useParams();
   const [paperTitle, setPaperTitle] = useState('');
   const [abstract, setAbstract] = useState('');
@@ -14,7 +17,10 @@ const PaperSubmissionForm = () => {
    const [formData, setFormData] = useState({
     paperTitle: "",
     abstract: "",
+    submittedBy: "",
+    
     file: null,
+    submittedTo: "",
   });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +42,7 @@ const PaperSubmissionForm = () => {
   useEffect(() => {
     const fetchAuthorData = async () => {
       try {
+       
         // Fetch recent conferences and submitted papers from the backend API
         const conferenceResponse= await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}`)
      
@@ -54,37 +61,50 @@ const PaperSubmissionForm = () => {
   }, []);
  
 
-   const handleSubmit = async (e) => {
-     e.preventDefault();
    
-     // Validate the form
-    //  if (!validateForm()) {
-    //    return;
-    //  }
-   
-     try {
-       console.log("Form data before submitting:", formData); // Debugging
-   
-       // Call the service function with formData
-       const response = await submitPaper(formData);
-       console.log("Response:", response); // Handle the response (e.g., success message)
-       alert("Paper submitted successfully!");
-       navigate("/AuthorDashboard");
-     } catch (err) {
-       console.error("Error during conference creation:", err);
-       alert("Failed to create the conference. Please try again.");
-     }
-   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+      const authorId = userDetails?.authorId.id; // Use correct field for user ID
+  
+      if (!authorId) {
+        console.error('Author ID not found in local storage');
+        return;
+      }
+  
+      const formDataToSend = {
+        paperTitle: formData.paperTitle,
+        abstract: formData.abstract,
+        file: formData.file,
+        submittedBy: authorId, // Set user ID from local storage
+        submittedTo: id, // Set conference ID from URL
+      };
+  
+      console.log("Form data before submitting:", formDataToSend); // Debugging
+  
+      // Call the service function with formData
+      const response = await submitPaper(formDataToSend);
+      console.log("Response:", response); // Handle the response (e.g., success message)
+      alert("Paper submitted successfully!");
+      navigate("/AuthorDashboard");
+    } catch (err) {
+      console.error("Error during paper submission:", err);
+      alert("Failed to submit the paper. Please try again.");
+    }
+  };
+  
 
   return recentConferences.map((conference) => (
     <Layout>
       <div className="paper-submission-container">
-        <button className="back-button" onClick={() => window.history.back()}>
+        {/* <button className="back-button" onClick={() => window.history.back()}>
           &lt; Back
-        </button>
+        </button> */}
         <h1 className="page-title">Conference Title: {conference.Conference_title}</h1>
-        <h2 className="subheading"><strong>Paper Submission deadline:</strong> {conference.Submission_deadline}</h2>
-        <h2 className="subheading">Submit Your Paper Here:</h2>
+        <h2 className="subheading">Paper Submission deadline:{conference.Submission_deadline}</h2>
+        <h2 className="page-title">Submit Your Paper Here:</h2>
         <form onSubmit={handleSubmit} className="form-container">
       <div className="form-group">
         <label>Paper Title</label>
@@ -99,7 +119,8 @@ const PaperSubmissionForm = () => {
 
       <div className="form-group">
         <label>Abstract</label>
-        <textarea
+        <input
+        class='abstract'
           name="abstract"
           placeholder="Enter your Paper Abstract"
           value={formData.abstract}

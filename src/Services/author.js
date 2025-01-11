@@ -25,3 +25,18 @@ export const registerAuthor = async (data) => {
       throw error; // Handle error accordingly
     }
   };
+  export const submitPaper = async (data) => {
+    try {
+      console.log('datta-=-',data);
+      
+      const response = await axios.post(`${BASE_API_URL}/submitPaper`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+      return response.data; // Return the response data (e.g., success message, etc.)
+    } catch (error) {
+      console.error("Error submiting paper", error);
+      throw error; // Handle error accordingly
+    }
+  };

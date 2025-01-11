@@ -4,31 +4,40 @@
   "info": {
     "singularName": "paper",
     "pluralName": "papers",
-    "displayName": "Paper"
+    "displayName": "Paper",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "SubmitedBy": {
-      "type": "string"
+    "SubmittedBy": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::author.author"
     },
-    "SybmittedTo": {
-      "type": "string"
+    "SubmittedTo": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::conference.conference"
     },
     "file": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
       "type": "media",
-      "multiple": true
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "files"
+      ]
     },
     "submissionDate": {
       "type": "datetime"
+    },
+    "Paper_Title": {
+      "type": "string"
+    },
+    "Abstract": {
+      "type": "text"
     }
   }
 }
