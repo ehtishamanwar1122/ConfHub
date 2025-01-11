@@ -161,6 +161,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                   submissionDate: new Date(),
                   SubmittedBy: submittedBy,
                   SubmittedTo: submittedTo,
+                  conference:submittedTo
                 
               },
           });
@@ -185,7 +186,28 @@ export default factories.createCoreController('api::author.author', ({ strapi })
             console.log('New Paper:', newPaper);
           }
    
-   
+          if (submittedTo) {
+            // Fetch the conference (submittedTo) by ID
+            const conference = await strapi.entityService.findOne('api::conference.conference', submittedTo, {
+              populate: ['Papers'],
+            });
+          
+            if (conference) {
+             
+              console.log('conn',conference);
+              // Add the new paper ID to the conference's Papers field
+             // const updatedPapers = conference.Papers.id ? [...conference.Papers, newPaper.id] : [newPaper.id];
+              // await strapi.entityService.update('api::conference.conference',
+              //    submittedTo,
+              //     {
+              //   data:
+              //    {
+              //     Papers: newPaper.id, // Assuming Papers is an array
+              //   },
+              // });
+          
+              // console.log('Updated Conference with New Paper:', conference);
+            }}
           ctx.send({
               message: 'Paper submitted successfully',
               paper: newPaper,

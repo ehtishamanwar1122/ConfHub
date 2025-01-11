@@ -14,7 +14,16 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchConferences = async () => {
       try {
-        const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved`);
+        const response = await axios.get('http://localhost:1337/api/conferences', {
+          params: {
+            filters: {
+              requestStatus: {
+                $eq: 'approved',
+              },
+            },
+            populate: '*',  // This will populate all related fields
+          },
+        });
         const allConferences = response.data.data
         console.log('conf',response);
         console.log('aprconf',allConferences);
@@ -97,6 +106,7 @@ const Dashboard = () => {
                   <h3 class='conference-heading'><strong>Conference Title:</strong> {conference.Conference_title}</h3>
                   <p><strong>Description:</strong>{conference.Description}</p>
                   <p><strong>Start Date:</strong> {conference.Start_date}</p>
+                  <p><strong>Submitted Papers: </strong> {conference.Papers.length}</p>
                   <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
                 </div>
               ))}
