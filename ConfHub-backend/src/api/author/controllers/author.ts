@@ -145,5 +145,57 @@ export default factories.createCoreController('api::author.author', ({ strapi })
             }
           
     },
+    async submitPaper(ctx) {
+      try {
+        const { paperTitle, abstract, submittedBy, submittedTo } = ctx.request.body;
+        const files = ctx.request.files ;
+  console.log('papper',ctx.request.body);
+  console.log('fille',ctx.request.files);
+  console.log('fillsse',files);
+          // Create the new paper entry
+
+          const newPaper = await strapi.entityService.create('api::paper.paper', {
+              data: {
+                  Paper_Title: paperTitle,
+                  Abstract: abstract,
+                  submissionDate: new Date(),
+                  SubmittedBy: submittedBy,
+                  SubmittedTo: submittedTo,
+                
+              },
+          });
+  
+          // If files are uploaded, associate them with the new paper
+          if (files && files.file) {
+            const uploadedFiles = await strapi.plugins.upload.services.upload.upload({
+              files: files.file, // Ensure that the correct field is used here (files.file or files[0] depending on the structure)
+              data: {
+                refId: newPaper.id,
+                ref: 'api::paper.paper',
+                field: 'file', // Field name in the content type (must match the field defined in the content type)
+              },
+            });
+      
+            await strapi.entityService.update('api::paper.paper', newPaper.id, {
+              data: {
+                file: uploadedFiles[0].id, // Assuming it's a single file upload
+              },
+            });
+            
+            console.log('New Paper:', newPaper);
+          }
+   
+   
+          ctx.send({
+              message: 'Paper submitted successfully',
+              paper: newPaper,
+          });
+      } catch (error) {
+          ctx.throw(500, 'An error occurred while submitting the paper', error);
+      }
+  }
+  
+      
+      
     
 }));

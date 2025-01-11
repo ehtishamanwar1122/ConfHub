@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
 import { useNavigate } from 'react-router-dom';
+import { ConfHub } from "../../../assets/Images";
 const HeaderContainer = styled.header`
     background-color: #f8f9fa;
     padding: 15px 20px;
@@ -136,7 +137,7 @@ const Header = ({ role }) => {
                     <FaBars />
                 </MenuButton>
                 <Logo to="/">
-                    Conf<span>Hub</span>
+                <img style={{ height:'30px' }} src={ConfHub}  />
                 </Logo>
                 <DropdownMenu visible={dropdownVisible}>
                     <DropdownItem to="/SubmitPaper">

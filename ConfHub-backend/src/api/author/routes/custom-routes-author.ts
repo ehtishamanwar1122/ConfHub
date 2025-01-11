@@ -16,6 +16,13 @@ export default {
           auth: false, // Disable authentication for this specific endpoint (if needed)
         },
       },
-     
+      {
+        method: 'POST',
+        path: '/author/submitPaper', // Custom endpoint for registration
+        handler: 'author.submitPaper',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+      },
     ],
   };

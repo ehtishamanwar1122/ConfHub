@@ -498,28 +498,31 @@ export interface ApiOrganizerOrganizer extends Struct.CollectionTypeSchema {
 export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
   collectionName: 'papers';
   info: {
+    description: '';
     displayName: 'Paper';
     pluralName: 'papers';
     singularName: 'paper';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
+    Abstract: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    file: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
-    >;
+    file: Schema.Attribute.Media<'files'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'> &
       Schema.Attribute.Private;
+    Paper_Title: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     submissionDate: Schema.Attribute.DateTime;
-    SubmitedBy: Schema.Attribute.String;
-    SybmittedTo: Schema.Attribute.String;
+    SubmittedBy: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    SubmittedTo: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::conference.conference'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

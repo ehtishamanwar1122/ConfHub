@@ -11,19 +11,24 @@
   }
   
   .page-title {
-    color: blue;
-    font-size: 1.5rem;
+    color: #1d4ed8;
+    font-size: 35px;
+    font-family: 'Abril Fatface', cursive;
+    font-weight: 300;
   }
   
   .subheading {
-    color: magenta;
-    font-size: 1.25rem;
+    color: #b808b8;
+    font-size: 35px;
+    font-family: 'Abril Fatface', cursive;
+    font-weight: 300;
   }
   
   .form-container {
-    border: 1px dashed #ccc;
+    border: 1px dashed #fff;
     padding: 20px;
-    background-color: #fafafa;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   }
   
   .form-group {
@@ -32,15 +37,21 @@
   
   .form-group label {
     display: block;
+    color: #1d4ed8;
+    font-family: 'Abhaya Libre', cursive;
+    font-size: 20px;
+    font-weight: 900;
+    
   }
   
   .form-group input,
   .form-group textarea {
     width: 100%;
-    padding: 10px;
+    padding: 20px;
     margin-top: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    border-radius: 10px;
+    
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   }
   
   .file-upload-container {
@@ -48,15 +59,20 @@
     border: 1px solid #ccc;
     padding: 20px;
     text-align: center;
-    background-color: #f9f9f9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
   }
   
   .file-upload-container label {
     cursor: pointer;
     padding: 10px;
     border: 1px dashed #ccc;
-    border-radius: 5px;
+    border-radius: 15px;
+    color: #1d4ed8;
     display: inline-block;
+    font-family: 'Abhaya Libre', cursive;
+    font-size: 20px;
+    font-weight: 900;
   }
   
   .file-upload-container p {
@@ -64,12 +80,13 @@
   }
   
   .submit-button {
-    background-color: rgb(115, 179, 243);
+    
     color: white;
-    padding: 10px 20px;
+    padding: 20px 20px;
+    background-color: #1d4ed8;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   
   @media (max-width: 768px) {
