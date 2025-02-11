@@ -3,7 +3,7 @@
  */
 
 import { factories } from '@strapi/strapi'
-
+const nodemailer = require('nodemailer');
 export default factories.createCoreController('api::conference.conference', ({ strapi }) => ({
     async createConference(ctx) {
         try {
@@ -68,7 +68,52 @@ export default factories.createCoreController('api::conference.conference', ({ s
                 }, 
             
               });
-          
+              const organizerEmail = await strapi.query("api::organizer.organizer").findOne({
+                where: { id: organizerId },
+                select: ["Organizer_Email"]  // Ensure you're selecting only the email field
+            });
+            console.log('org email', organizerEmail);
+            const emailAddress = organizerEmail?.Organizer_Email;
+            if (emailAddress) {
+              const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                  user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+                  pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+                },
+              });
+            
+              // Function to send email
+              const sendEmail = async (to, subject, text, html) => {
+                const mailOptions = {
+                  from: 'mudassiralishah555@gmail.com',    // Sender address
+                  to,                              // Recipient address
+                  subject,                         // Subject line
+                  text,                            // Plain text body
+                  html,                            // HTML body
+                };
+            
+                try {
+                  await transporter.sendMail(mailOptions);
+                  console.log('Email sent successfully');
+                } catch (error) {
+                  console.error('Error sending email:', error);
+                }
+              };
+            
+              // Send email using the extracted email address
+              await sendEmail(
+                emailAddress,  // Pass the email string here
+                'Your Conference Request Has Been Received',
+                `Thank you for submitting your conference request on ConfHub. We have received your request to create "${conferenceTitle}" and it is currently under review. Our team will review the details, and you will be notified once it has been approved.`,
+                `<p>Hello,</p>
+                 <p>Your request to create the conference "<strong>${conferenceTitle}</strong>" on ConfHub has been received. Please wait for the admin's approval. You will be notified once the review process is complete.</p>
+                 <p>Best regards,<br>ConfHub Team</p>`
+              );
+            } else {
+              console.error('No organizer email found.');
+            }
+            
               return ctx.send({
                 message: "Conference created successfully.",
                 conference: newConference,
@@ -102,8 +147,63 @@ export default factories.createCoreController('api::conference.conference', ({ s
           if (!updatedConference) {
             return ctx.notFound('conference not found');
           }
-    
+          // Fetch the conference and populate the organizer relationship
+const conference = await strapi.entityService.findOne('api::conference.conference', id, {
+  populate: ['Organizer']  // Ensure 'organizer' relation is populated
+});
+
+if (!conference || !(conference as any).Organizer) {
+  return ctx.badRequest('Organizer not found for this conference');
+}
+
+// Extract organizer details
+const organizerId = (conference as any).Organizer.id;
+const organizerEmail = (conference as any).Organizer.Organizer_Email;
+
+// Fetch the conference title separately (optional)
+const conferenceTitle = conference.Conference_title;
+
+console.log('Organizer ID:', organizerId);
+console.log('Organizer Email:', organizerEmail);
+console.log('Conference Title:', conferenceTitle);
+
+      
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+              pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+            },
+          });
           
+          // Function to send email
+          const sendEmail = async (to, subject, text, html) => {
+            const mailOptions = {
+              from: 'mudassiralishah555@gmail.com',    // Sender address
+              to,                              // Recipient address
+              subject,                         // Subject line
+              text,                            // Plain text body
+              html,                            // HTML body
+            };
+          
+            try {
+              await transporter.sendMail(mailOptions);
+              console.log('Email sent successfully');
+            } catch (error) {
+              console.error('Error sending email:', error);
+            }
+          };
+          await sendEmail(
+            organizerEmail,
+            'Your Conference Status Has Been Updated',
+            `Your conference "${conferenceTitle}" on ConfHub has been updated to the status: ${status}.`,
+            `<p>Hello,</p>
+             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on ConfHub has been updated to <strong>${status}</strong>.</p>
+             <p>Please log in to your account to view further details.</p>
+             <p>If you have any questions, feel free to contact our support team.</p>
+             <p>Best regards,<br>ConfHub Team</p>`
+        );
+        
       
           // Respond with the updated organizer
           ctx.send({
