@@ -80,7 +80,7 @@
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      background-color: rgb(113, 187, 243);
+      background-color: rgb(49, 35, 128);
   }
   
   .request-details {
@@ -121,3 +121,89 @@
       max-width: 960px;
       margin: 0 auto;
   }
+  .request-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width:1400px;
+    margin: 15px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: "Poppins", sans-serif;
+    transition: transform 0.2s ease-in-out;
+}
+
+.request-card:hover {
+    transform: translateY(-5px);
+}
+
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 90px;
+    background: #2d7aee;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.avatar-circle {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #63b1f5, #1103c9);
+    border-radius: 50%;
+}
+
+.request-details {
+    flex: 1;
+}
+
+.request-details p {
+    font-size: 20px;
+    font-family: 'Abhaya Libre', cursive;
+    color: #2b2a2a;
+    margin: 5px 0;
+    font-weight: 500;
+    justify-content: center;
+}
+.value {
+  color: #000000; /* Blue for values */
+  font-weight: bold;
+  font-size: 28px;
+}
+.request-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.approve-button,
+.reject-button {
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.approve-button {
+    background: green;
+    color: white;
+}
+
+.approve-button:hover {
+    background: #43a047;
+}
+
+.reject-button {
+    background: #e74c3c;
+    color: white;
+}
+
+.reject-button:hover {
+    background: #c0392b;
+}

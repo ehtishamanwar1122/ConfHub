@@ -419,12 +419,12 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Conference_location: Schema.Attribute.String & Schema.Attribute.Required;
+    Conference_time: Schema.Attribute.Time & Schema.Attribute.Required;
     Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Description: Schema.Attribute.Text & Schema.Attribute.Required;
-    End_date: Schema.Attribute.Date & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

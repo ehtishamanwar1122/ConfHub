@@ -5,6 +5,7 @@ import axios from "axios";
 import { dashboard_img1 } from "../assets/Images";
 import { Conference_Management_System } from "../assets/Images";
 import { ConfHub } from "../assets/Images";
+import { dashboard_bg } from "../assets/Images";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [conferences, setConferences] = useState([]);
@@ -93,10 +94,17 @@ const Dashboard = () => {
         {/* Conferences In Progress Section */}
         <section className="conference-list">
           <h2>Conferences In Progress</h2>
+          
           {loading ? (
             <p>Loading conferences...</p>
           ) : conferences.length > 0 ? (
-            <div className="conference-cards">
+            <div className="conference-cards"
+            style={{
+              backgroundImage: `url(${dashboard_bg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              
+            }}>
               {conferences.map((conference) => (
                 <div
                   key={conference.id}
@@ -105,7 +113,7 @@ const Dashboard = () => {
                 >
                   <h3 class='conference-heading'><strong>Conference Title:</strong> {conference.Conference_title}</h3>
                   <p><strong>Description:</strong>{conference.Description}</p>
-                  <p><strong>Start Date:</strong> {conference.Start_date}</p>
+                  <p><strong>Conference Date:</strong> {conference.Start_date}</p>
                   <p><strong>Submitted Papers: </strong> {conference.Papers.length}</p>
                   <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
                 </div>

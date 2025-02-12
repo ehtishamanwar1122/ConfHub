@@ -16,7 +16,10 @@ const AuthorDashboard = () => {
     const fetchAuthorData = async () => {
       try {
         // Fetch recent conferences and submitted papers from the backend API
-        const conferenceResponse= await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved`)
+        const conferenceResponse = await axios.get(
+          'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate=*'
+        );
+        
       //  const papersResponse = await axios.get('http://localhost:1337/api/papers/submitted');
         console.log('v',conferenceResponse.data.data);
         
@@ -50,6 +53,7 @@ const AuthorDashboard = () => {
         <p>{conference.Description}</p>
         <p><strong>Start Date:</strong> {conference.Start_date}</p>
         <p><strong>Location:</strong> {conference.Conference_location}</p>
+        <p><strong>Papers Submitted:</strong> {conference.Papers.length}</p>
         <p><strong>Paper Submission deadline:</strong> {conference.Submission_deadline}</p>
         <button
           className="join-conference-button"

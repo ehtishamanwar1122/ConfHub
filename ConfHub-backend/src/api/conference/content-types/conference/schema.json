@@ -23,8 +23,8 @@
       "type": "date",
       "required": true
     },
-    "End_date": {
-      "type": "date",
+    "Conference_time": {
+      "type": "time",
       "required": true
     },
     "Conference_location": {
