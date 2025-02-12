@@ -10,6 +10,7 @@ import ConferenceDetails from "./Components/Conference/ConferenceDetails";
 import RegisterAuthor from "./Components/Author/AuthorRegistration";
 import AuthorDashboard from "./Components/Author/AuthorDashboard";
 import PaperSubmissionForm from "./Components/Author/SubmitPaper";
+import OrgConfDetails from "./Components/Conference/OrgConfDetails";
 function App() {
   return (
     <Router>
@@ -25,6 +26,7 @@ function App() {
         <Route path="/registerAuthor" element={<RegisterAuthor />} />
         <Route path="/AuthorDashboard" element={<AuthorDashboard />} />
         <Route path="/SubmitPaper/:id" element={<PaperSubmissionForm />} />
+        <Route path="/orgConferenceDetails/:id" element={<OrgConfDetails />} />
       </Routes>
     </Router>
   );

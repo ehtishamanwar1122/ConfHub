@@ -88,9 +88,10 @@ const AdminDashboard = () => {
           <div className="avatar-circle"></div>
         </div>
         <div className="request-details">
-          <p>Organizer Name: {organizer.Organizer_FirstName} {organizer.Organizer_LastName}</p>
-          <p>Organizer Email: {organizer.Organizer_Email}</p>
-          <p>Affiliation: {organizer.Affiliation}</p>
+          <p>Organizer Name:        <span className="value">{organizer.Organizer_FirstName} {organizer.Organizer_LastName}</span> </p>
+          <p>Organizer Email:        <span className="value">{organizer.Organizer_Email}</span></p>
+          <p>Affiliation:        <span className="value">{organizer.Affiliation}</span></p>
+          <p>Department:        <span className="value">{organizer.Department}</span></p>
           {activeTab === 'completed' && (
             <p>Status: {organizer.reqStatus || 'No status available'}</p>
           )}

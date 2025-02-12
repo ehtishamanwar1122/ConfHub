@@ -14,7 +14,7 @@ export default factories.createCoreController('api::conference.conference', ({ s
                 conferenceTitle,
                 conferenceDescription,
                 startDate,
-                endDate,
+                conferenceTime,
                 conferenceLocation,
                 trackTitle,
                 trackDescription,
@@ -30,9 +30,9 @@ export default factories.createCoreController('api::conference.conference', ({ s
             
           
               // Ensure end date is not earlier than start date
-              if (new Date(startDate) > new Date(endDate)) {
-                return ctx.badRequest("End date cannot be earlier than start date.");
-              }
+              // if (new Date(startDate) > new Date(endDate)) {
+              //   return ctx.badRequest("End date cannot be earlier than start date.");
+              // }
           
               // Ensure review deadline is not earlier than submission deadline
               if (new Date(submissionDeadline) > new Date(reviewDeadline)) {
@@ -55,7 +55,7 @@ export default factories.createCoreController('api::conference.conference', ({ s
                     Conference_title: conferenceTitle,
                     Description:conferenceDescription,
                   Start_date:startDate,
-                  End_date:endDate,
+                  Conference_time:conferenceTime,
                   Conference_location:conferenceLocation,
                   Track_title:trackTitle,
                   Track_description:trackDescription,

@@ -138,14 +138,11 @@ const Header = ({ role }) => {
                  <img style={{ height:'30px' }} src={ConfHub}  />
                 </Logo>
                 <DropdownMenu visible={dropdownVisible}>
-                    <DropdownItem to="/create-conference">
-                        Organzier List
+                    <DropdownItem to="/AdminDashboard">
+                        Organizer Requests
                     </DropdownItem>
-                    <DropdownItem to="/manage-conferences">
-                        Pending Request
-                    </DropdownItem>
-                    <DropdownItem to='/AdminConferenceManager'>Conference Management</DropdownItem>
-                    <DropdownItem to="/help">Help</DropdownItem>
+                    <DropdownItem to='/AdminConferenceManager'>Conference Requests</DropdownItem>
+                    <DropdownItem disabled>Help</DropdownItem>
                 </DropdownMenu>
                 {role && (
                     <Nav>

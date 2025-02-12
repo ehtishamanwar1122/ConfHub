@@ -140,14 +140,12 @@ const Header = ({ role }) => {
                 <img style={{ height:'30px' }} src={ConfHub}  />
                 </Logo>
                 <DropdownMenu visible={dropdownVisible}>
-                    <DropdownItem to="/SubmitPaper">
+                    <DropdownItem disabled>
                         Submit Paper
                     </DropdownItem>
-                    <DropdownItem to="/conference/:id">
-                       Conference Details
-                    </DropdownItem>
-                    <DropdownItem to="/settings">Settings</DropdownItem>
-                    <DropdownItem to="/help">Help</DropdownItem>
+                    
+                    <DropdownItem disabled>Settings</DropdownItem>
+                    <DropdownItem disabled>Help</DropdownItem>
                 </DropdownMenu>
                 {role && (
                     <Nav>

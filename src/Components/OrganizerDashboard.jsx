@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Layout from './Layouts/Layout';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom"; 
 const DashboardContainer = styled.div`
     padding: 20px;
 `;
@@ -25,17 +26,20 @@ const Tab = styled.button`
 `;
 
 const Card = styled.div`
-    background-color: white;
-    border-radius: 15px;
+ background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Add shadow */
     padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: flex-start;
-    overflow: hidden;
-    border: 1px solid #eee;
+    width: 1500px;
+    
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom:30px;
+    cursor: pointer;
+    &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 1);
+  }
 `;
-
 const CardImage = styled.div`
     width: 150px;
     margin-right: 20px;
@@ -72,6 +76,7 @@ const CardArrow = styled.div`
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
 `;
 const OrganizerDashboard = () => {
+    const navigate = useNavigate(); 
     const [activeTab, setActiveTab] = useState('inProgress');
     const [conferences, setConferences] = useState([]);
 
@@ -105,7 +110,9 @@ const OrganizerDashboard = () => {
     const filteredConferences = conferences.filter(conference =>
         activeTab === 'inProgress' ? conference.Status === 'inProgress' : conference.Status === 'completed'
     );
-
+    const handleCardClick = (conferenceId) => {
+        navigate(`/orgConferenceDetails/${conferenceId}`);
+    };
     return (
         <Layout>
             <DashboardContainer>
@@ -120,6 +127,7 @@ const OrganizerDashboard = () => {
                 {filteredConferences.length > 0 ? (
                     filteredConferences.map((conference, index) => {
                         const {
+                            id,
                             Conference_title,
                             Description,
                             Submission_deadline,
@@ -130,7 +138,7 @@ const OrganizerDashboard = () => {
                         } = conference;
 
                         return (
-                            <Card key={index}>
+                            <Card key={index} onClick={() => handleCardClick(id)} style={{ cursor: "pointer" }}>
                                 <CardContent>
                                     <CardTitle>{Conference_title}</CardTitle>
                                     <p><strong>Description:</strong> {Description}</p>
