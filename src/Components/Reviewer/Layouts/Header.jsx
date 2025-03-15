@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
 import { useNavigate } from 'react-router-dom';
+
 const HeaderContainer = styled.header`
     background-color: #f8f9fa;
     padding: 15px 20px;
@@ -107,6 +108,7 @@ const Header = ({ role }) => {
         setDropdownVisible((prev) => !prev);
     };
 
+    // Define navigation links for each role
     const links = {
         Admin: [
             { name: 'Dashboard', to: '/admin/dashboard' },
@@ -121,12 +123,16 @@ const Header = ({ role }) => {
             { name: 'Schedule Sessions', to: '/organizer/schedule' },
             { name: 'Manage Reviews', to: '/organizer/reviews' },
         ],
-        Reviewer: [{ name: 'Assigned Reviews', to: '/reviewer/reviews' }],
+        Reviewer: [
+            { name: 'Assigned Papers', to: '/reviewer/assigned-papers' },
+            { name: 'Submit Review', to: '/reviewer/submit-review' },
+        ],
         Guest: [{ name: 'Conferences', to: '/conferences' }],
     };
+
     const handleLogout = () => {
-        localStorage.clear(); 
-        navigate('/'); 
+        localStorage.clear();
+        navigate('/');
     };
 
     return (
@@ -138,19 +144,21 @@ const Header = ({ role }) => {
                 <Logo to="/">
                     Conf<span>Hub</span>
                 </Logo>
+                {/* Dropdown Menu for Reviewer */}
                 <DropdownMenu visible={dropdownVisible}>
-                    <DropdownItem to="/SubmitPaper">
-                    Manage Invitation
+                    <DropdownItem to="/ManageInvitations">
+                        Manage Invitations
                     </DropdownItem>
-                    <DropdownItem to="/conference/:id">
-                    View Conference Details
+                    <DropdownItem to="/ReviewerDashboard">
+                        View Assigned Papers
                     </DropdownItem>
-                    <DropdownItem to="/conference/:id">
-                    Submit Review
+                    <DropdownItem to="/SubmitReview">
+                        Submit Review
                     </DropdownItem>
                     <DropdownItem to="/settings">Settings</DropdownItem>
                     <DropdownItem to="/help">Help</DropdownItem>
                 </DropdownMenu>
+                {/* Navigation Links */}
                 {role && (
                     <Nav>
                         {links[role]?.map((link) => (
