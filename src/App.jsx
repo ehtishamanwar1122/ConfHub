@@ -10,7 +10,13 @@ import ConferenceDetails from "./Components/Conference/ConferenceDetails";
 import RegisterAuthor from "./Components/Author/AuthorRegistration";
 import AuthorDashboard from "./Components/Author/AuthorDashboard";
 import PaperSubmissionForm from "./Components/Author/SubmitPaper";
+
+import ReviewerDashboard from "./Components/Reviewer/ReviewerDashboard";
+import ManageInvitations from "./Components/Reviewer/ManageInvitation";
+import SubmitReview from "./Components/Reviewer/SubmitReview";
+
 import OrgConfDetails from "./Components/Conference/OrgConfDetails";
+
 function App() {
   return (
     <Router>
@@ -25,8 +31,16 @@ function App() {
         <Route path="/conference/:id" element={<ConferenceDetails />} />
         <Route path="/registerAuthor" element={<RegisterAuthor />} />
         <Route path="/AuthorDashboard" element={<AuthorDashboard />} />
+
+        <Route path="/SubmitPaper" element={<PaperSubmissionForm />} />
+        <Route path="/ReviewerDashboard" element={<ReviewerDashboard />} />
+        
+        <Route path="/ManageInvitations" element={<ManageInvitations />} />
+        <Route path="/SubmitReview" element={<SubmitReview />} />
+
         <Route path="/SubmitPaper/:id" element={<PaperSubmissionForm />} />
         <Route path="/orgConferenceDetails/:id" element={<OrgConfDetails />} />
+
       </Routes>
     </Router>
   );
