@@ -3,8 +3,9 @@ import axios from 'axios'; // Import axios for making API requests
 import '../../styles/AuthorDashboard.css'; // Import your CSS file
 import Layout from './Layouts/Layout';
 import styled from 'styled-components'; // Styled-components for tab styling
-
+import { useNavigate } from "react-router-dom";
 const AuthorDashboard = () => {
+   const navigate = useNavigate();
   const [recentConferences, setRecentConferences] = useState([]); // Recent conferences
   const [submittedPapers, setSubmittedPapers] = useState([]); // Submitted papers
   const [activeTab, setActiveTab] = useState('conferences'); // Tracks the active tab
@@ -15,11 +16,15 @@ const AuthorDashboard = () => {
     const fetchAuthorData = async () => {
       try {
         // Fetch recent conferences and submitted papers from the backend API
-        const conferenceResponse = await axios.get('http://localhost:1337/api/conferences/recent');
-        const papersResponse = await axios.get('http://localhost:1337/api/papers/submitted');
+        const conferenceResponse = await axios.get(
+          'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate=*'
+        );
         
-        setRecentConferences(conferenceResponse.data);
-        setSubmittedPapers(papersResponse.data);
+      //  const papersResponse = await axios.get('http://localhost:1337/api/papers/submitted');
+        console.log('v',conferenceResponse.data.data);
+        
+        setRecentConferences(conferenceResponse.data.data);
+        //setSubmittedPapers(papersResponse.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching author data:', error);
@@ -29,7 +34,10 @@ const AuthorDashboard = () => {
 
     fetchAuthorData();
   }, []);
-
+  
+  const handleSubmitPaper = (conferenceId) => {
+    navigate(`/SubmitPaper/${conferenceId}`);
+  };
   const renderConferences = () => {
     if (loading) {
       return <p>Loading conferences...</p>;
@@ -41,10 +49,18 @@ const AuthorDashboard = () => {
 
     return recentConferences.map((conference) => (
       <div className="conference-card" key={conference.id}>
-        <h3>{conference.title}</h3>
-        <p>{conference.description}</p>
-        <p><strong>Start Date:</strong> {conference.startDate}</p>
-        <p><strong>Location:</strong> {conference.location}</p>
+        <h3>{conference.Conference_title}</h3>
+        <p>{conference.Description}</p>
+        <p><strong>Start Date:</strong> {conference.Start_date}</p>
+        <p><strong>Location:</strong> {conference.Conference_location}</p>
+        <p><strong>Papers Submitted:</strong> {conference.Papers.length}</p>
+        <p><strong>Paper Submission deadline:</strong> {conference.Submission_deadline}</p>
+        <button
+          className="join-conference-button"
+          onClick={() => handleSubmitPaper(conference.id)}
+        >
+          Submit Your Paper
+        </button>
       </div>
     ));
   };

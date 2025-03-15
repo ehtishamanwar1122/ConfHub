@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginPageImage } from "../assets/Images";
-import { loginOrganizer, loginAdmin } from "../Services/api.js"; // Import both services
+import { loginOrganizer, loginAdmin } from "../Services/api.js"; 
+import { loginAuthor} from "../Services/author.js";
 import "../styles/login.css";
 
 const Login = () => {
@@ -46,6 +47,21 @@ const Login = () => {
       } catch (error) {
         console.log("Organizer Login failed",  error.response?.data?.error?.message);
         alert("Organizer Login failed: " + (error.response?.data?.message || "An error occurred during login"));
+      }
+    }
+    else if (formData.role === "author") {
+      // Organizer login
+      try {
+        const result = await loginAuthor(formData); // Call loginOrganizer function
+        const loggedInUserData = result.user; // Assuming the response contains organizer details
+
+    // Save organizer details in local storage
+    localStorage.setItem("userDetails", JSON.stringify(loggedInUserData));
+        console.log("author Login successful", result.user);
+        navigate("/AuthorDashboard"); // Navigate to the Organizer Dashboard
+      } catch (error) {
+        console.log("Author Login failed",  error.response?.data?.error?.message);
+        alert("Author Login failed: " + (error.response?.data?.message || "An error occurred during login"));
       }
     } else {
       // Handle unexpected roles

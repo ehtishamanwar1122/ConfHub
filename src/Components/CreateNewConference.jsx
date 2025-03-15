@@ -9,7 +9,7 @@ const CreateConference = () => {
     conferenceTitle: '',
     conferenceDescription: '',
     startDate: '',
-    endDate: '',
+    conferenceTime: '',
     conferenceLocation: '',
     trackTitle: '',
     trackDescription: '',
@@ -42,11 +42,11 @@ const CreateConference = () => {
     if (!formData.startDate) {
       newErrors.startDate = 'Start Date is required.';
     }
-    if (!formData.endDate) {
-      newErrors.endDate = 'End Date is required.';
-    } else if (formData.startDate && formData.endDate < formData.startDate) {
-      newErrors.endDate = 'End Date cannot be earlier than Start Date.';
-    }
+    // if (!formData.endDate) {
+    //   newErrors.endDate = 'End Date is required.';
+    // } else if (formData.startDate && formData.endDate < formData.startDate) {
+    //   newErrors.endDate = 'End Date cannot be earlier than Start Date.';
+    // }
     if (!formData.conferenceLocation.trim()) {
       newErrors.conferenceLocation = 'Conference Location is required.';
     }
@@ -78,12 +78,16 @@ const CreateConference = () => {
     if (!validateForm()) {
       return;
     }
+    const formattedFormData = {
+      ...formData,
+      conferenceTime: formData.conferenceTime ? `${formData.conferenceTime}:00.000` : "", // Append seconds and milliseconds
+  };
   
     try {
-      console.log("Form data before submitting:", formData); // Debugging
+      console.log("Form data before submitting:", formattedFormData); // Debugging
   
       // Call the service function with formData
-      const response = await createConference(formData);
+      const response = await createConference(formattedFormData);
       console.log("Response:", response); // Handle the response (e.g., success message)
       alert("Conference created successfully! Now wait till your conference is approved by the admin");
       navigate("/OrganizerDashboard");
@@ -125,7 +129,7 @@ const CreateConference = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2">
             <div>
-              <label htmlFor="startDate">Start Date</label>
+              <label htmlFor="startDate">Conference Date</label>
               <input
                 type="date"
                 id="startDate"
@@ -135,14 +139,14 @@ const CreateConference = () => {
               {errors.startDate && <p className="error">{errors.startDate}</p>}
             </div>
             <div>
-              <label htmlFor="endDate">End Date</label>
+              <label htmlFor="conferenceTime">Conference Time</label>
               <input
-                type="date"
-                id="endDate"
-                value={formData.endDate}
+                type="time"
+                id="conferenceTime"
+                value={formData.conferenceTime}
                 onChange={handleChange}
               />
-              {errors.endDate && <p className="error">{errors.endDate}</p>}
+              {errors.conferenceTime && <p className="error">{errors.conferenceTime}</p>}
             </div>
           </div>
 

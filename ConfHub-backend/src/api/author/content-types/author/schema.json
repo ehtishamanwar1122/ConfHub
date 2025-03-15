@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "authors",
+  "info": {
+    "singularName": "author",
+    "pluralName": "authors",
+    "displayName": "Author"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "authorEmail": {
+      "type": "email"
+    },
+    "alternativeContact": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "biography": {
+      "type": "string"
+    },
+    "researchInterest": {
+      "type": "string"
+    },
+    "UserID": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

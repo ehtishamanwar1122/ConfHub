@@ -1,12 +1,16 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/registerOrganizer.css";
-import { LoginPageImage } from "../assets/Images";
-import { registerOrganizer } from "../Services/api.js";
-
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/registerOrganizer.css';
+import { LoginPageImage } from '../assets/Images';
+import {  registerOrganizer } from '../Services/api.js';
+import { registerAuthor } from '../Services/author.js';
 const RegisterOrganizer = () => {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState('organizer');
   const [formData, setFormData] = useState({
+    country: "",
+    biography: "",
+    researchInterests: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -15,6 +19,7 @@ const RegisterOrganizer = () => {
     department: "",
     password: "",
     confirmPassword: "",
+
     fullName: "", 
     phoneNumber: "", 
     orcidId: "", 
@@ -24,11 +29,24 @@ const RegisterOrganizer = () => {
     researchInterests: "", 
     domain: "",
     subDomain:""
+
   });
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const [userType, setUserType] = useState('organizer');
+
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,11 +57,32 @@ const RegisterOrganizer = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await registerOrganizer(formData);
-      console.log("Response:", response);
+      const response =
+        userType === 'author'
+          ? await registerAuthor({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            alternativeContact: formData.alternativeContact,
+              email: formData.email,
+              country: formData.country,
+              biography: formData.biography,
+              researchInterests: formData.researchInterests,
+              password: formData.password,
+            })
+          : await registerOrganizer({
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              alternativeContact: formData.alternativeContact,
+              affiliation: formData.affiliation,
+              department: formData.department,
+              password: formData.password,
+            });
+
+      console.log(`${userType.charAt(0).toUpperCase() + userType.slice(1)} Response:`, response);
       navigate("/login");
     } catch (err) {
-      console.error("Error during registration:", err);
+      console.error(`Error during ${userType} registration:`, err);
       setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -58,6 +97,8 @@ const RegisterOrganizer = () => {
     }));
   };
 
+
+
   return (
     <div className="container">
       <div className="image-section">
@@ -65,7 +106,11 @@ const RegisterOrganizer = () => {
       </div>
       <div className="form-section">
         <div className="switch-buttons">
+
           <button onClick={() => navigate("/login")}>Login</button>
+
+          <button onClick={() => navigate('/login')}>Login</button>
+
           <button className="active">Register</button>
         </div>
 
@@ -85,9 +130,8 @@ const RegisterOrganizer = () => {
           "Welcome to Reviewer’s registration form, evaluate submitted papers and contribute to the review process."}
         </p>
 
-        {error && <p className="error">{error}</p>}
-
         <form onSubmit={handleSubmit}>
+
           <div className="form-row">
             <input type="text" placeholder="First Name" name="firstName" value={formData.firstName} onChange={handleInputChange} />
             <input type="text" placeholder="Last Name" name="lastName" value={formData.lastName} onChange={handleInputChange} />
@@ -118,6 +162,133 @@ const RegisterOrganizer = () => {
               <div className="form-row">
                 <input type="text" placeholder="Country" name="country" value={formData.country} onChange={handleInputChange} />
                 <textarea placeholder="Biography" name="biography" value={formData.biography} onChange={handleInputChange} />
+
+          {userType === 'author' ? (
+            <>
+              <div className="form-row">
+              <input
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+                
+              </div>
+              <div className="form-row">
+              <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Alternative Contact"
+                  name="alternativeContact"
+                  value={formData.alternativeContact}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="Country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                />
+                <textarea
+                  placeholder="Biography"
+                  name="biography"
+                  value={formData.biography}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                  <select
+                    name="researchInterests"
+                    value={formData.researchInterests}
+                    onChange={handleInputChange}
+                    placeholder="Research Interests"
+                  >
+                    <option value="">Select Research Interest</option>
+                    <option value="AI">Artificial Intelligence</option>
+                    <option value="ML">Machine Learning</option>
+                    <option value="DataScience">Data Science</option>
+                    <option value="Other">Other</option> {/* Added option for custom input */}
+                  </select>
+
+                  {/* Input field for custom research interest */}
+                  {formData.researchInterests === "Other" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify"
+                      name="researchInterests"
+                      value={formData.researchInterests}
+                      onChange={handleInputChange}
+                    />
+                  )}
+                </div>
+            </>
+          ) : (
+            <>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Alternative Contact"
+                  name="alternativeContact"
+                  value={formData.alternativeContact}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="Affiliation"
+                  name="affiliation"
+                  value={formData.affiliation}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  placeholder="Department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                />
+
               </div>
             </>
           )}
@@ -134,8 +305,9 @@ const RegisterOrganizer = () => {
             <input type="password" placeholder="Confirm Password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} />
           </div>
 
+          {error && <p className="error">{error}</p>}
           <button className="btn-register" type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Registering..." : `Register as ${userType.charAt(0).toUpperCase() + userType.slice(1)}`}
           </button>
         </form>
       </div>

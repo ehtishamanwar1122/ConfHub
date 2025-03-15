@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "papers",
+  "info": {
+    "singularName": "paper",
+    "pluralName": "papers",
+    "displayName": "Paper",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "SubmittedBy": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::author.author"
+    },
+    "SubmittedTo": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::conference.conference"
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "files"
+      ]
+    },
+    "submissionDate": {
+      "type": "datetime"
+    },
+    "Paper_Title": {
+      "type": "string"
+    },
+    "Abstract": {
+      "type": "text"
+    },
+    "conference": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::conference.conference",
+      "inversedBy": "Papers"
+    }
+  }
+}

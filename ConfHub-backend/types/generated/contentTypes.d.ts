@@ -369,6 +369,44 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
+  collectionName: 'authors';
+  info: {
+    displayName: 'Author';
+    pluralName: 'authors';
+    singularName: 'author';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    alternativeContact: Schema.Attribute.String;
+    authorEmail: Schema.Attribute.Email;
+    biography: Schema.Attribute.String;
+    country: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    firstName: Schema.Attribute.String;
+    lastName: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::author.author'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    researchInterest: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    UserID: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
   collectionName: 'conferences';
   info: {
@@ -381,12 +419,12 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Conference_location: Schema.Attribute.String & Schema.Attribute.Required;
+    Conference_time: Schema.Attribute.Time & Schema.Attribute.Required;
     Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Description: Schema.Attribute.Text & Schema.Attribute.Required;
-    End_date: Schema.Attribute.Date & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -398,6 +436,7 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
       'api::organizer.organizer'
     > &
       Schema.Attribute.Required;
+    Papers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
     publishedAt: Schema.Attribute.DateTime;
     requestStatus: Schema.Attribute.Enumeration<
       ['pending', 'approved', 'rejected']
@@ -454,6 +493,44 @@ export interface ApiOrganizerOrganizer extends Struct.CollectionTypeSchema {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
+  collectionName: 'papers';
+  info: {
+    description: '';
+    displayName: 'Paper';
+    pluralName: 'papers';
+    singularName: 'paper';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    Abstract: Schema.Attribute.Text;
+    conference: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::conference.conference'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    file: Schema.Attribute.Media<'files'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'> &
+      Schema.Attribute.Private;
+    Paper_Title: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    submissionDate: Schema.Attribute.DateTime;
+    SubmittedBy: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    SubmittedTo: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::conference.conference'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -914,6 +991,7 @@ export interface PluginUsersPermissionsUser
     draftAndPublish: false;
   };
   attributes: {
+    authorId: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -970,8 +1048,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::author.author': ApiAuthorAuthor;
       'api::conference.conference': ApiConferenceConference;
       'api::organizer.organizer': ApiOrganizerOrganizer;
+      'api::paper.paper': ApiPaperPaper;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

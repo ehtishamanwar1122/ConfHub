@@ -3,7 +3,9 @@ import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { dashboard_img1 } from "../assets/Images";
-
+import { Conference_Management_System } from "../assets/Images";
+import { ConfHub } from "../assets/Images";
+import { dashboard_bg } from "../assets/Images";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [conferences, setConferences] = useState([]);
@@ -13,11 +15,20 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchConferences = async () => {
       try {
-        const response = await axios.get("http://localhost:1337/api/conferences");
-        const approvedConferences = response.data.data.filter(
-          (conf) => conf.status === "approved" && conf.progress === "in-progress"
-        );
-        setConferences(approvedConferences);
+        const response = await axios.get('http://localhost:1337/api/conferences', {
+          params: {
+            filters: {
+              requestStatus: {
+                $eq: 'approved',
+              },
+            },
+            populate: '*',  // This will populate all related fields
+          },
+        });
+        const allConferences = response.data.data
+        console.log('conf',response);
+        console.log('aprconf',allConferences);
+        setConferences(allConferences);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching conferences:", error);
@@ -51,11 +62,18 @@ const Dashboard = () => {
             Login
           </button>
         </nav>
+        {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}>
+        <h3 class ='heading1' style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3>
+      </div> */}
+       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' ,marginTop:'10px' }}>
+        <h3 class ='heading1'> <img src={ConfHub} alt="Confhun" /></h3>
+      </div>
 
         <div className="hero-content">
           <div className="hero-text">
             <h1>
-              <span>Conference Management</span> System
+              {/* <span>Conference Management</span> System */}
+              <img src={Conference_Management_System} alt="Conference illustration" />
             </h1>
             <p>
               From managing program committees to publishing proceedings, our
@@ -71,28 +89,33 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '10vh' }}>
-        <h3 style={{ fontSize: '3em', color:'#1D4ED8' }}>ConfHub</h3>
-      </div>
-
+      
       <div className="main-page">
         {/* Conferences In Progress Section */}
         <section className="conference-list">
           <h2>Conferences In Progress</h2>
+          
           {loading ? (
             <p>Loading conferences...</p>
           ) : conferences.length > 0 ? (
-            <div className="conference-cards">
+            <div className="conference-cards"
+            style={{
+              backgroundImage: `url(${dashboard_bg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              
+            }}>
               {conferences.map((conference) => (
                 <div
                   key={conference.id}
                   className="conference-card"
                   onClick={() => handleConferenceClick(conference.id)}
                 >
-                  <h3>{conference.title}</h3>
-                  <p>{conference.description}</p>
-                  <p><strong>Start Date:</strong> {conference.startDate}</p>
-                  <p><strong>End Date:</strong> {conference.endDate}</p>
+                  <h3 class='conference-heading'><strong>Conference Title:</strong> {conference.Conference_title}</h3>
+                  <p><strong>Description:</strong>{conference.Description}</p>
+                  <p><strong>Conference Date:</strong> {conference.Start_date}</p>
+                  <p><strong>Submitted Papers: </strong> {conference.Papers.length}</p>
+                  <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
                 </div>
               ))}
             </div>

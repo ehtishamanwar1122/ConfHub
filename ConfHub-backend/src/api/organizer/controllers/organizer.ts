@@ -1,19 +1,23 @@
 import { factories } from '@strapi/strapi';
+//import path from 'path';
+//const { sendEmail } = require(path.resolve(__dirname, '../../../api/email/email'));
+const nodemailer = require('nodemailer');
+
 export default factories.createCoreController('api::organizer.organizer', ({ strapi }) => ({
     async registerOrganizer(ctx) {
       try {
         // Destructure the fields directly from the request body
-        const { firstName, lastName, email, alternativeContact, affiliation, department, password, confirmPassword } = ctx.request.body;
+        const { firstName, lastName, email, alternativeContact, affiliation, department, password } = ctx.request.body;
   
         // Validation (optional)
-        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        if (!firstName || !lastName || !email || !password ) {
           return ctx.badRequest('Missing required fields.');
         }
   
         // Check if the passwords match
-        if (password !== confirmPassword) {
-          return ctx.badRequest('Passwords do not match.');
-        }
+        // if (password !== confirmPassword) {
+        //   return ctx.badRequest('Passwords do not match.');
+        // }
   
         // Check if the organizer already exists by email
         const existingOrganizer = await strapi.query('api::organizer.organizer').findOne({
@@ -24,7 +28,7 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           return ctx.badRequest('Organizer with this email already exists.');
         }
   
-        // Create the new organizer (you can hash the password before saving it)
+        // Create the new organizer
        
         const fullName = `${firstName} ${lastName}`;
         let newOrganizer:any;
@@ -62,6 +66,38 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           },
         }
       );
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+        },
+      });
+      
+      // Function to send email
+      const sendEmail = async (to, subject, text, html) => {
+        const mailOptions = {
+          from: 'mudassiralishah555@gmail.com',    // Sender address
+          to,                              // Recipient address
+          subject,                         // Subject line
+          text,                            // Plain text body
+          html,                            // HTML body
+        };
+      
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log('Email sent successfully');
+        } catch (error) {
+          console.error('Error sending email:', error);
+        }
+      };
+      await sendEmail(
+        email,
+        'Your Account has been created',
+        'Hello, Your request for a organizer account in Confhub  has been recieved now wait for the admin approval to login to your account.  ',
+        `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been recieved now wait for the admin's approval to login to your account.</p>`
+      );
+  
         // Return the new organizer (without password)
         ctx.send({
           message: 'Organizer registered successfully!',
@@ -204,15 +240,41 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
             UserID: true,
           },
         });
-       console.log('up dat',updatedOrganizer);
-       
         if (!updatedOrganizer) {
           return ctx.notFound('Organizer not found');
         }
-  
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+            pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+          },
+        });
+        
+        // Function to send email
+        const sendEmail = async (to, subject, text, html) => {
+          const mailOptions = {
+            from: 'mudassiralishah555@gmail.com',    // Sender address
+            to,                              // Recipient address
+            subject,                         // Subject line
+            text,                            // Plain text body
+            html,                            // HTML body
+          };
+        
+          try {
+            await transporter.sendMail(mailOptions);
+            console.log('Email sent successfully');
+          } catch (error) {
+            console.error('Error sending email:', error);
+          }
+        };
+        
+    
         if (status === 'approved') {
           // Get the linked user from the organizer
           const linkedUser = (updatedOrganizer as any).UserID?.id;
+          const userEmail = (updatedOrganizer as any).UserID?.email;
+      const loginUrl = 'http://localhost:5173/login';
           console.log('linedd',linkedUser);
           
           // Update the user's status (confirmed: true, blocked: false)
@@ -222,6 +284,21 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
               blocked: false,
             },
           });
+         await sendEmail(
+        userEmail,
+        'Your Account has been Approved',
+        'Hello, Your request for a organizer account in Confhub  has been approved by the admin. You can now log in to your account using the following link: ' + loginUrl,
+        `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been approved by the admin. You can now log in to your account using the following link:</p><a href="${loginUrl}">${loginUrl}</a>`
+      );
+        }
+        if (status === 'rejected') {
+          const userEmail = (updatedOrganizer as any).UserID?.email;
+          await sendEmail(
+            userEmail,
+            'Your Account has been Rejected',
+            'Hello, Your request for a organizer account in Confhub  has been rejected by the admin. ',
+            `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been rejected by the admin </p>`
+          );
         }
     
         // Respond with the updated organizer

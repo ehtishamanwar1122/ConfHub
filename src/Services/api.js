@@ -38,3 +38,4 @@ export const loginAdmin = async (data) => {
     throw error; // Handle error accordingly
   }
 };
+

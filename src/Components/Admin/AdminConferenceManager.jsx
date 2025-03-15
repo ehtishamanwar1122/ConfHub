@@ -87,12 +87,15 @@ const AdminConferenceManager = () => {
           <div className="avatar-circle"></div>
         </div>
         <div className="request-details">
-          <p>Conference Title: {conference.Conference_title     }</p>
-          <p>Organizer Name: {conference.Organizer.Organizer_FirstName}  {conference.Organizer.Organizer_LastName}</p>
-          <p>Paper Submission Deadline: {conference.Submission_deadline}</p>
-          <p>Review Submission Deadline: {conference.Review_deadline}</p>
-          <p>Status: {conference.requestStatus}</p>
-        </div>
+    <p>Conference Title: <span className="value">{conference.Conference_title}</span></p>
+    <p>Organizer Name: <span className="value">{conference.Organizer.Organizer_FirstName} {conference.Organizer.Organizer_LastName}</span></p>
+    <p>Conference Date: <span className="value">{conference.Start_date}</span></p>
+    <p>Conference Time: <span className="value">{conference.Conference_time}</span></p>
+    <p>Paper Submission Deadline: <span className="value">{conference.Submission_deadline}</span></p>
+    <p>Review Submission Deadline: <span className="value">{conference.Review_deadline}</span></p>
+    <p>Status: <span className="value">{conference.requestStatus}</span></p>
+</div>
+
         {activeTab === 'pending' && (
           <div className="request-actions">
             <button
