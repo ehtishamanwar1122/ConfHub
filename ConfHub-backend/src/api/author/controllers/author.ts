@@ -147,7 +147,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
     },
     async submitPaper(ctx) {
       try {
-        const { paperTitle, abstract, submittedBy, submittedTo } = ctx.request.body;
+        const { paperTitle, abstract, submittedBy, submittedTo ,domain} = ctx.request.body;
         const files = ctx.request.files ;
   console.log('papper',ctx.request.body);
   console.log('fille',ctx.request.files);
@@ -161,7 +161,8 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                   submissionDate: new Date(),
                   SubmittedBy: submittedBy,
                   SubmittedTo: submittedTo,
-                  conference:submittedTo
+                  conference:submittedTo,
+                  Domain:domain
                 
               },
           });

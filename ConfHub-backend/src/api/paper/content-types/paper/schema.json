@@ -36,6 +36,9 @@
     "Paper_Title": {
       "type": "string"
     },
+    "Domain": {
+      "type": "string"
+    },
     "Abstract": {
       "type": "text"
     },

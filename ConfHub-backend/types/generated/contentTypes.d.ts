@@ -516,6 +516,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Domain: Schema.Attribute.String;
     file: Schema.Attribute.Media<'files'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'> &
@@ -531,6 +532,45 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiReviewerReviewer extends Struct.CollectionTypeSchema {
+  collectionName: 'reviewers';
+  info: {
+    description: '';
+    displayName: 'Reviewer';
+    pluralName: 'reviewers';
+    singularName: 'reviewer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    alternativeContact: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    domain: Schema.Attribute.String;
+    email: Schema.Attribute.Email;
+    firstName: Schema.Attribute.String;
+    lastName: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reviewer.reviewer'
+    > &
+      Schema.Attribute.Private;
+    password: Schema.Attribute.Password;
+    publishedAt: Schema.Attribute.DateTime;
+    subDomain: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    UserID: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1021,6 +1061,7 @@ export interface PluginUsersPermissionsUser
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
+    reviewerId: Schema.Attribute.Relation<'oneToOne', 'api::reviewer.reviewer'>;
     role: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::users-permissions.role'
@@ -1052,6 +1093,7 @@ declare module '@strapi/strapi' {
       'api::conference.conference': ApiConferenceConference;
       'api::organizer.organizer': ApiOrganizerOrganizer;
       'api::paper.paper': ApiPaperPaper;
+      'api::reviewer.reviewer': ApiReviewerReviewer;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

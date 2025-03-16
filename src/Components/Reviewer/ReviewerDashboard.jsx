@@ -6,73 +6,58 @@ import styled from 'styled-components'; // For styling
 const ReviewerDashboard = () => {
   const [assignedPapers, setAssignedPapers] = useState([]); // Papers assigned to the reviewer
   const [reviewDeadlines, setReviewDeadlines] = useState([]); // Upcoming review deadlines
-  const [ongoingPapers, setOngoingPapers] = useState([]); // Ongoing papers in the reviewer's domain
-  const [activeTab, setActiveTab] = useState('papers'); // Tracks the active tab
+  const [ongoingPapers, setOngoingPapers] = useState([]); // Ongoing papers matching reviewer's domain
+  const [activeTab, setActiveTab] = useState("papers"); // Tracks the active tab
   const [loading, setLoading] = useState(true); // Loading state
 
-  // Reviewer's domain and sub-domain (replace with dynamic values from the reviewer's profile)
-  const reviewerDomain = 'Computer Science'; // Example domain
-  const reviewerSubDomain = 'Artificial Intelligence'; // Example sub-domain
+  // Fetch reviewer ID from local storage
+  const storedUser = JSON.parse(localStorage.getItem("userDetails"));
+const userId = storedUser?.id; // Extract id properly
 
-  // Fetch data for the reviewer dashboard
   useEffect(() => {
     const fetchReviewerData = async () => {
       try {
-        // Fetch assigned papers
-        const papersResponse = await axios.get('http://localhost:1337/api/papers/assigned');
-        setAssignedPapers(papersResponse.data);
+        // Step 1: Get user ID from local storage
+       
+  
+        if (!userId) {
+          console.error("User ID not found in local storage.");
+          setLoading(false);
+          return;
+        }
+  
+        // Step 2: Fetch user details
+        const userResponse = await axios.get(`http://localhost:1337/api/users/${userId}?populate=reviewerId`);
+        const userData = userResponse.data;
+  
+        console.log("User Data:", userData);
+       
+        
+        const domain = userData?.reviewerId?.domain;
 
-        // Fetch review deadlines
-        const deadlinesResponse = await axios.get('http://localhost:1337/api/reviews/deadlines');
-        setReviewDeadlines(deadlinesResponse.data);
+        console.log("Reviewer domain:", domain);
 
-        // Fetch ongoing papers based on the reviewer's domain and sub-domain
-        const ongoingResponse = await axios.get('http://localhost:1337/api/papers/ongoing', {
-          params: {
-            domain: reviewerDomain, // Pass reviewer's domain
-            subDomain: reviewerSubDomain, // Pass reviewer's sub-domain
-          },
-        });
-        setOngoingPapers(ongoingResponse.data);
-
-        setLoading(false); // Data fetching complete
+        // Fetch papers
+        const papersResponse = await axios.get("http://localhost:1337/api/papers?populate[SubmittedBy][populate]=*&populate[SubmittedTo][populate]=*&populate[conference][populate]=*");
+        const papers = papersResponse.data;
+       console.log('paperss',papers);
+       
+       const papersArray = papers.data || []; // Extract the array
+       const filteredPapers = papersArray.filter(
+         (paper) => paper.Domain === domain
+       );
+       console.log('filtered',filteredPapers);
+       
+        setOngoingPapers(filteredPapers);
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching reviewer data:', error);
+        console.error("Error fetching reviewer data:", error);
         setLoading(false);
       }
     };
 
     fetchReviewerData();
-  }, [reviewerDomain, reviewerSubDomain]); // Re-fetch data if domain/sub-domain changes
-
-  // Render assigned papers
-  const renderAssignedPapers = () => {
-    if (loading) return <p>Loading assigned papers...</p>;
-    if (assignedPapers.length === 0) return <p>No papers assigned for review.</p>;
-
-    return assignedPapers.map((paper) => (
-      <PaperCard key={paper.id}>
-        <h3>{paper.title}</h3>
-        <p><strong>Conference:</strong> {paper.conference}</p>
-        <p><strong>Deadline:</strong> {paper.deadline}</p>
-        <p><strong>Status:</strong> {paper.status}</p>
-      </PaperCard>
-    ));
-  };
-
-  // Render review deadlines
-  const renderReviewDeadlines = () => {
-    if (loading) return <p>Loading review deadlines...</p>;
-    if (reviewDeadlines.length === 0) return <p>No upcoming review deadlines.</p>;
-
-    return reviewDeadlines.map((deadline) => (
-      <DeadlineCard key={deadline.id}>
-        <h3>{deadline.conference}</h3>
-        <p><strong>Paper Title:</strong> {deadline.paperTitle}</p>
-        <p><strong>Deadline:</strong> {deadline.deadline}</p>
-      </DeadlineCard>
-    ));
-  };
+  }, []);
 
   // Render ongoing papers
   const renderOngoingPapers = () => {
@@ -81,11 +66,23 @@ const ReviewerDashboard = () => {
 
     return ongoingPapers.map((paper) => (
       <PaperCard key={paper.id}>
-        <h3>{paper.title}</h3>
-        <p><strong>Domain:</strong> {paper.domain}</p>
-        <p><strong>Sub-Domain:</strong> {paper.subDomain}</p>
-        <p><strong>Conference:</strong> {paper.conference}</p>
-        <p><strong>Status:</strong> {paper.status}</p>
+        
+        <p>
+          <strong>Paper Title:</strong><h3>{paper.Paper_Title}</h3>
+        </p>
+        <p>
+          {/* <strong>Submitted By:</strong> {paper.Domain} */}
+        </p>
+        <p>
+          <strong>Conference Name:</strong> {paper.SubmittedTo.Conference_title}
+        </p>
+        <p>
+          <strong>Domain:</strong> {paper.Domain}
+        </p>
+        <p>
+          <strong>Review Deadline:</strong> {paper.conference.Review_deadline}
+        </p>
+        <button>Review This Paper</button>
       </PaperCard>
     ));
   };
@@ -97,22 +94,18 @@ const ReviewerDashboard = () => {
 
         {/* Tabs for navigation */}
         <TabContainer>
-          <Tab active={activeTab === 'papers'} onClick={() => setActiveTab('papers')}>
-            Assigned Papers
-          </Tab>
-          <Tab active={activeTab === 'deadlines'} onClick={() => setActiveTab('deadlines')}>
-            Review Deadlines
-          </Tab>
-          <Tab active={activeTab === 'ongoing'} onClick={() => setActiveTab('ongoing')}>
+          <Tab active={activeTab === "ongoing"} onClick={() => setActiveTab("ongoing")}>
             Ongoing Papers
+          </Tab>
+          <Tab active={activeTab === "papers"} onClick={() => setActiveTab("papers")}>
+            Assigned Papers
           </Tab>
         </TabContainer>
 
         {/* Content based on active tab */}
         <ContentContainer>
-          {activeTab === 'papers' && renderAssignedPapers()}
-          {activeTab === 'deadlines' && renderReviewDeadlines()}
-          {activeTab === 'ongoing' && renderOngoingPapers()}
+          {activeTab === "ongoing" && renderOngoingPapers()}
+          {activeTab === "papers" && <p>No assigned papers implemented yet.</p>}
         </ContentContainer>
       </MainContent>
     </Layout>

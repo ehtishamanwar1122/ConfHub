@@ -21,6 +21,7 @@ const PaperSubmissionForm = () => {
     submittedBy: "",
     file: null,
     submittedTo: "",
+    domain:"",
   });
 
   const handleInputChange = (e) => {
@@ -61,7 +62,7 @@ const PaperSubmissionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.paperTitle || !formData.abstract || !formData.file) {
+    if (!formData.paperTitle || !formData.abstract || !formData.domain|| !formData.file) {
       alert("Please fill in all fields and upload a file.");
       return;
     }
@@ -78,6 +79,7 @@ const PaperSubmissionForm = () => {
       const formDataToSend = {
         paperTitle: formData.paperTitle,
         abstract: formData.abstract,
+        domain:formData.domain,
         file: formData.file,
         submittedBy: authorId, // Set user ID from local storage
         submittedTo: id, // Set conference ID from URL
@@ -113,7 +115,15 @@ const PaperSubmissionForm = () => {
               onChange={handleInputChange}
             />
           </div>
-
+          <div className="form-group">
+                <select name="domain" value={formData.domain} onChange={handleInputChange} >
+                <option value="">Select Domain</option>
+                <option value="AI">Artificial Intelligence</option>
+                <option value="ML">Machine Learning</option>
+                <option value="DataScience">Data Science</option>
+                <option value="Other">Other</option>
+              </select>
+              </div>
           <div className="form-group">
             <label>Abstract</label>
             <input
