@@ -77,6 +77,11 @@
       "type": "relation",
       "relation": "oneToOne", 
       "target": "api::author.author"
+    },
+    "reviewerId": {
+      "type": "relation",
+      "relation": "oneToOne", 
+      "target": "api::reviewer.reviewer"
     }
   }
 }
