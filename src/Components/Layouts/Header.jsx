@@ -142,12 +142,21 @@ const Header = ({ role }) => {
                     <DropdownItem to="/CreateConference">
                         Create New Conference
                     </DropdownItem>
-                    <DropdownItem disabled>
+                    <DropdownItem to="/ManageConferences">
                         Manage Conferences
                     </DropdownItem>
-                    <DropdownItem disabled>Settings</DropdownItem>
-                    <DropdownItem disabled>Help</DropdownItem>
+                    <DropdownItem to="/ManageReviewerRequests">
+                        Manage Reviewer Requests
+                    </DropdownItem>
+                    <DropdownItem to="/Settings">
+                        Settings
+                    </DropdownItem>
+                    <DropdownItem to="/Help">
+                        Help
+                    </DropdownItem>
+                    
                 </DropdownMenu>
+
                 {role && (
                     <Nav>
                         {links[role]?.map((link) => (
