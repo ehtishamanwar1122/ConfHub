@@ -10,7 +10,7 @@ import ConferenceDetails from "./Components/Conference/ConferenceDetails";
 import RegisterAuthor from "./Components/Author/AuthorRegistration";
 import AuthorDashboard from "./Components/Author/AuthorDashboard";
 import PaperSubmissionForm from "./Components/Author/SubmitPaper";
-
+import ManageReviewerRequests from "./Components/ManageReviewRequest";
 import ReviewerDashboard from "./Components/Reviewer/ReviewerDashboard";
 import ManageInvitations from "./Components/Reviewer/ManageInvitation";
 import SubmitReview from "./Components/Reviewer/SubmitReview";
@@ -26,6 +26,8 @@ function App() {
         <Route path="/register" element={<RegisterOrganizer />} />
         <Route path="/OrganizerDashboard" element={<OrganizerDashboard />} />
         <Route path="/CreateConference" element={<CreateConference />} />
+        
+        <Route path="/ManageReviewerRequests" element={<ManageReviewerRequests />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />
         <Route path="/conference/:id" element={<ConferenceDetails />} />
