@@ -509,6 +509,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Abstract: Schema.Attribute.Text;
+    Author: Schema.Attribute.String;
     conference: Schema.Attribute.Relation<
       'manyToOne',
       'api::conference.conference'
@@ -523,12 +524,58 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Paper_Title: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    review: Schema.Attribute.Relation<'oneToOne', 'api::review.review'>;
+    reviewRequests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reviewer.reviewer'
+    >;
+    reviewRequestsConfirmed: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reviewer.reviewer'
+    >;
+    reviewRequestsRejected: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::reviewer.reviewer'
+    >;
     submissionDate: Schema.Attribute.DateTime;
     SubmittedBy: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     SubmittedTo: Schema.Attribute.Relation<
       'oneToOne',
       'api::conference.conference'
     >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiReviewReview extends Struct.CollectionTypeSchema {
+  collectionName: 'reviews';
+  info: {
+    description: '';
+    displayName: 'Review';
+    pluralName: 'reviews';
+    singularName: 'review';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    Comments: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::review.review'
+    > &
+      Schema.Attribute.Private;
+    paper: Schema.Attribute.Relation<'oneToOne', 'api::paper.paper'>;
+    publishedAt: Schema.Attribute.DateTime;
+    Recommendations: Schema.Attribute.String;
+    reviewer: Schema.Attribute.Relation<'oneToOne', 'api::reviewer.reviewer'>;
+    Score: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -548,6 +595,7 @@ export interface ApiReviewerReviewer extends Struct.CollectionTypeSchema {
   };
   attributes: {
     alternativeContact: Schema.Attribute.String;
+    AssignedPapers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -563,6 +611,7 @@ export interface ApiReviewerReviewer extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     password: Schema.Attribute.Password;
     publishedAt: Schema.Attribute.DateTime;
+    review: Schema.Attribute.Relation<'oneToOne', 'api::review.review'>;
     subDomain: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1093,6 +1142,7 @@ declare module '@strapi/strapi' {
       'api::conference.conference': ApiConferenceConference;
       'api::organizer.organizer': ApiOrganizerOrganizer;
       'api::paper.paper': ApiPaperPaper;
+      'api::review.review': ApiReviewReview;
       'api::reviewer.reviewer': ApiReviewerReviewer;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

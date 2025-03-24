@@ -17,6 +17,9 @@
       "relation": "oneToOne",
       "target": "api::author.author"
     },
+    "Author": {
+      "type": "string"
+    },
     "SubmittedTo": {
       "type": "relation",
       "relation": "oneToOne",
@@ -47,6 +50,28 @@
       "relation": "manyToOne",
       "target": "api::conference.conference",
       "inversedBy": "Papers"
+    },
+    "reviewRequests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reviewer.reviewer",
+      "required": false
+    },
+    "reviewRequestsConfirmed": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reviewer.reviewer"
+    },
+    "reviewRequestsRejected": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reviewer.reviewer"
+    },
+    "review": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::review.review",
+      "mappedBy": "paper"
     }
   }
 }

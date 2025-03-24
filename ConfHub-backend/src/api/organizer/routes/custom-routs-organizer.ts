@@ -34,5 +34,23 @@ export default {
           policies: [],
         },
       },
+      {
+        method: 'POST',
+        path: '/organizers/ConfirmReviewRequest', // Custom endpoint for registration
+        handler: 'organizer.confirmReviewRequest',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
+      {
+        method: 'POST',
+        path: '/organizers/RejectReviewRequest', // Custom endpoint for registration
+        handler: 'organizer.rejectReviewRequest',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
     ],
   };

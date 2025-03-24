@@ -311,6 +311,171 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
         ctx.internalServerError('An error occurred while updating status');
       }
     },
+    async confirmReviewRequest(ctx) {
+      const { paperId, reviewerId } = ctx.request.body;
+      const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
+        populate:'*',
+    });
+const reviewerEmail=reviewer.email;
+    if (!reviewer) {
+        return ctx.badRequest("Reviewer not found.");
+    }
+      console.log('Request Body:', ctx.request.body); // Log the request to inspect the data
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+        },
+      });
+      
+      // Function to send email
+      const sendEmail = async (to, subject, text, html) => {
+        const mailOptions = {
+          from: 'mudassiralishah555@gmail.com',    // Sender address
+          to,                              // Recipient address
+          subject,                         // Subject line
+          text,                            // Plain text body
+          html,                            // HTML body
+        };
+      
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log('Email sent successfully');
+        } catch (error) {
+          console.error('Error sending email:', error);
+        }
+      };
+      
+      try {
+        //for reviewr collection typee
+        const AssignPaperToReviewer = await strapi.db.query("api::reviewer.reviewer").update({
+          where: { id: reviewerId },
+          data: {
+            AssignedPapers: {
+              connect: [{ id: paperId }], 
+            },
+          },
+        });
+        //for paper collection type
+        const ConfirmReviewRequest = await strapi.db.query("api::paper.paper").update({
+          where: { id: paperId },
+          data: {
+            reviewRequestsConfirmed: {
+              connect: [{ id: reviewerId }], 
+            },
+          },
+        });
+        const updatedPaper = await strapi.db.query("api::paper.paper").update({
+          where: { id: paperId },
+          data: {
+            reviewRequests: {
+              disconnect: [{ id: reviewerId }],
+            },
+          },
+          populate: ['reviewRequests'], // Ensure the updated data is returned
+        });
+        await sendEmail(
+          reviewerEmail,
+          `Your request for paper review with title "${updatedPaper.Paper_Title}" has been Approved`,
+          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been approved by the admin. You can now log in to your account and proceed with the review process. `,
+          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been approved by the admin.</p><p>You can now log in to your account and proceed with the review process.</p>`
+        );
+        
+        
     
+       
+        return ctx.send({
+          message: 'paper assignment successful',
+          updatedPaper:updatedPaper
+        });
+      } catch (err) {
+        console.error("Error during paper assignment  :", err);
+        return ctx.internalServerError("Error during paper assignment.");
+      }
+    },
+    async rejectReviewRequest(ctx) {
+      const { paperId, reviewerId } = ctx.request.body;
+      const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
+        populate:'*',
+     });
+      const reviewerEmail=reviewer.email;
+     if (!reviewer) {
+        return ctx.badRequest("Reviewer not found.");
+     }
+      console.log('Request Body:', ctx.request.body); // Log the request to inspect the data
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+        },
+      });
+      
+      // Function to send email
+      const sendEmail = async (to, subject, text, html) => {
+        const mailOptions = {
+          from: 'mudassiralishah555@gmail.com',    // Sender address
+          to,                              // Recipient address
+          subject,                         // Subject line
+          text,                            // Plain text body
+          html,                            // HTML body
+        };
+         const sendEmail = async (to, subject, text, html) => {
+        const mailOptions = {
+          from: 'mudassiralishah555@gmail.com',    // Sender address
+          to,                              // Recipient address
+          subject,                         // Subject line
+          text,                            // Plain text body
+          html,                            // HTML body
+        };
+      
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log('Email sent successfully');
+        } catch (error) {
+          console.error('Error sending email:', error);
+        }
+       };
+      
+       try {
+        
+        //for paper collection type
+        const RejectReviewRequest = await strapi.db.query("api::paper.paper").update({
+          where: { id: paperId },
+          data: {
+            reviewRequestsRejected: {
+              connect: [{ id: reviewerId }], 
+            },
+          },
+        });
+        const updatedPaper = await strapi.db.query("api::paper.paper").update({
+          where: { id: paperId },
+          data: {
+            reviewRequests: {
+              disconnect: [{ id: reviewerId }],
+            },
+          },
+          populate: ['reviewRequests'], // Ensure the updated data is returned
+        });
+        
+        await sendEmail(
+          reviewerEmail,
+          `Your request for paper review with title "${updatedPaper.Paper_Title}" has been Rejected`,
+          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been rejected by the admin. If you have any questions, please contact support.`,
+          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been rejected by the admin.</p><p>If you have any questions, please contact support.</p>`
+        );
+        
+       
+        return ctx.send({
+          message: 'paper rejection successful',
+          updatedPaper:updatedPaper
+        });
+      } catch (err) {
+        console.error("Error during paper assignment  :", err);
+        return ctx.internalServerError("Error during paper assignment.");
+      }
+    }
+  },
   }));
   

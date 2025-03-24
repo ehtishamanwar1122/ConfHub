@@ -37,6 +37,18 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "AssignedPapers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::paper.paper",
+      "required": false
+    },
+    "review": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::review.review",
+      "mappedBy": "reviewer"
     }
   }
 }

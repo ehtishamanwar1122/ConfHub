@@ -146,5 +146,59 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
       }
     
     },
+    async requestReview(ctx) {
+      try {
+        const { paperId, reviewerId, status } = ctx.request.body;
+    
+        console.log("Request Body:", ctx.request.body);
+       
+        const updatedPaper = await strapi.db.query("api::paper.paper").update({
+          where: { id: paperId },
+          data: {
+            reviewRequests: {
+              connect: [{ id: reviewerId }], 
+            },
+          },
+        });
+        
+       
+        return ctx.send({
+          message: "Request received successfully!",
+          paper: updatedPaper,
+        });
+      } catch (error) {
+        console.error("Error processing review request:", error);
+    
+        return ctx.badRequest("Failed to process review request");
+      }
+    },
+    async submitReview(ctx) {
+      try {
+        const { comments, recommendation, score ,paperId,reviewerId} = ctx.request.body;
+    
+        console.log("Request Body:", ctx.request.body);
+       
+        const review = await strapi.entityService.create('api::review.review', {
+          data: {
+            Comments: comments,
+          Recommendations: recommendation,
+          Score: score,
+          paper: paperId,
+          reviewer:reviewerId,
+        },
+      });
+        
+       
+        return ctx.send({
+          message: "Request received successfully!",
+         
+        });
+      } catch (error) {
+        console.error("Error processing review request:", error);
+    
+        return ctx.badRequest("Failed to process review request");
+      }
+    },
+    
     
 }));

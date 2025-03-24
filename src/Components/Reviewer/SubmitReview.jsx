@@ -1,65 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Layout from './Layouts/Layout';
-import styled from 'styled-components';
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Layout from "./Layouts/Layout";
+import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import { submitReview } from '../../Services/reviewerService';
+const storedUser = JSON.parse(localStorage.getItem("userDetails"));
+ 
+const reviewerId=storedUser.reviewerId.id;
 const SubmitReview = () => {
-  const [assignedPapers, setAssignedPapers] = useState([]);
-  const [selectedPaperId, setSelectedPaperId] = useState('');
-  const [reviewComments, setReviewComments] = useState('');
-  const [score, setScore] = useState('');
-  const [recommendation, setRecommendation] = useState('Accept');
+  const { id } = useParams(); // Get paperId from the route
+  const [paperDetails, setPaperDetails] = useState(null);
+  const [reviewComments, setReviewComments] = useState("");
+  const [score, setScore] = useState("");
+  const [recommendation, setRecommendation] = useState("Accept");
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
-    const fetchAssignedPapers = async () => {
+    const fetchPaperDetails = async () => {
+      console.log("idd", id);
+
       try {
-        const response = await axios.get('http://localhost:1337/api/papers/assigned');
-        setAssignedPapers(response.data);
+        const response = await axios.get(
+          `http://localhost:1337/api/papers?filters[id][$eq]=${id}&populate=*`
+        );
+        setPaperDetails(response.data.data);
+        console.log("ppm", response);
+        console.log("dee", response.data.data);
       } catch (error) {
-        console.error('Error fetching assigned papers:', error);
+        console.error("Error fetching paper details:", error);
       }
     };
 
-    fetchAssignedPapers();
+    fetchPaperDetails();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedPaperId || !reviewComments || !score) {
-      setErrorMessage('Please fill in all fields.');
-      return;
-    }
+    // if (!selectedPaperId || !reviewComments || !score) {
+    //   setErrorMessage("Please fill in all fields.");
+    //   return;
+    // }
 
     setLoading(true);
-    setErrorMessage('');
-    setSuccessMessage('');
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const reviewData = {
-        paperId: selectedPaperId,
+        paperId: id,
+        reviewerId:reviewerId,
         comments: reviewComments,
         score: parseInt(score),
         recommendation,
       };
 
-      const response = await axios.post('http://localhost:1337/api/reviews/submit', reviewData);
-
-      if (response.status === 200) {
-        setSuccessMessage('✅ Review submitted successfully!');
-        setSelectedPaperId('');
-        setReviewComments('');
-        setScore('');
-        setRecommendation('Accept');
-      } else {
-        setErrorMessage('Failed to submit review. Please try again.');
-      }
+      
+      console.log("review aat", reviewData);
+try {
+  const response = await submitReview(reviewData);
+  console.log("Review request sent successfully:", response);
+} catch (error) {
+  console.error("Failed to send review request:", error);
+}
+    
     } catch (error) {
-      console.error('Error submitting review:', error);
-      setErrorMessage('An error occurred while submitting the review.');
+      console.error("Error submitting review:", error);
+      setErrorMessage("An error occurred while submitting the review.");
     } finally {
       setLoading(false);
     }
@@ -70,23 +78,27 @@ const SubmitReview = () => {
       <PageWrapper>
         <FormCard>
           <FormHeader>Submit Your Review</FormHeader>
-
+          {paperDetails ? (
+            <div>
+              <p>
+                <strong>Paper Title:</strong> {paperDetails[0].Paper_Title}
+              </p>
+              <p>
+                <strong>Author:</strong> {paperDetails[0].Author}
+              </p>
+              <p>
+                <strong>Conference:</strong>{" "}
+                {paperDetails[0].conference.Conference_title}
+              </p>
+              <p>
+                <strong>Review Deadline:</strong>{" "}
+                {paperDetails[0].conference.Review_deadline}
+              </p>
+            </div>
+          ) : (
+            <p>Loading paper details...</p>
+          )}
           <Form onSubmit={handleSubmit}>
-            <Field>
-              <Label>Select Paper</Label>
-              <Select
-                value={selectedPaperId}
-                onChange={(e) => setSelectedPaperId(e.target.value)}
-              >
-                <option value="">-- Select a Paper --</option>
-                {assignedPapers.map((paper) => (
-                  <option key={paper.id} value={paper.id}>
-                    {paper.title} ({paper.conference})
-                  </option>
-                ))}
-              </Select>
-            </Field>
-
             <Field>
               <Label>Review Comments</Label>
               <Textarea
@@ -127,7 +139,7 @@ const SubmitReview = () => {
             {successMessage && <Message success>{successMessage}</Message>}
 
             <SubmitButton type="submit" disabled={loading}>
-              {loading ? 'Submitting...' : 'Submit Review'}
+              {loading ? "Submitting..." : "Submit Review"}
             </SubmitButton>
           </Form>
         </FormCard>
@@ -144,7 +156,7 @@ const PageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  
+
   padding: 20px;
 `;
 
@@ -263,7 +275,7 @@ const SubmitButton = styled.button`
 const Message = styled.div`
   margin-top: 10px;
   font-size: 14px;
-  color: ${({ error, success }) => (error ? '#d9534f' : success ? '#28a745' : '#333')};
+  color: ${({ error, success }) =>
+    error ? "#d9534f" : success ? "#28a745" : "#333"};
   text-align: center;
 `;
-
