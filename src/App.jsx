@@ -38,7 +38,7 @@ function App() {
         <Route path="/ReviewerDashboard" element={<ReviewerDashboard />} />
         
         <Route path="/ManageInvitations" element={<ManageInvitations />} />
-        <Route path="/SubmitReview" element={<SubmitReview />} />
+        <Route path="/SubmitReview/:id" element={<SubmitReview />} />
 
         <Route path="/SubmitPaper/:id" element={<PaperSubmissionForm />} />
         <Route path="/orgConferenceDetails/:id" element={<OrgConfDetails />} />

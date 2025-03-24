@@ -16,6 +16,22 @@ export default {
           auth: false, 
         },
       },
+      {
+        method: 'POST',
+        path: '/reviewers/reviewRequest', 
+        handler: 'reviewer.requestReview',
+        config: {
+          auth: false, 
+        },
+      },
+      {
+        method: 'POST',
+        path: '/reviewers/reviewSubmit', 
+        handler: 'reviewer.submitReview',
+        config: {
+          auth: false, 
+        },
+      },
       
      
     ]

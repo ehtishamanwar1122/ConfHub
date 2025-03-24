@@ -25,3 +25,25 @@ export const registerReviewer = async (data) => {
       throw error; // Handle error accordingly
     }
   };
+  export const reviewRequest = async (data) => {
+    try {
+      console.log('datta',data);
+      
+      const response = await axios.post(`${BASE_API_URL}/reviewRequest`, data);
+      return response.data; // Return the response data (e.g., success message, etc.)
+    } catch (error) {
+      console.error("Error sending review request", error);
+      throw error; // Handle error accordingly
+    }
+  };
+  export const submitReview = async (data) => {
+    try {
+      console.log('datta',data);
+      
+      const response = await axios.post(`${BASE_API_URL}/reviewSubmit`, data);
+      return response.data; // Return the response data (e.g., success message, etc.)
+    } catch (error) {
+      console.error("Error sending review request", error);
+      throw error; // Handle error accordingly
+    }
+  };

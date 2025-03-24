@@ -152,7 +152,16 @@ export default factories.createCoreController('api::author.author', ({ strapi })
   console.log('papper',ctx.request.body);
   console.log('fille',ctx.request.files);
   console.log('fillsse',files);
-          // Create the new paper entry
+          
+
+  const author = await strapi.entityService.findOne('api::author.author', submittedBy, {
+    populate: '*'
+});
+
+if (!author) {
+    return ctx.badRequest('Invalid SubmittedBy ID: Author not found');
+}
+const authorName = `${author.firstName} ${author.lastName}`;
 
           const newPaper = await strapi.entityService.create('api::paper.paper', {
               data: {
@@ -162,8 +171,8 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                   SubmittedBy: submittedBy,
                   SubmittedTo: submittedTo,
                   conference:submittedTo,
-                  Domain:domain
-                
+                  Domain:domain,
+                  Author:authorName
               },
           });
   

@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reviews",
+  "info": {
+    "singularName": "review",
+    "pluralName": "reviews",
+    "displayName": "Review",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Comments": {
+      "type": "string"
+    },
+    "Recommendations": {
+      "type": "string"
+    },
+    "Score": {
+      "type": "integer"
+    },
+    "reviewer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::reviewer.reviewer",
+      "inversedBy": "review"
+    },
+    "paper": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::paper.paper",
+      "inversedBy": "review"
+    }
+  }
+}
