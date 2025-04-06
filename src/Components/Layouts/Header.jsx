@@ -1,110 +1,23 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
 import { useNavigate } from 'react-router-dom';
-const HeaderContainer = styled.header`
-    background-color: #f8f9fa;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #dee2e6;
-`;
+import { ConfHub } from '../../assets/Images';
+import RoleSwitcherButton from '../RoleSwitcher'; // Import the new button component
 
-const LeftSection = styled.div`
-    display: flex;
-    align-items: center;
-    position: relative; /* For dropdown positioning */
-`;
-
-const Logo = styled(Link)`
-    font-size: 1.75rem;
-    font-weight: bold;
-    text-decoration: none;
-    color: #3f51b5;
-    margin-right: 20px;
-    span {
-        color: #9c27b0;
-    }
-`;
-
-const MenuButton = styled.button`
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #555;
-    cursor: pointer;
-    margin-right: 20px;
-`;
-
-const Nav = styled.nav`
-    display: flex;
-`;
-
-const NavItem = styled(Link)`
-    color: #333;
-    text-decoration: none;
-    margin-left: 20px;
-    padding: 5px 10px;
-    border-radius: 5px;
-    &:hover {
-        background-color: #e9ecef;
-    }
-`;
-
-const DropdownMenu = styled.div`
-    position: absolute;
-    top: 50px; /* Adjust to position dropdown below button */
-    left: 10px;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 200px;
-    z-index: 100;
-    display: ${(props) => (props.visible ? 'block' : 'none')};
-`;
-
-const DropdownItem = styled(Link)`
-    display: block;
-    padding: 10px 15px;
-    color: #333;
-    text-decoration: none;
-    &:hover {
-        background-color: #f8f9fa;
-    }
-`;
-
-const RightSection = styled.div`
-    display: flex;
-    align-items: center;
-`;
-
-const NotificationIcon = styled.span`
-    font-size: 1.2rem;
-    color: #555;
-    margin-right: 20px;
-`;
-
-const LogoutButton = styled.button`
-    border: 1px solid #007bff;
-    color: #007bff;
-    padding: 8px 15px;
-    border-radius: 5px;
-    background-color: transparent;
-    cursor: pointer;
-    &:hover {
-        background-color: #e9ecef;
-    }
-`;
-
-const Header = ({ role }) => {
+const Header = () => {
     const navigate = useNavigate();
+    const [role, setRole] = useState('Admin'); // Default role
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const dropdownRef = useRef(null); // To detect click outside dropdown
 
     const toggleDropdown = () => {
         setDropdownVisible((prev) => !prev);
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/');
     };
 
     const links = {
@@ -120,60 +33,113 @@ const Header = ({ role }) => {
         Organizer: [
             { name: 'Schedule Sessions', to: '/organizer/schedule' },
             { name: 'Manage Reviews', to: '/organizer/reviews' },
+            { name: 'Create Conference', to: '/CreateConference' }, // Create Conference option
+        ],
+        SubOrganizer: [ // SubOrganizer should see Organizer options without Create Conference
+            { name: 'Schedule Sessions', to: '/organizer/schedule' },
+            { name: 'Manage Reviews', to: '/organizer/reviews' },
         ],
         Reviewer: [{ name: 'Assigned Reviews', to: '/reviewer/reviews' }],
         Guest: [{ name: 'Conferences', to: '/conferences' }],
     };
-    const handleLogout = () => {
-        localStorage.clear(); 
-        navigate('/'); 
+
+    // Close dropdown if clicking outside of it
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownVisible(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleRoleChange = (newRole) => {
+        setRole(newRole);
     };
 
     return (
-        <HeaderContainer>
-            <LeftSection>
-                <MenuButton onClick={toggleDropdown}>
+        <header className="bg-gray-100 p-4 flex items-center justify-between border-b border-gray-300">
+            <div className="flex items-center relative">
+                <button
+                    onClick={toggleDropdown}
+                    className="text-gray-600 text-2xl mr-5"
+                >
                     <FaBars />
-                </MenuButton>
-                <Logo to="/">
-                    Conf<span>Hub</span>
-                </Logo>
-                <DropdownMenu visible={dropdownVisible}>
-                    <DropdownItem to="/CreateConference">
-                        Create New Conference
-                    </DropdownItem>
-                    <DropdownItem to="/ManageConferences">
-                        Manage Conferences
-                    </DropdownItem>
-                    <DropdownItem to="/ManageReviewerRequests">
-                        Manage Reviewer Requests
-                    </DropdownItem>
-                    <DropdownItem to="/Settings">
-                        Settings
-                    </DropdownItem>
-                    <DropdownItem to="/Help">
-                        Help
-                    </DropdownItem>
-                    
-                </DropdownMenu>
-
-                {role && (
-                    <Nav>
-                        {links[role]?.map((link) => (
-                            <NavItem key={link.name} to={link.to}>
-                                {link.name}
-                            </NavItem>
-                        ))}
-                    </Nav>
+                </button>
+               <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
+                <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
+                </Link>
+                {dropdownVisible && (
+                    <div
+                        ref={dropdownRef}
+                        className="absolute top-12 left-0 bg-white border border-gray-300 rounded-lg shadow-lg w-48 z-10"
+                    >
+                        {role !== 'SubOrganizer' && ( // Don't show "Create Conference" for SubOrganizer
+                            <Link
+                                to="/CreateConference"
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                            >
+                                Create New Conference
+                            </Link>
+                        )}
+                        <Link
+                            to="/ManageConferences"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                            Manage Conferences
+                        </Link>
+                        <Link
+                            to="/ManageReviewerRequests"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                            Manage Reviewer Requests
+                        </Link>
+                        <Link
+                            to="/AssignSubOrganizer"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                            Assign Sub-Organizer Role
+                        </Link>
+                        <Link
+                            to="/Settings"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                            Settings
+                        </Link>
+                        <Link
+                            to="/Help"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                            Help
+                        </Link>
+                    </div>
                 )}
-            </LeftSection>
-            <RightSection>
-                <NotificationIcon>
+
+              
+            </div>
+
+            <div className="flex items-center ml-auto mr-2 text-base">
+                <RoleSwitcherButton
+                    roles={['Admin', 'Author', 'Organizer', 'Reviewer', 'Guest', 'SubOrganizer']}
+                    onRoleSelect={handleRoleChange}
+                />
+            </div>
+
+            <div className="flex items-center">
+                <span className="text-gray-600 text-xl mr-5">
                     <FaBell />
-                </NotificationIcon>
-                <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-            </RightSection>
-        </HeaderContainer>
+                </span>
+                <button
+                    onClick={handleLogout}
+                    className="border border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
+                >
+                    Logout
+                </button>
+            </div>
+        </header>
     );
 };
 
