@@ -16,7 +16,8 @@ import ManageInvitations from "./Components/Reviewer/ManageInvitation";
 import SubmitReview from "./Components/Reviewer/SubmitReview";
 
 import OrgConfDetails from "./Components/Conference/OrgConfDetails";
-
+import AssignSubOrganizer from "./Components/AssignSubOrganizer";
+import SubOrganizerDashboard from './Components/SubOrganizer/SubOrganizerDashboard'
 function App() {
   return (
     <Router>
@@ -26,7 +27,9 @@ function App() {
         <Route path="/register" element={<RegisterOrganizer />} />
         <Route path="/OrganizerDashboard" element={<OrganizerDashboard />} />
         <Route path="/CreateConference" element={<CreateConference />} />
-        
+        <Route path="/AssignSubOrganizer" element={<AssignSubOrganizer />} />
+        <Route path="/SubOrganizerDashboard" element={<SubOrganizerDashboard />} />
+
         <Route path="/ManageReviewerRequests" element={<ManageReviewerRequests />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/AdminConferenceManager" element={<AdminConferenceManager />} />

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "./Layouts/Layout";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
-import { submitReview } from '../../Services/reviewerService';
-const storedUser = JSON.parse(localStorage.getItem("userDetails"));
- 
-const reviewerId=storedUser.reviewerId.id;
+import { useParams, useNavigate } from "react-router-dom";
+import { submitReview } from "../../Services/reviewerService";
+
 const SubmitReview = () => {
-  const { id } = useParams(); // Get paperId from the route
+  const { id } = useParams(); // Get paperId from URL
+  const navigate = useNavigate();
+  const [reviewerId, setReviewerId] = useState(null);
   const [paperDetails, setPaperDetails] = useState(null);
   const [reviewComments, setReviewComments] = useState("");
   const [score, setScore] = useState("");
@@ -16,57 +16,62 @@ const SubmitReview = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Fetch reviewerId from localStorage
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("userDetails"));
+    if (storedUser?.reviewerId?.id) {
+      setReviewerId(storedUser.reviewerId.id);
+    } else {
+      setErrorMessage("Reviewer not found. Please log in.");
+      // Optional: Redirect to login page
+      setTimeout(() => navigate("/login"), 2000);
+    }
+  }, []);
+
+  // Fetch paper details
   useEffect(() => {
     const fetchPaperDetails = async () => {
-      console.log("idd", id);
-
       try {
         const response = await axios.get(
           `http://localhost:1337/api/papers?filters[id][$eq]=${id}&populate=*`
         );
-        setPaperDetails(response.data.data);
-        console.log("ppm", response);
-        console.log("dee", response.data.data);
+        setPaperDetails(response.data.data[0]); // Use single object instead of array
       } catch (error) {
         console.error("Error fetching paper details:", error);
+        setErrorMessage("Failed to load paper details.");
       }
     };
 
     fetchPaperDetails();
-  }, []);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // if (!selectedPaperId || !reviewComments || !score) {
-    //   setErrorMessage("Please fill in all fields.");
-    //   return;
-    // }
-
     setLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
-    try {
-      const reviewData = {
-        paperId: id,
-        reviewerId:reviewerId,
-        comments: reviewComments,
-        score: parseInt(score),
-        recommendation,
-      };
+    if (!reviewComments || !score || !reviewerId) {
+      setErrorMessage("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
 
-      
-      console.log("review aat", reviewData);
-try {
-  const response = await submitReview(reviewData);
-  console.log("Review request sent successfully:", response);
-} catch (error) {
-  console.error("Failed to send review request:", error);
-}
-    
+    const reviewData = {
+      paperId: id,
+      reviewerId: reviewerId,
+      comments: reviewComments,
+      score: parseInt(score),
+      recommendation,
+    };
+
+    try {
+      const response = await submitReview(reviewData);
+      setSuccessMessage("Review submitted successfully.");
+      console.log("Review sent:", response);
     } catch (error) {
-      console.error("Error submitting review:", error);
+      console.error("Failed to submit review:", error);
       setErrorMessage("An error occurred while submitting the review.");
     } finally {
       setLoading(false);
@@ -78,26 +83,28 @@ try {
       <PageWrapper>
         <FormCard>
           <FormHeader>Submit Your Review</FormHeader>
+
           {paperDetails ? (
             <div>
               <p>
-                <strong>Paper Title:</strong> {paperDetails[0].Paper_Title}
+                <strong>Paper Title:</strong> {paperDetails.Paper_Title}
               </p>
               <p>
-                <strong>Author:</strong> {paperDetails[0].Author}
+                <strong>Author:</strong> {paperDetails.Author}
               </p>
               <p>
                 <strong>Conference:</strong>{" "}
-                {paperDetails[0].conference.Conference_title}
+                {paperDetails.conference?.Conference_title}
               </p>
               <p>
                 <strong>Review Deadline:</strong>{" "}
-                {paperDetails[0].conference.Review_deadline}
+                {paperDetails.conference?.Review_deadline}
               </p>
             </div>
           ) : (
             <p>Loading paper details...</p>
           )}
+
           <Form onSubmit={handleSubmit}>
             <Field>
               <Label>Review Comments</Label>
@@ -156,7 +163,6 @@ const PageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-
   padding: 20px;
 `;
 
