@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaBars, FaBell } from 'react-icons/fa';
 import { ConfHub } from '../../../assets/Images';
-import RoleSwitcherButton from '../../RoleSwitcher'; // Import the new button component
+import RoleSwitcherButton from '../../RoleSwitcher';
 
 const Header = () => {
     const navigate = useNavigate();
-    const [role, setRole] = useState('Admin'); // Default role
+    const [role, setRole] = useState('Reviewer'); // Default role
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const dropdownRef = useRef(null); // To detect click outside dropdown
+    const [availableRoles, setAvailableRoles] = useState([]);
+    const dropdownRef = useRef(null);
 
     const toggleDropdown = () => {
         setDropdownVisible((prev) => !prev);
@@ -24,32 +24,20 @@ const Header = () => {
         setRole(newRole);
     };
 
-    const links = {
-        Admin: [
-            { name: 'Dashboard', to: '/admin/dashboard' },
-            { name: 'Users', to: '/admin/users' },
-            { name: 'Settings', to: '/admin/settings' },
-        ],
-        Author: [
-            { name: 'Submit Paper', to: '/author/submit' },
-            { name: 'My Submissions', to: '/author/submissions' },
-        ],
-        Organizer: [
-            { name: 'Schedule Sessions', to: '/organizer/schedule' },
-            { name: 'Manage Reviews', to: '/organizer/reviews' },
-        ],
-        SubOrganizer: [
-            { name: 'Schedule Sessions', to: '/organizer/schedule' },
-            { name: 'Manage Reviews', to: '/organizer/reviews' },
-        ],
-        Reviewer: [
-            { name: 'Assigned Papers', to: '/reviewer/assigned-papers' },
-            { name: 'Submit Review', to: '/reviewer/submit-review' },
-        ],
-        Guest: [{ name: 'Conferences', to: '/conferences' }],
-    };
+    useEffect(() => {
+        const storedUser = localStorage.getItem('userDetails');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            const roles = ['Reviewer']; // Default role
 
-    // Close dropdown if clicking outside of it
+            if (user.SubOrganizerRole && user.SubOrganizerRole.length > 0) {
+                roles.push('SubOrganizer');
+            }
+
+            setAvailableRoles(roles);
+        }
+    }, []);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -61,7 +49,8 @@ const Header = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    const hasSubOrganizerRole = userDetails?.SubOrganizerRole?.length > 0;
     return (
         <header className="bg-gray-100 p-4 flex justify-between items-center border-b border-gray-300">
             <div className="flex items-center relative">
@@ -69,41 +58,31 @@ const Header = () => {
                     <FaBars />
                 </button>
                 <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
-                                    <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
+                    <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
                 </Link>
 
-                {/* Dropdown Menu */}
                 <div
                     ref={dropdownRef}
                     className={`absolute top-12 left-0 bg-white border border-gray-300 rounded-lg shadow-md w-48 ${dropdownVisible ? 'block' : 'hidden'}`}
                 >
-                    <Link to="/ManageInvitations" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        Manage Invitations
-                    </Link>
-                    <Link to="/ReviewerDashboard" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        View Assigned Papers
-                    </Link>
-                    <Link to="/SubmitReview" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        Submit Review
-                    </Link>
-                    <Link to="/settings" className="block p-2 text-gray-700 hover:bg-gray-200">
+                    <Link to="#" className="block p-2 text-gray-700 hover:bg-gray-200">
                         Settings
                     </Link>
-                    <Link to="/help" className="block p-2 text-gray-700 hover:bg-gray-200">
+                    <Link to="#" className="block p-2 text-gray-700 hover:bg-gray-200">
                         Help
                     </Link>
                 </div>
-
-               
             </div>
 
-            {/* Role Switcher */}
-            <div className="flex items-center ml-auto mr-2 text-base">
-                <RoleSwitcherButton
-                    roles={['Admin', 'Author', 'Organizer', 'Reviewer', 'Guest', 'SubOrganizer']}
-                    onRoleSelect={handleRoleChange}
-                />
-            </div>
+            {/* Conditional Role Switcher */}
+            {hasSubOrganizerRole && (
+                <div className="flex items-center ml-auto mr-2 text-base">
+                    <RoleSwitcherButton
+                        roles={availableRoles}
+                        onRoleSelect={handleRoleChange}
+                    />
+                </div>
+            )}
 
             {/* Notification and Logout */}
             <div className="flex items-center">

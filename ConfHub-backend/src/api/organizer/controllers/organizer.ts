@@ -477,5 +477,132 @@ const reviewerEmail=reviewer.email;
       }
     }
   },
+
+
+  async assignSubOrganizerRole(ctx) {
+    const { conferenceId, selectedAuthors, selectedReviewers } = ctx.request.body;
+
+    // Log the request body to inspect the data
+    console.log('Request Body:', ctx.request.body);
+
+    // Initialize arrays to hold the populated authors and reviewers
+    let authorsData = [];
+    let reviewersData = [];
+
+    // Step 1: Check if selectedAuthors is not empty, then find authors
+    if (selectedAuthors && selectedAuthors.length > 0) {
+        try {
+            // Find multiple authors by their IDs using the findMany method
+            authorsData = await strapi.query('api::author.author').findMany({
+                where: {
+                    id: { $in: selectedAuthors }, // Use $in to match multiple IDs
+                },
+                populate: true,
+            });
+        } catch (error) {
+            console.error('Error fetching authors:', error);
+            return ctx.send({ message: 'Error fetching authors' }, 500);
+        }
+    }
+
+    // Step 2: Check if selectedReviewers is not empty, then find reviewers by ID
+    if (selectedReviewers && selectedReviewers.length > 0) {
+        try {
+            // Find multiple reviewers by their IDs using the findMany method
+            reviewersData = await strapi.query('api::reviewer.reviewer').findMany({
+                where: {
+                    id: { $in: selectedReviewers }, // Use $in to match multiple IDs
+                },
+                populate: true,
+            });
+        } catch (error) {
+            console.error('Error fetching reviewers:', error);
+            return ctx.send({ message: 'Error fetching reviewers' }, 500);
+        }
+    }
+
+    console.log('authorsData:', authorsData);
+    console.log('reviewersData:', reviewersData);
+
+    // Step 3: Handle the case where no authors or reviewers were found
+    if (authorsData.length === 0 && reviewersData.length === 0) {
+        return ctx.send({ message: 'No authors or reviewers selected' }, 400);
+    }
+
+    // Step 4: Initialize arrays to store user IDs for authors and reviewers
+    let authorsUserIds = [];
+    let reviewersUserIds = [];
+
+    // Step 5: Process authors and reviewers and store their UserIDs
+    if (authorsData.length > 0) {
+        for (let author of authorsData) {
+            try {
+                const assignSubOrganizerRole = await strapi.db.query("plugin::users-permissions.user").update({
+                    where: { id: author.UserID.id }, // Update user with the respective author ID
+                    data: {
+                        SubOrganizerRole: {
+                            connect: [{ id: conferenceId }],
+                        },
+                    },
+                });
+                console.log(`Assigned role to author with user ID: ${author.UserID.id}`);
+                
+                // Collect author UserIDs
+                authorsUserIds.push(author.UserID.id);
+            } catch (error) {
+                console.error(`Error assigning role to author with ID: ${author.UserID.id}`, error);
+            }
+        }
+    }
+
+    if (reviewersData.length > 0) {
+        for (let reviewer of reviewersData) {
+            try {
+                const assignSubOrganizerRole = await strapi.db.query("plugin::users-permissions.user").update({
+                    where: { id: reviewer.UserID.id }, // Update user with the respective reviewer ID
+                    data: {
+                        SubOrganizerRole: {
+                            connect: [{ id: conferenceId }],
+                        },
+                    },
+                });
+                console.log(`Assigned role to reviewer with user ID: ${reviewer.UserID.id}`);
+                
+                // Collect reviewer UserIDs
+                reviewersUserIds.push(reviewer.UserID.id);
+            } catch (error) {
+                console.error(`Error assigning role to reviewer with ID: ${reviewer.UserID.id}`, error);
+            }
+        }
+    }
+
+    // Step 6: Update the conference with the collected author and reviewer UserIDs
+    try {
+        const assignSubOrganizerToConference = await strapi.db.query("api::conference.conference").update({
+            where: { id: conferenceId }, // Find the conference by its ID
+            data: {
+                AssignedSubOrganizer: {
+                    connect: [
+                        ...authorsUserIds.map(id => ({ id })), // Connect all author IDs
+                        ...reviewersUserIds.map(id => ({ id })), // Connect all reviewer IDs
+                    ],
+                },
+            },
+        });
+        console.log(`Assigned SubOrganizer roles to conference with ID: ${conferenceId}`);
+    } catch (error) {
+        console.error(`Error assigning SubOrganizers to conference with ID: ${conferenceId}`, error);
+        return ctx.send({ message: 'Error updating conference with SubOrganizers' }, 500);
+    }
+
+    // Step 7: Return a successful response
+    return ctx.send({
+        message: 'Role Assigned Successfully',
+        authors: authorsData,
+        reviewers: reviewersData,
+    });
+}
+
+
   }));
   

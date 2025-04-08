@@ -82,6 +82,11 @@
       "type": "relation",
       "relation": "oneToOne", 
       "target": "api::reviewer.reviewer"
+    },
+    "SubOrganizerRole": {
+      "type": "relation",
+      "relation": "oneToMany", 
+      "target": "api::conference.conference"
     }
   }
 }

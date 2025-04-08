@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from './Layouts/Layout';
 import { useNavigate } from "react-router-dom";
 import AssignSubOrganizer from './AssignSubOrganizer'; // Import the AssignSubOrganizer component
-
+import axios from 'axios';
 const OrganizerDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('inProgress');
@@ -10,45 +10,78 @@ const OrganizerDashboard = () => {
     const [showAssignModal, setShowAssignModal] = useState(false); // State for showing the modal
     const [selectedConferenceId, setSelectedConferenceId] = useState(null); // Store selected conference ID for assigning sub-organizer
 
-    // Dummy Data for Conferences
-    const dummyConferences = [
-        {
-            id: 1,
-            Conference_title: 'Tech Innovations 2025',
-            Description: 'A conference focusing on the latest innovations in technology.',
-            Submission_deadline: '2025-05-01',
-            Review_deadline: '2025-06-01',
-            Status: 'inProgress',
-            Start_date: '2025-07-10',
-            Conference_location: 'New York, USA'
-        },
-        {
-            id: 2,
-            Conference_title: 'Health Tech Summit',
-            Description: 'Discussing the future of healthcare technologies and digital health.',
-            Submission_deadline: '2025-06-15',
-            Review_deadline: '2025-07-10',
-            Status: 'completed',
-            Start_date: '2025-08-20',
-            Conference_location: 'Berlin, Germany'
-        },
-        {
-            id: 3,
-            Conference_title: 'AI & Machine Learning Conference',
-            Description: 'A deep dive into AI and its applications across industries.',
-            Submission_deadline: '2025-07-01',
-            Review_deadline: '2025-08-01',
-            Status: 'inProgress',
-            Start_date: '2025-09-15',
-            Conference_location: 'San Francisco, USA'
-        },
-    ];
+    // // Dummy Data for Conferences
+    // const dummyConferences = [
+    //     {
+    //         id: 1,
+    //         Conference_title: 'Tech Innovations 2025',
+    //         Description: 'A conference focusing on the latest innovations in technology.',
+    //         Submission_deadline: '2025-05-01',
+    //         Review_deadline: '2025-06-01',
+    //         Status: 'inProgress',
+    //         Start_date: '2025-07-10',
+    //         Conference_location: 'New York, USA'
+    //     },
+    //     {
+    //         id: 2,
+    //         Conference_title: 'Health Tech Summit',
+    //         Description: 'Discussing the future of healthcare technologies and digital health.',
+    //         Submission_deadline: '2025-06-15',
+    //         Review_deadline: '2025-07-10',
+    //         Status: 'completed',
+    //         Start_date: '2025-08-20',
+    //         Conference_location: 'Berlin, Germany'
+    //     },
+    //     {
+    //         id: 3,
+    //         Conference_title: 'AI & Machine Learning Conference',
+    //         Description: 'A deep dive into AI and its applications across industries.',
+    //         Submission_deadline: '2025-07-01',
+    //         Review_deadline: '2025-08-01',
+    //         Status: 'inProgress',
+    //         Start_date: '2025-09-15',
+    //         Conference_location: 'San Francisco, USA'
+    //     },
+    // ];
 
-    // Set dummy data into state
+   
     useEffect(() => {
-        setConferences(dummyConferences);
-    }, []);
+        const fetchConferences = async () => {
+            try {
+                const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+                const organizerId = userDetails?.organizerId?.id;
+                const subOrganizerRoles = userDetails?.SubOrganizerRole || [];
+                 const userId= userDetails?.id;
+               console.log('idd',userDetails);
+               if (subOrganizerRoles.length > 0) {
+                const conferenceIds = subOrganizerRoles.map(role => role.documentId);
+                if (conferenceIds.length === 0) return;
+                const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[AssignedSubOrganizer][id][$eq]=${userId}&populate=*`);
+                
+              console.log('rr',response);
+              
+                
+                setConferences(response.data.data);
+                console.log('Conferences for SubOrganizer:', response.data.data);
+                return;
+            }
+                if (!organizerId) {
+                    console.error('Organizer ID not found in local storage');
+                    return;
+                }
+        
+                const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[Organizer][$eq]=${organizerId}`);
+                const allRequests = response.data.data;
+                console.log('Conferences:', allRequests);
 
+                setConferences(allRequests); // Assuming `data` is an array of conferences
+            } catch (error) {
+                console.error('Error fetching conferences:', error);
+            }
+        };
+
+        fetchConferences();
+    }, []);
     // Filter conferences based on active tab
     const filteredConferences = conferences.filter(conference =>
         activeTab === 'inProgress' ? conference.Status === 'inProgress' : conference.Status === 'completed'

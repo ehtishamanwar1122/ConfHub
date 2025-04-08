@@ -61,7 +61,8 @@ const Header = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    const hasSubOrganizerRole = userDetails?.SubOrganizerRole?.length > 0;
     return (
         <header className="bg-gray-100 p-4 flex justify-between items-center border-b border-gray-300">
             <div className="flex items-center relative">
@@ -77,15 +78,8 @@ const Header = () => {
                     ref={dropdownRef}
                     className={`absolute top-12 left-0 bg-white border border-gray-300 rounded-lg shadow-md w-48 ${dropdownVisible ? 'block' : 'hidden'}`}
                 >
-                    <Link to="/ManageInvitations" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        Manage Invitations
-                    </Link>
-                    <Link to="/ReviewerDashboard" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        View Assigned Papers
-                    </Link>
-                    <Link to="/SubmitReview" className="block p-2 text-gray-700 hover:bg-gray-200">
-                        Submit Review
-                    </Link>
+                  
+
                     <Link to="/settings" className="block p-2 text-gray-700 hover:bg-gray-200">
                         Settings
                     </Link>
@@ -97,13 +91,14 @@ const Header = () => {
             </div>
 
             {/* Role Switcher */}
-            <div className="flex items-center ml-auto mr-2 text-base">
-                <RoleSwitcherButton
-                    roles={['Admin', 'Author', 'Organizer', 'Reviewer', 'Guest', 'SubOrganizer']}
-                    onRoleSelect={handleRoleChange}
-                />
-            </div>
-
+            {hasSubOrganizerRole && (
+    <div className="flex items-center ml-auto mr-2 text-base">
+        <RoleSwitcherButton
+            roles={['Author', 'SubOrganizer']}
+            onRoleSelect={handleRoleChange}
+        />
+    </div>
+)}
             {/* Notification and Logout */}
             <div className="flex items-center">
                 <span className="text-xl text-gray-700 mr-4">

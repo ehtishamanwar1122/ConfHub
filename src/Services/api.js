@@ -60,3 +60,15 @@ export const rejectReviewRequest = async (data) => {
     throw error; // Handle error accordingly
   }
 };
+
+export const assignSubOrganizerRole = async (data) => {
+  try {
+    console.log('datta',data);
+    
+    const response = await axios.post(`${BASE_API_URL}/AssignRole`, data);
+    return response.data; 
+  } catch (error) {
+    console.error("Error assigning role ", error);
+    throw error; // Handle error accordingly
+  }
+};

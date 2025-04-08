@@ -82,6 +82,12 @@
       "target": "api::paper.paper",
       "mappedBy": "conference",
       "required": false
+    },
+    "AssignedSubOrganizer": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "required": false
     }
   }
 }

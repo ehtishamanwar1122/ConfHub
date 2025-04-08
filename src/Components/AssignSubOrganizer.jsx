@@ -1,41 +1,80 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import {  assignSubOrganizerRole } from '../Services/api.js';
 const AssignSubOrganizer = ({ conferenceId, onClose }) => {
-    // Dummy data for authors and reviewers
-    const authors = [
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Robert Brown' },
-    ];
-
-    const reviewers = [
-        { id: 1, name: 'Alice Johnson' },
-        { id: 2, name: 'Charlie Lee' },
-        { id: 3, name: 'Eva Green' },
-    ];
-
-    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [authors, setAuthors] = useState([]);
+    const [reviewers, setReviewers] = useState([]);
+    const [selectedAuthors, setSelectedAuthors] = useState([]);
+    const [selectedReviewers, setSelectedReviewers] = useState([]);
     const [error, setError] = useState('');
 
-    const handleUserSelection = (userId) => {
-        setSelectedUsers(prevState =>
-            prevState.includes(userId)
-                ? prevState.filter(id => id !== userId) // Remove user if already selected
-                : [...prevState, userId] // Add user if not selected
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const [authorsResponse, reviewersResponse] = await Promise.all([
+                    axios.get('http://localhost:1337/api/authors'),
+                    axios.get('http://localhost:1337/api/reviewers')
+                ]);
+
+                const fetchedAuthors = authorsResponse.data.data.map(item => ({
+                    id: item.id,
+                    name:item.firstName+   item.lastName
+                }));
+                const fetchedReviewers = reviewersResponse.data.data.map(item => ({
+                    id: item.id,
+                    name:item.firstName+item.lastName
+                    
+                }));
+               console.log('autther',authorsResponse,reviewersResponse);
+               
+                setAuthors(fetchedAuthors);
+                setReviewers(fetchedReviewers);
+            } catch (err) {
+                console.error('Error fetching users:', err);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+  
+    const handleAuthorSelection = (authorId) => {
+        setSelectedAuthors(prev =>
+            prev.includes(authorId)
+                ? prev.filter(id => id !== authorId)
+                : [...prev, authorId]
         );
     };
 
-    const handleAssign = () => {
-        if (selectedUsers.length === 0) {
-            setError('Please select at least one person to assign');
+    const handleReviewerSelection = (reviewerId) => {
+        setSelectedReviewers(prev =>
+            prev.includes(reviewerId)
+                ? prev.filter(id => id !== reviewerId)
+                : [...prev, reviewerId]
+        );
+    };
+
+    const handleAssign = async () => {
+        if (selectedAuthors.length === 0 && selectedReviewers.length === 0) {
+            setError('Please select at least one author or reviewer to assign');
             return;
         }
 
-        // Simulate assigning sub-organizers by logging the selected user IDs
-        console.log(`Assigned Sub-Organizers for conference ${conferenceId}:`, selectedUsers);
-        onClose(); // Close modal after success
+        const payload = {
+            conferenceId: conferenceId,
+            selectedAuthors: selectedAuthors,
+            selectedReviewers: selectedReviewers
+        };
+        try {
+            const response = await assignSubOrganizerRole(payload);
+            console.log('Assignment successful:', response);
+            onClose(); // Close modal on success
+        } catch (error) {
+            console.error('Error assigning sub-organizers:', error);
+            setError('Something went wrong while assigning sub-organizers');
+        }
     };
-
+    
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-lg">
@@ -53,7 +92,8 @@ const AssignSubOrganizer = ({ conferenceId, onClose }) => {
                                 <input
                                     type="checkbox"
                                     value={author.id}
-                                    onChange={() => handleUserSelection(author.id)}
+                                    onChange={() => handleAuthorSelection(author.id)}
+                                    checked={selectedAuthors.includes(author.id)}
                                     className="form-checkbox h-5 w-5 text-blue-500 border-gray-300 rounded mr-3"
                                 />
                                 <label className="text-gray-800">{author.name}</label>
@@ -71,7 +111,8 @@ const AssignSubOrganizer = ({ conferenceId, onClose }) => {
                                 <input
                                     type="checkbox"
                                     value={reviewer.id}
-                                    onChange={() => handleUserSelection(reviewer.id)}
+                                    onChange={() => handleReviewerSelection(reviewer.id)}
+                                    checked={selectedReviewers.includes(reviewer.id)}
                                     className="form-checkbox h-5 w-5 text-blue-500 border-gray-300 rounded mr-3"
                                 />
                                 <label className="text-gray-800">{reviewer.name}</label>
