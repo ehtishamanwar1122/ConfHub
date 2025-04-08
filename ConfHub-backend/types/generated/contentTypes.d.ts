@@ -418,6 +418,10 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    AssignedSubOrganizer: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::users-permissions.user'
+    >;
     Conference_location: Schema.Attribute.String & Schema.Attribute.Required;
     Conference_time: Schema.Attribute.Time & Schema.Attribute.Required;
     Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1114,6 +1118,10 @@ export interface PluginUsersPermissionsUser
     role: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::users-permissions.role'
+    >;
+    SubOrganizerRole: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::conference.conference'
     >;
     Type: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;

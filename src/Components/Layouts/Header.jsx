@@ -59,87 +59,93 @@ const Header = () => {
     const handleRoleChange = (newRole) => {
         setRole(newRole);
     };
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    const isSubOrganizer = userDetails?.SubOrganizerRole?.length > 0;
+    console.log('k',isSubOrganizer);
+    
 
+    const usertype = JSON.parse(localStorage.getItem('userDetails'));
+
+let availableRoles = ['Author', 'Reviewer', 'SubOrganizer'];
+
+if (usertype?.Type === 'reviewer') {
+    availableRoles = ['Reviewer', 'SubOrganizer'];
+} else if (usertype?.Type === 'author') {
+    availableRoles = ['Author', 'SubOrganizer'];
+}
     return (
-        <header className="bg-gray-100 p-4 flex items-center justify-between border-b border-gray-300">
-            <div className="flex items-center relative">
-                <button
-                    onClick={toggleDropdown}
-                    className="text-gray-600 text-2xl mr-5"
+      <header className="bg-gray-100 p-4 flex items-center justify-between border-b border-gray-300">
+        <div className="flex items-center relative">
+          <button
+            onClick={toggleDropdown}
+            className="text-gray-600 text-2xl mr-5"
+          >
+            <FaBars />
+          </button>
+          <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
+            <img src={ConfHub} alt="ConfHub" style={{ height: "30px" }} />
+          </Link>
+          {dropdownVisible && (
+            <div
+              ref={dropdownRef}
+              className="absolute top-12 left-0 bg-white border border-gray-300 rounded-lg shadow-lg w-48 z-10"
+            >
+              {!isSubOrganizer && (
+                <Link
+                  to="/CreateConference"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
-                    <FaBars />
-                </button>
-               <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
-                <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
+                  Create New Conference
                 </Link>
-                {dropdownVisible && (
-                    <div
-                        ref={dropdownRef}
-                        className="absolute top-12 left-0 bg-white border border-gray-300 rounded-lg shadow-lg w-48 z-10"
-                    >
-                        {role !== 'SubOrganizer' && ( // Don't show "Create Conference" for SubOrganizer
-                            <Link
-                                to="/CreateConference"
-                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                            >
-                                Create New Conference
-                            </Link>
-                        )}
-                        <Link
-                            to="/ManageConferences"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                            Manage Conferences
-                        </Link>
-                        <Link
-                            to="/ManageReviewerRequests"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                            Manage Reviewer Requests
-                        </Link>
-                        <Link
-                            to="/AssignSubOrganizer"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                            Assign Sub-Organizer Role
-                        </Link>
-                        <Link
-                            to="/Settings"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                            Settings
-                        </Link>
-                        <Link
-                            to="/Help"
-                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
-                            Help
-                        </Link>
-                    </div>
-                )}
-
+              )}
+              <Link
+                to="#"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Manage Conferences
+              </Link>
+              <Link
+                to="/ManageReviewerRequests"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Manage Reviewer Requests
+              </Link>
               
+              <Link
+                to="/Settings"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Settings
+              </Link>
+              <Link
+                to="/Help"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Help
+              </Link>
             </div>
+          )}
+        </div>
 
-            <div className="flex items-center ml-auto mr-2 text-base">
-                <RoleSwitcherButton
-                    roles={['Admin', 'Author', 'Organizer', 'Reviewer', 'Guest', 'SubOrganizer']}
-                    onRoleSelect={handleRoleChange}
-                />
-            </div>
+        <div className="flex items-center ml-auto mr-2 text-base">
+          <RoleSwitcherButton
+            roles={availableRoles}
+            onRoleSelect={handleRoleChange}
+          />
+        </div>
 
-            <div className="flex items-center">
-                <span className="text-gray-600 text-xl mr-5">
-                    <FaBell />
-                </span>
-                <button
-                    onClick={handleLogout}
-                    className="border border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
-                >
-                    Logout
-                </button>
-            </div>
-        </header>
+        <div className="flex items-center">
+          <span className="text-gray-600 text-xl mr-5">
+            <FaBell />
+          </span>
+          <button
+            onClick={handleLogout}
+            className="border border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
     );
 };
 

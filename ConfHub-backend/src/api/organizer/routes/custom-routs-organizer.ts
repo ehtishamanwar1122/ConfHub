@@ -52,5 +52,14 @@ export default {
         },
         
       },
+      {
+        method: 'POST',
+        path: '/organizers/AssignRole', // Custom endpoint for registration
+        handler: 'organizer.assignSubOrganizerRole',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
     ],
   };
