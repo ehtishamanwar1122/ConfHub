@@ -18,6 +18,8 @@ import SubmitReview from "./Components/Reviewer/SubmitReview";
 import OrgConfDetails from "./Components/Conference/OrgConfDetails";
 import AssignSubOrganizer from "./Components/AssignSubOrganizer";
 import SubOrganizerDashboard from './Components/SubOrganizer/SubOrganizerDashboard'
+import PaperReviewPage from "./Components/Author/PaperReview";
+
 function App() {
   return (
     <Router>
@@ -28,6 +30,7 @@ function App() {
         <Route path="/OrganizerDashboard" element={<OrganizerDashboard />} />
         <Route path="/CreateConference" element={<CreateConference />} />
         <Route path="/AssignSubOrganizer" element={<AssignSubOrganizer />} />
+
         <Route path="/SubOrganizerDashboard" element={<SubOrganizerDashboard />} />
 
         <Route path="/ManageReviewerRequests" element={<ManageReviewerRequests />} />
@@ -38,6 +41,9 @@ function App() {
         <Route path="/AuthorDashboard" element={<AuthorDashboard />} />
 
         <Route path="/SubmitPaper" element={<PaperSubmissionForm />} />
+        <Route path="/paper-review/:paperId" element={<PaperReviewPage />} />
+     
+
         <Route path="/ReviewerDashboard" element={<ReviewerDashboard />} />
         
         <Route path="/ManageInvitations" element={<ManageInvitations />} />

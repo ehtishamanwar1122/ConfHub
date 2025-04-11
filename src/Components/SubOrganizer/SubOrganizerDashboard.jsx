@@ -111,33 +111,49 @@ const SubOrganizerDashboard = () => {
             <div className="p-5">
                 {/* Tab Navigation */}
                 <div className="mb-5">
-                    <ul className="flex border-b-2">
-                        <li
-                            className={`cursor-pointer px-4 py-2 ${activeTab === 'conferenceDetails' ? 'border-b-4 border-blue-500' : ''}`}
-                            onClick={() => setActiveTab('conferenceDetails')}
-                        >
-                            Conference Details
-                        </li>
-                        <li
-                            className={`cursor-pointer px-4 py-2 ${activeTab === 'submittedPapers' ? 'border-b-4 border-blue-500' : ''}`}
-                            onClick={() => setActiveTab('submittedPapers')}
-                        >
-                            Submitted Papers
-                        </li>
-                        <li
-                            className={`cursor-pointer px-4 py-2 ${activeTab === 'reviewRequests' ? 'border-b-4 border-blue-500' : ''}`}
-                            onClick={() => setActiveTab('reviewRequests')}
-                        >
-                            Manage Review Requests
-                        </li>
-                        <li
-                            className={`cursor-pointer px-4 py-2 ${activeTab === 'requestReviewer' ? 'border-b-4 border-blue-500' : ''}`}
-                            onClick={() => setActiveTab('requestReviewer')}
-                        >
-                            Request Reviewer
-                        </li>
-                    </ul>
-                </div>
+    <ul className="flex border-b border-gray-200">
+        <li
+            className={`cursor-pointer px-6 py-3 text-sm font-medium ${
+                activeTab === 'conferenceDetails'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
+            }`}
+            onClick={() => setActiveTab('conferenceDetails')}
+        >
+            Conference Details
+        </li>
+        <li
+            className={`cursor-pointer px-6 py-3 text-sm font-medium ${
+                activeTab === 'submittedPapers'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
+            }`}
+            onClick={() => setActiveTab('submittedPapers')}
+        >
+            Submitted Papers
+        </li>
+        <li
+            className={`cursor-pointer px-6 py-3 text-sm font-medium ${
+                activeTab === 'reviewRequests'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
+            }`}
+            onClick={() => setActiveTab('reviewRequests')}
+        >
+            Manage Review Requests
+        </li>
+        <li
+            className={`cursor-pointer px-6 py-3 text-sm font-medium ${
+                activeTab === 'requestReviewer'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
+            }`}
+            onClick={() => setActiveTab('requestReviewer')}
+        >
+            Request Reviewer
+        </li>
+    </ul>
+</div>
 
                 {/* Tab Content */}
                 {activeTab === 'conferenceDetails' && (
