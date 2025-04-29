@@ -12,10 +12,11 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "SubmittedBy": {
+    "submitted_by": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::author.author"
+      "relation": "manyToOne",
+      "target": "api::author.author",
+      "inversedBy": "submittedPapers"
     },
     "Author": {
       "type": "string"
@@ -69,7 +70,7 @@
     },
     "review": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::review.review",
       "mappedBy": "paper"
     }

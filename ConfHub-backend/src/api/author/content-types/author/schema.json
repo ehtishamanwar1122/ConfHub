@@ -36,6 +36,12 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "submittedPapers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::paper.paper",
+      "mappedBy": "submitted_by"
     }
   }
 }

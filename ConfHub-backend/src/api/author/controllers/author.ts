@@ -168,7 +168,7 @@ const authorName = `${author.firstName} ${author.lastName}`;
                   Paper_Title: paperTitle,
                   Abstract: abstract,
                   submissionDate: new Date(),
-                  SubmittedBy: submittedBy,
+                  submitted_by: submittedBy,
                   SubmittedTo: submittedTo,
                   conference:submittedTo,
                   Domain:domain,

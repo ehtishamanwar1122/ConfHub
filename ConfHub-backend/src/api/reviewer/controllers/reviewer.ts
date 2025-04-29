@@ -174,7 +174,7 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
     },
     async submitReview(ctx) {
       try {
-        const { comments, recommendation, score ,paperId,reviewerId} = ctx.request.body;
+        const { comments, recommendation, score ,paperId,reviewerId,significance,overall,presentation,originality} = ctx.request.body;
     
         console.log("Request Body:", ctx.request.body);
        
@@ -182,12 +182,22 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
           data: {
             Comments: comments,
           Recommendations: recommendation,
-          Score: score,
+          // Score: score,
           paper: paperId,
           reviewer:reviewerId,
+          overall:overall,
+          originality:originality,
+          presentation:presentation,
+          significance:significance
         },
       });
-        
+      const updatedPaper = await strapi.db.query("api::paper.paper").update({
+        where: { id: paperId },
+        data: {
+          reviewRequestsConfirmed: {
+            disconnect: [{ id: reviewerId }],
+          },
+        },});
        
         return ctx.send({
           message: "Request received successfully!",
