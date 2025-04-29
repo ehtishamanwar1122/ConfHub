@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// import axios from 'axios'; // Import axios for making API requests (commented for dummy data)
+ import axios from 'axios'; // Import axios for making API requests (commented for dummy data)
 import Layout from './Layouts/Layout';
 import { useNavigate } from "react-router-dom";
 
@@ -13,26 +13,26 @@ const AuthorDashboard = () => {
   // Fetch recent conferences and submitted papers (dummy data instead of real API)
   useEffect(() => {
     // Dummy data for recent conferences
-    const dummyConferences = [
-      {
-        id: 1,
-        Conference_title: "International AI Conference",
-        Description: "Explore the future of artificial intelligence.",
-        Start_date: "2025-05-10",
-        Conference_location: "Berlin, Germany",
-        Papers: [{}, {}, {}],
-        Submission_deadline: "2025-04-30",
-      },
-      {
-        id: 2,
-        Conference_title: "Web Development Expo",
-        Description: "Dive into the latest trends in web technologies.",
-        Start_date: "2025-06-15",
-        Conference_location: "New York, USA",
-        Papers: [{}],
-        Submission_deadline: "2025-05-20",
-      },
-    ];
+    // const dummyConferences = [
+    //   {
+    //     id: 1,
+    //     Conference_title: "International AI Conference",
+    //     Description: "Explore the future of artificial intelligence.",
+    //     Start_date: "2025-05-10",
+    //     Conference_location: "Berlin, Germany",
+    //     Papers: [{}, {}, {}],
+    //     Submission_deadline: "2025-04-30",
+    //   },
+    //   {
+    //     id: 2,
+    //     Conference_title: "Web Development Expo",
+    //     Description: "Dive into the latest trends in web technologies.",
+    //     Start_date: "2025-06-15",
+    //     Conference_location: "New York, USA",
+    //     Papers: [{}],
+    //     Submission_deadline: "2025-05-20",
+    //   },
+    // ];
 
     // Dummy data for submitted papers
     const dummyPapers = [
@@ -51,22 +51,28 @@ const AuthorDashboard = () => {
     ];
 
     // Simulate loading
-    setTimeout(() => {
-      setRecentConferences(dummyConferences);
-      setSubmittedPapers(dummyPapers);
-      setLoading(false);
-    }, 1000);
+    // setTimeout(() => {
+    //   setRecentConferences(dummyConferences);
+    //   setSubmittedPapers(dummyPapers);
+    //   setLoading(false);
+    // }, 1000);
 
     // Uncomment below if switching back to API
-    /*
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+const authorId = userDetails?.authorId?.id;
     const fetchAuthorData = async () => {
       try {
         const conferenceResponse = await axios.get(
           'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate=*'
         );
-        const papersResponse = await axios.get('http://localhost:1337/api/papers/submitted');
+      
         setRecentConferences(conferenceResponse.data.data);
-        setSubmittedPapers(papersResponse.data);
+        const papersResponse = await axios.get(`http://localhost:1337/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*`);
+        // Step 3: Access the submitted papers
+        const submittedPapers = papersResponse.data?.data;
+        console.log('ppa',submittedPapers);
+        
+        setSubmittedPapers(submittedPapers);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching author data:', error);
@@ -75,7 +81,7 @@ const AuthorDashboard = () => {
     };
 
     fetchAuthorData();
-    */
+    
   }, []);
 
   // Navigate to Submit Paper page
@@ -123,9 +129,10 @@ const AuthorDashboard = () => {
 
     return submittedPapers.map((paper) => (
       <div className="bg-white rounded-lg  shadow p-6 mb-4" key={paper.id}>
-        <h3 className="text-xl text-center font-semibold mb-2">{paper.title}</h3>
-        <p><strong>Conference:</strong> {paper.conference}</p>
-        <p><strong>Status:</strong> {paper.status}</p>
+        <h3 className="text-xl text-center font-semibold mb-2">Paper Title: {paper.Paper_Title }</h3>
+        <p><strong>Conference:</strong> {paper.conference.Conference_title}</p>
+        <p><strong>Review Deadline :</strong> {paper.conference.Review_deadline }</p>
+
         <button
           className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={() => handleShowReview(paper.id)}

@@ -397,6 +397,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     researchInterest: Schema.Attribute.String;
+    submittedPapers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -528,7 +529,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Paper_Title: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    review: Schema.Attribute.Relation<'oneToOne', 'api::review.review'>;
+    review: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
     reviewRequests: Schema.Attribute.Relation<
       'oneToMany',
       'api::reviewer.reviewer'
@@ -542,7 +543,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
       'api::reviewer.reviewer'
     >;
     submissionDate: Schema.Attribute.DateTime;
-    SubmittedBy: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    submitted_by: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
     SubmittedTo: Schema.Attribute.Relation<
       'oneToOne',
       'api::conference.conference'
@@ -565,7 +566,7 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    Comments: Schema.Attribute.String;
+    Comments: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -575,11 +576,15 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
       'api::review.review'
     > &
       Schema.Attribute.Private;
-    paper: Schema.Attribute.Relation<'oneToOne', 'api::paper.paper'>;
+    originality: Schema.Attribute.Integer;
+    overall: Schema.Attribute.Integer;
+    paper: Schema.Attribute.Relation<'manyToOne', 'api::paper.paper'>;
+    presentation: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     Recommendations: Schema.Attribute.String;
     reviewer: Schema.Attribute.Relation<'oneToOne', 'api::reviewer.reviewer'>;
     Score: Schema.Attribute.Integer;
+    significance: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

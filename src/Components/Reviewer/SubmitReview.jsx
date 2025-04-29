@@ -63,32 +63,33 @@ const SubmitReview = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (
-      !reviewComments ||
-      !score ||
-      originality === "" ||
-      significance === "" ||
-      presentation === "" ||
-      overall === "" ||
-      !reviewerId
-    ) {
-      setErrorMessage("Please fill in all fields.");
-      setLoading(false);
-      return;
-    }
+    // if (
+    //   !reviewComments ||
+    //   // !score ||
+    //   originality === "" ||
+    //   significance === "" ||
+    //   presentation === "" ||
+    //   overall === "" ||
+    //   !reviewerId
+    // ) {
+    //   setErrorMessage("Please fill in all fields.");
+    //   setLoading(false);
+    //   return;
+    // }
 
     const reviewData = {
       paperId: id,
       reviewerId,
       comments: reviewComments,
-      score: parseInt(score),
+      //score: parseInt(score),
       recommendation,
       originality: parseInt(originality),
       significance: parseInt(significance),
       presentation: parseInt(presentation),
       overall: parseInt(overall),
     };
-
+ console.log('pay',reviewData);
+ 
     try {
       const response = await submitReview(reviewData);
       setSuccessMessage("Review submitted successfully.");
