@@ -1,36 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
-
-const FooterContainer = styled.footer`
-    background-color: #343a40; 
-    color: #fff;
-    padding: 25px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    position: relative; /* Can be changed to fixed if needed */
-    bottom: 0;
-    margin-top:10px;
-    margin: 0; /* Removes left and right margin */
-    margin-top: auto; /* Pushes footer to the bottom if the container is a flexbox */
-`;
-
-
-const FooterText = styled.p`
-    font-size: 0.9rem;
-    margin:0;
-`;
+import React from "react";
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear();
-    return (
-        <FooterContainer>
-            <FooterText>ConfHub</FooterText>
-            <FooterText>Company, {currentYear} &copy; All Rights Reserved</FooterText>
-        </FooterContainer>
-    );
+  return (
+    <footer className="bg-gradient-to-r from-blue-600 to-pink-500 text-white py-4 text-center">
+      <p className="text-sm font-medium">&copy; 2024 ConfHub. All rights reserved.</p>
+    </footer>
+  );
 };
 
 export default Footer;
