@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import axios from 'axios';
 import Layout from './Layouts/Layout';
-import '../../styles/AdminDashboard.css'; // Import your CSS file
 
 const AdminConferenceManager = () => {
   const [conferences, setConferences] = useState([]);
@@ -15,8 +13,7 @@ const AdminConferenceManager = () => {
       try {
         const response = await axios.get('http://localhost:1337/api/conferences?populate=*');
         const allRequests = response.data.data;
- console.log('conf',allRequests);
- 
+
         // Separate pending and completed requests
         const pending = allRequests.filter(req => req.requestStatus === 'pending');
         const completed = allRequests.filter(req => req.requestStatus === 'approved' || req.requestStatus === 'rejected');
@@ -81,80 +78,81 @@ const AdminConferenceManager = () => {
       return <p>No {activeTab === 'pending' ? 'pending' : 'completed'} requests.</p>;
     }
 
-    return requestsToRender.map((conference, index) => (
-      <div className="request-card" key={conference.id}>
-        <div className="avatar">
-          <div className="avatar-circle"></div>
-        </div>
-        <div className="request-details">
-    <p>Conference Title: <span className="value">{conference.Conference_title}</span></p>
-    <p>Organizer Name: <span className="value">{conference.Organizer.Organizer_FirstName} {conference.Organizer.Organizer_LastName}</span></p>
-    <p>Conference Date: <span className="value">{conference.Start_date}</span></p>
-    <p>Conference Time: <span className="value">{conference.Conference_time}</span></p>
-    <p>Paper Submission Deadline: <span className="value">{conference.Submission_deadline}</span></p>
-    <p>Review Submission Deadline: <span className="value">{conference.Review_deadline}</span></p>
-    <p>Status: <span className="value">{conference.requestStatus}</span></p>
-</div>
-
-        {activeTab === 'pending' && (
-          <div className="request-actions">
-            <button
-              className="approve-button"
-              onClick={() => handleApprove(index)}
-            >
-              Approve Conference
-            </button>
-            <button
-              className="reject-button"
-              onClick={() => handleReject(index)}
-            >
-              Reject Conference
-            </button>
-          </div>
-        )}
+    return (
+      <div className="overflow-x-auto mt-8">
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left border-b">#</th>
+              <th className="px-4 py-2 text-left border-b">Conference Title</th>
+              <th className="px-4 py-2 text-left border-b">Organizer Name</th>
+              <th className="px-4 py-2 text-left border-b">Date</th>
+              <th className="px-4 py-2 text-left border-b">Time</th>
+              <th className="px-4 py-2 text-left border-b">Submission Deadline</th>
+              <th className="px-4 py-2 text-left border-b">Review Deadline</th>
+              <th className="px-4 py-2 text-left border-b">Status</th>
+              {activeTab === 'pending' && <th className="px-4 py-2 text-left border-b">Actions</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {requestsToRender.map((conference, index) => (
+              <tr key={conference.id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2">{index + 1}</td>
+                <td className="px-4 py-2">{conference.Conference_title}</td>
+                <td className="px-4 py-2">{conference.Organizer?.Organizer_FirstName} {conference.Organizer?.Organizer_LastName}</td>
+                <td className="px-4 py-2">{conference.Start_date}</td>
+                <td className="px-4 py-2">{conference.Conference_time}</td>
+                <td className="px-4 py-2">{conference.Submission_deadline}</td>
+                <td className="px-4 py-2">{conference.Review_deadline}</td>
+                <td className="px-4 py-2">{conference.requestStatus}</td>
+                {activeTab === 'pending' && (
+                  <td className="px-4 py-2">
+                    <button
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+                      onClick={() => handleApprove(index)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                      onClick={() => handleReject(index)}
+                    >
+                      Reject
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    ));
+    );
   };
 
   return (
     <Layout>
-      <div className="main-content">
-        <h1>Approve and Reject Conference Request</h1>
+      <div className="main-content px-8 py-6">
+        <h1 className="text-3xl font-bold mb-6">Approve and Reject Conference Request</h1>
 
-        <TabContainer>
-          <Tab active={activeTab === 'pending'} onClick={() => setActiveTab('pending')}>
+        <div className="flex space-x-4 mb-6">
+          <button
+            className={`px-6 py-2 rounded-full ${activeTab === 'pending' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+            onClick={() => setActiveTab('pending')}
+          >
             Pending Requests
-          </Tab>
-          <Tab active={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>
+          </button>
+          <button
+            className={`px-6 py-2 rounded-full ${activeTab === 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+            onClick={() => setActiveTab('completed')}
+          >
             Completed Requests
-          </Tab>
-        </TabContainer>
-
-        <div className="requests-container">
-          {renderRequests()}
+          </button>
         </div>
+
+        {renderRequests()}
       </div>
     </Layout>
   );
 };
 
 export default AdminConferenceManager;
-
-// Styled Components
-const TabContainer = styled.div`
-  display: flex;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 25px;
-`;
-
-const Tab = styled.button`
-  padding: 10px 20px;
-  border: none;
-  background-color: ${props => props.active ? '#007bff' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#333'};
-  cursor: pointer;
-  border-radius: 25px;
-  margin-right: 10px;
-`;

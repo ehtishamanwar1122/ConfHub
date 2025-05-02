@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layouts/Layout";
-import axios from "axios"; // Commented out for demo
+import axios from "axios";
 import { reviewRequest } from "../../Services/reviewerService";
 
 const ReviewerDashboard = () => {
-  const [assignedPapers, setAssignedPapers] = useState([]);
   const [ongoingPapers, setOngoingPapers] = useState([]);
+  const [assignedPapers, setAssignedPapers] = useState([]);
   const [completedReviews, setCompletedReviews] = useState([]);
-
-  const [activeTab, setActiveTab] = useState("papers");
+  const [activeTab, setActiveTab] = useState("ongoing");
   const [loading, setLoading] = useState(true);
 
   const storedUser = JSON.parse(localStorage.getItem("userDetails"));
@@ -16,284 +15,212 @@ const ReviewerDashboard = () => {
   const reviewerId = storedUser?.reviewerId?.id;
 
   useEffect(() => {
-    // Commented API calls
-    const fetchReviewerData = async () => {
-      try {
-        if (!userId) return;
+    const fetchData = async () => {
+      if (!userId || !reviewerId) return;
 
+      try {
         const userResponse = await axios.get(
           `http://localhost:1337/api/users/${userId}?populate=reviewerId`
         );
+
         const domain = userResponse.data?.reviewerId?.domain;
-        const reviewerId = userResponse.data?.reviewerId?.id;
-        const forOngoingPapers = await axios.get(
-          "http://localhost:1337/api/papers?populate=*"
+
+        const [ongoingRes, completedRes, assignedRes] = await Promise.all([
+          axios.get("http://localhost:1337/api/papers?populate=*"),
+          axios.get(
+            "http://localhost:1337/api/papers?populate[review][populate]=reviewer&populate=conference"
+          ),
+          axios.get(
+            `http://localhost:1337/api/papers?filters[reviewRequestsConfirmed][id][$eq]=${reviewerId}&populate=*`
+          ),
+        ]);
+
+        const allPapers = ongoingRes.data?.data || [];
+        const completedData = completedRes.data?.data || [];
+        const assignedData = assignedRes.data?.data || [];
+
+        const completed = completedData.filter((paper) =>
+          paper.review?.some((r) => r.reviewer?.id === reviewerId)
         );
-        const forCompletedPapers = await axios.get(
-          "http://localhost:1337/api/papers?populate[review][populate]=reviewer&populate=conference"
-        );
-        const forAssignedPapers = await axios.get(
-          `http://localhost:1337/api/papers?filters[reviewRequestsConfirmed][id][$eq]=${reviewerId}&populate=*`
-        );
 
-        const papersData = forAssignedPapers.data?.data || [];
-        const papersData3 = forCompletedPapers.data?.data || [];
-        const papersArray = forOngoingPapers.data?.data || [];
-        
-       
-          // Papers where review is completed (review.reviewer includes reviewerId)
-          const completedReviews = papersData3.filter((paper) => {
-            return paper.review?.some((r) => r.reviewer?.id === reviewerId);
-          });
-          console.log("for assigned", papersData);
-          console.log("for completed", papersData3);
-          
-          console.log("comm", completedReviews);
-        
-        
-          setAssignedPapers(papersData);
-          setCompletedReviews(completedReviews); // You need to add useState for this
-        
-        
-        console.log("alll pape", papersArray);
-          
-          const filteredPapers = papersArray.filter((paper) => {
-            const isDomainMatch = paper.Domain === domain;
-            const isReviewNotSubmitted = papersData3.filter((paper) => {
-              return !paper.review?.some((r) => r.reviewer?.id === reviewerId);
-            });
+        const ongoing = allPapers.filter((paper) => {
+          const domainMatch = paper.Domain === domain;
+          const alreadyReviewed = completed.some((p) => p.id === paper.id);
+          const alreadyRequested =
+            paper.reviewRequests?.some((r) => r.id === reviewerId) ||
+            paper.reviewRequestsConfirmed?.some((r) => r.id === reviewerId) ||
+            paper.reviewRequestsRejected?.some((r) => r.id === reviewerId);
 
-            const isNotRequested = !paper.reviewRequests?.some(
-              (r) => r.id === reviewerId
-            );
-            const isNotConfirmed = !paper.reviewRequestsConfirmed?.some(
-              (r) => r.id === reviewerId
-            );
-            const isNotRejected = !paper.reviewRequestsRejected?.some(
-              (r) => r.id === reviewerId
-            );
+          return domainMatch && !alreadyReviewed && !alreadyRequested;
+        });
 
-            return (
-              isDomainMatch &&
-              isNotRequested &&
-              isNotConfirmed &&
-              isNotRejected &&
-              isReviewNotSubmitted
-            );
-          });
-
-          setOngoingPapers(filteredPapers);
-        
-
-        
-        
-       
-      } catch (error) {
-        console.error(error);
+        setCompletedReviews(completed);
+        setAssignedPapers(assignedData);
+        setOngoingPapers(ongoing);
+      } catch (err) {
+        console.error("Error fetching reviewer data:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    fetchReviewerData();
-
-    // Dummy data
-    // const dummyOngoing = [
-    //   {
-    //     id: 1,
-    //     Paper_Title: "AI for Healthcare",
-    //     Domain: "Artificial Intelligence",
-    //     SubmittedTo: { Conference_title: "ICAI 2025" },
-    //     conference: { Review_deadline: "2025-05-15" },
-    //   },
-    //   {
-    //     id: 2,
-    //     Paper_Title: "Quantum Machine Learning",
-    //     Domain: "Artificial Intelligence",
-    //     SubmittedTo: { Conference_title: "QMLConf 2025" },
-    //     conference: { Review_deadline: "2025-06-01" },
-    //   }
-    // ];
-
-    // const dummyAssigned = [
-    //   {
-    //     id: 3,
-    //     Paper_Title: "Ethics in AI",
-    //     Author: "John Doe",
-    //     SubmittedTo: { Conference_title: "ICAI 2025" },
-    //     conference: { Review_deadline: "2025-05-20" },
-    //     file: {
-    //       url: "https://example.com/paper.pdf",
-    //       name: "Ethics_in_AI.pdf"
-    //     }
-    //   }
-    // ];
-
-    // setOngoingPapers(dummyOngoing);
-    // setAssignedPapers(dummyAssigned);
-    setLoading(false);
-  }, []);
+    fetchData();
+  }, [userId, reviewerId]);
 
   const handleReviewRequest = async (paper) => {
     alert("Request received! Your review request has been submitted.");
-    console.log("Review request for:", paper);
-    const payload = {
-      paperId: paper.id,
-      reviewerId,
-      status: "pending",
-    };
     try {
-      const response = await reviewRequest(payload);
+      const response = await reviewRequest({
+        paperId: paper.id,
+        reviewerId,
+        status: "pending",
+      });
       console.log("Review request sent:", response);
     } catch (error) {
-      console.error("Failed:", error);
+      console.error("Review request failed:", error);
     }
   };
 
-  const renderOngoingPapers = () => {
-    if (loading) return <p>Loading ongoing papers...</p>;
-    if (ongoingPapers.length === 0)
-      return <p>No ongoing papers in your domain.</p>;
+// Replace renderOngoing function
+const renderOngoing = () =>
+  ongoingPapers.length ? (
+    <table className="min-w-full bg-white border border-gray-200">
+      <thead>
+        <tr className="bg-gray-100 text-left">
+          <th className="p-3 border">Title</th>
+          <th className="p-3 border">Conference</th>
+          <th className="p-3 border">Domain</th>
+          <th className="p-3 border">Review Deadline</th>
+          <th className="p-3 border">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ongoingPapers.map((paper) => (
+          <tr key={paper.id} className="border-t">
+            <td className="p-3 border">{paper.Paper_Title}</td>
+            <td className="p-3 border">{paper.conference?.Conference_title}</td>
+            <td className="p-3 border">{paper.Domain}</td>
+            <td className="p-3 border">{paper.conference?.Review_deadline}</td>
+            <td className="p-3 border">
+              <button
+                onClick={() => handleReviewRequest(paper)}
+                className="bg-blue-500 rounded-full text-white px-4 py-2  hover:bg-blue-600"
+              >
+                Review This Paper
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p>No ongoing papers in your domain.</p>
+  );
 
-    return ongoingPapers.map((paper) => (
-      <div key={paper.id} className="bg-white p-4 rounded-lg shadow-md mb-4">
-        <p>
-          <strong>Paper Title:</strong> <h3>{paper.Paper_Title}</h3>
-        </p>
-        <p>
-          <strong>Conference Name:</strong> {paper.conference.Conference_title}
-        </p>
-        <p>
-          <strong>Domain:</strong> {paper.Domain}
-        </p>
-        <p>
-          <strong>Review Deadline:</strong> {paper.conference.Review_deadline}
-        </p>
-        <button
-          onClick={() => handleReviewRequest(paper)}
-          className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-        >
-          Review This Paper
-        </button>
-      </div>
-    ));
-  };
+// Replace renderAssigned function
+const renderAssigned = () => (
+  <table className="min-w-full bg-white border border-gray-200">
+    <thead>
+      <tr className="bg-gray-100 text-left">
+        <th className="p-3 border">Title</th>
+        <th className="p-3 border">Author</th>
+        <th className="p-3 border">Conference</th>
+        <th className="p-3 border">Deadline</th>
+        <th className="p-3 border">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {assignedPapers.map((paper) => (
+        <tr key={paper.id} className="border-t">
+          <td className="p-3 border">{paper.Paper_Title}</td>
+          <td className="p-3 border">{paper.Author}</td>
+          <td className="p-3 border">{paper.SubmittedTo?.Conference_title}</td>
+          <td className="p-3 border">{paper.conference?.Review_deadline}</td>
+          <td className="p-3 border space-y-2">
+            {paper.file?.url && (
+              <a
+                href={paper.file.url}
+                download={paper.file.name}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm"
+              >
+                <i className="fa fa-download mr-1"></i>Download
+              </a>
+            )}
+            <button
+              onClick={() => (window.location.href = `/SubmitReview/${paper.id}`)}
+              className="inline-block bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-sm"
+            >
+              <i className="fa fa-edit mr-1"></i>Submit
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
+// Replace renderCompleted function
+const renderCompleted = () => (
+  <table className="min-w-full bg-white border border-gray-200">
+    <thead>
+      <tr className="bg-gray-100 text-left">
+        <th className="p-3 border">Title</th>
+        <th className="p-3 border">Author</th>
+        <th className="p-3 border">Conference</th>
+        <th className="p-3 border">Deadline</th>
+        <th className="p-3 border">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {completedReviews.map((paper) => (
+        <tr key={paper.id} className="border-t">
+          <td className="p-3 border">{paper.Paper_Title}</td>
+          <td className="p-3 border">{paper.Author}</td>
+          <td className="p-3 border">{paper.conference?.Conference_title}</td>
+          <td className="p-3 border">{paper.conference?.Review_deadline}</td>
+          <td className="p-3 border rounded-full text-green-600 font-semibold">Review Submitted</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
 
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-semibold mb-6">
-          Welcome to Reviewer Dashboard
-        </h1>
+        <h1 className="text-3xl font-semibold mb-6">Welcome to Reviewer Dashboard</h1>
 
-        <div className="flex mb-6 bg-gray-100 p-2 rounded-full">
-          <button
-            onClick={() => setActiveTab("ongoing")}
-            className={`py-2 px-6 rounded-full ${
-              activeTab === "ongoing"
-                ? "bg-blue-500 text-white"
-                : "bg-transparent text-gray-700"
-            }`}
-          >
-            Ongoing Papers
-          </button>
-          <button
-            onClick={() => setActiveTab("papers")}
-            className={`py-2 px-6 rounded-full ${
-              activeTab === "papers"
-                ? "bg-blue-500 text-white"
-                : "bg-transparent text-gray-700"
-            }`}
-          >
-            Assigned Papers
-          </button>
-          <button
-            onClick={() => setActiveTab("completed")}
-            className={`py-2 px-6 rounded-full ${
-              activeTab === "completed"
-                ? "bg-blue-500 text-white"
-                : "bg-transparent text-gray-700"
-            }`}
-          >
-            Completed Reviews
-          </button>
+        <div className="flex mb-6 p-2 rounded-full">
+          {["ongoing", "papers", "completed"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-2 px-6 rounded-full ${
+                activeTab === tab
+                  ? "bg-blue-500 text-white"
+                  : "bg-transparent text-gray-700"
+              }`}
+            >
+              {tab === "ongoing" ? "Ongoing Papers" : tab === "papers" ? "Assigned Papers" : "Completed Reviews"}
+            </button>
+          ))}
         </div>
 
         <div className="mt-6">
-          {activeTab === "ongoing" && renderOngoingPapers()}
-
-          {activeTab === "papers" && (
+          {loading ? (
+            <p>Loading...</p>
+          ) : activeTab === "ongoing" ? (
+            renderOngoing()
+          ) : activeTab === "papers" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {assignedPapers.map((paper) => (
-                <div
-                  key={paper.id}
-                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
-                >
-                  <h3 className="text-lg font-semibold mb-2">
-                    {paper.Paper_Title}
-                  </h3>
-                  <p className="text-sm mb-1">
-                    <strong>Author:</strong> {paper.Author}
-                  </p>
-                  <p className="text-sm mb-1">
-                    <strong>Conference:</strong>{" "}
-                    {paper.SubmittedTo?.Conference_title}
-                  </p>
-                  <p className="text-sm mb-4">
-                    <strong>Deadline:</strong>{" "}
-                    {paper.conference?.Review_deadline}
-                  </p>
-
-                  <div className="flex flex-col gap-3">
-                    {paper.file?.url && (
-                      <a
-                        href={paper.file.url}
-                        download={paper.file.name}
-                        className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <i className="fa fa-download mr-2"></i> Download Paper
-                      </a>
-                    )}
-                    <button
-                      className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-md transition"
-                      onClick={() =>
-                        (window.location.href = `/SubmitReview/${paper.id}`)
-                      }
-                    >
-                      <i className="fa fa-edit mr-2"></i> Submit Review
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {renderAssigned()}
             </div>
-          )}
-          {activeTab === "completed" && (
+          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {completedReviews.map((paper) => (
-                <div
-                  key={paper.id}
-                  className="bg-white p-6 rounded-xl shadow-md"
-                >
-                  <h3 className="text-lg font-semibold mb-2">
-                    {paper.Paper_Title}
-                  </h3>
-                  <p className="text-sm mb-1">
-                    <strong>Author:</strong> {paper.Author}
-                  </p>
-                  <p className="text-sm mb-1">
-                    <strong>Conference:</strong>{" "}
-                    {paper.conference?.Conference_title}
-                  </p>
-                  <p className="text-sm mb-4">
-                    <strong>Deadline:</strong>{" "}
-                    {paper.conference?.Review_deadline}
-                  </p>
-                  <p className="text-green-600 font-semibold">
-                    Review Submitted
-                  </p>
-                </div>
-              ))}
+              {renderCompleted()}
             </div>
           )}
         </div>

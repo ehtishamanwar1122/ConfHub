@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layouts/Layout';
 import axios from 'axios';
-import '../../styles/SubmitPaper.css'; // Import the CSS file
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { submitPaper } from '../../Services/author.js';
-import { useNavigate } from "react-router-dom";
 
 const PaperSubmissionForm = () => {
   const navigate = useNavigate();
@@ -12,7 +10,7 @@ const PaperSubmissionForm = () => {
   const [paperTitle, setPaperTitle] = useState('');
   const [abstract, setAbstract] = useState('');
   const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState(''); // To store the file name
+  const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
   const [recentConferences, setRecentConferences] = useState([]);
   const [formData, setFormData] = useState({
@@ -21,7 +19,7 @@ const PaperSubmissionForm = () => {
     submittedBy: "",
     file: null,
     submittedTo: "",
-    domain:"",
+    domain: "",
   });
 
   const handleInputChange = (e) => {
@@ -32,7 +30,6 @@ const PaperSubmissionForm = () => {
     }));
   };
 
-  // Handle file input change
   const handleFileChange = (e) => {
     const { files } = e.target;
     const selectedFile = files[0];
@@ -40,15 +37,13 @@ const PaperSubmissionForm = () => {
       ...prevData,
       file: selectedFile,
     }));
-    setFileName(selectedFile.name); // Set the selected file name
+    setFileName(selectedFile.name);
   };
 
   useEffect(() => {
     const fetchAuthorData = async () => {
       try {
-        // Fetch recent conferences and submitted papers from the backend API
         const conferenceResponse = await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}`);
-        console.log('v--', conferenceResponse.data.data);
         setRecentConferences(conferenceResponse.data.data);
         setLoading(false);
       } catch (error) {
@@ -58,40 +53,47 @@ const PaperSubmissionForm = () => {
     };
 
     fetchAuthorData();
-  }, []);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.paperTitle || !formData.abstract || !formData.domain|| !formData.file) {
+    
+    if (!formData.paperTitle || !formData.abstract || !formData.domain || !formData.file) {
       alert("Please fill in all fields and upload a file.");
       return;
     }
-
+  
     try {
-      const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-      const authorId = userDetails?.authorId.id; // Use correct field for user ID
-
-      if (!authorId) {
-        console.error('Author ID not found in local storage');
+      const userDetails = localStorage.getItem("userDetails");
+      
+      if (!userDetails) {
+        console.error('No user details found in localStorage');
+        alert('You must be logged in to submit a paper.');
         return;
       }
-
+  
+      const parsedUserDetails = JSON.parse(userDetails);
+      const authorId = parsedUserDetails?.authorId?.id;
+  
+      if (!authorId) {
+        console.error('Author ID not found in userDetails');
+        alert('Author ID is missing. Please log in again.');
+        return;
+      }
+  
       const formDataToSend = {
         paperTitle: formData.paperTitle,
         abstract: formData.abstract,
-        domain:formData.domain,
+        domain: formData.domain,
         file: formData.file,
-        submittedBy: authorId, // Set user ID from local storage
-        submittedTo: id, // Set conference ID from URL
+        submittedBy: authorId,
+        submittedTo: id,
       };
-
-      console.log("Form data before submitting:", formDataToSend); // Debugging
-
-      // Call the service function with formData
+  
       const response = await submitPaper(formDataToSend);
-      console.log("Response:", response); // Handle the response (e.g., success message)
       alert("Paper submitted successfully!");
       navigate("/AuthorDashboard");
+  
     } catch (err) {
       console.error("Error during paper submission:", err);
       alert("Failed to submit the paper. Please try again.");
@@ -101,63 +103,83 @@ const PaperSubmissionForm = () => {
   return recentConferences.map((conference) => (
     <Layout>
       <div className="paper-submission-container">
-        <h1 className="page-title">Conference Title: {conference.Conference_title}</h1>
-        <h2 className="subheading">Paper Submission deadline: {conference.Submission_deadline}</h2>
-        <h2 className="page-title">Submit Your Paper Here:</h2>
+        <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#6D24C5] to-[#9F13AB] bg-clip-text text-transparent">
+          Conference Title: {conference.Conference_title}
+        </h1>
+        <h2 className="text-lg font-semibold mb-4 text-gray-700">
+          Paper Submission deadline: {conference.Submission_deadline}
+        </h2>
+        <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-[#6D24C5] to-[#9F13AB] bg-clip-text text-transparent">
+          Submit Your Paper Here:
+        </h2>
         <form onSubmit={handleSubmit} className="form-container">
           <div className="form-group">
-            <label>Paper Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Paper Title</label>
             <input
               type="text"
               name="paperTitle"
               placeholder="Enter your Paper Title"
               value={formData.paperTitle}
               onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
           <div className="form-group">
-                <select name="domain" value={formData.domain} onChange={handleInputChange} >
-                <option value="">Select Domain</option>
-                <option value="AI">Artificial Intelligence</option>
-                <option value="ML">Machine Learning</option>
-                <option value="DataScience">Data Science</option>
-                <option value="Other">Other</option>
-              </select>
-              </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Domain</label>
+            <select 
+              name="domain" 
+              value={formData.domain} 
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+            >
+              <option value="">Select Domain</option>
+              <option value="AI">Artificial Intelligence</option>
+              <option value="ML">Machine Learning</option>
+              <option value="DataScience">Data Science</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
           <div className="form-group">
-            <label>Abstract</label>
-            <input
-              className='abstract'
+            <label className="block text-sm font-medium text-gray-700 mb-1">Abstract</label>
+            <textarea
               name="abstract"
               placeholder="Enter your Paper Abstract"
               value={formData.abstract}
               onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              rows={4}
+              required
             />
           </div>
 
-          <div className="file-upload-container">
-            <label>
-              Upload files
-              <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Paper (PDF only)</label>
+            <div className="mt-1 flex items-center">
+              <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                Choose File
                 <input
                   type="file"
                   name="file"
                   onChange={handleFileChange}
                   accept=".pdf"
-                  style={{ display: 'none' }}
+                  className="hidden"
                   id="fileUpload"
+                  required
                 />
-                <label htmlFor="fileUpload">
-                  Choose a file 
-                </label>
-              </div>
-              <p>PDF formats</p>
-            </label>
-            {fileName && <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Selected File: {fileName}</p>}
-{/* Display the selected file name */}
+              </label>
+              {fileName && (
+                <span className="ml-3 text-sm text-gray-700">{fileName}</span>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-gray-500">PDF format required</p>
           </div>
 
-          <button type="submit" className="submit-button">
+          <button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
             Submit Paper
           </button>
         </form>

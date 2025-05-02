@@ -92,37 +92,54 @@ const Dashboard = () => {
       
       <div className="main-page">
         {/* Conferences In Progress Section */}
-        <section className="conference-list">
-          <h2>Conferences In Progress</h2>
-          
-          {loading ? (
-            <p>Loading conferences...</p>
-          ) : conferences.length > 0 ? (
-            <div className="conference-cards"
-            style={{
-              backgroundImage: `url(${dashboard_bg})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              
-            }}>
-              {conferences.map((conference) => (
-                <div
-                  key={conference.id}
-                  className="conference-card"
-                  onClick={() => handleConferenceClick(conference.id)}
-                >
-                  <h3 class='conference-heading'><strong>Conference Title:</strong> {conference.Conference_title}</h3>
-                  <p><strong>Description:</strong>{conference.Description}</p>
-                  <p><strong>Conference Date:</strong> {conference.Start_date}</p>
-                  <p><strong>Submitted Papers: </strong> {conference.Papers.length}</p>
-                  <p><strong>Paper Submission Deadline</strong> {conference.Submission_deadline  }</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No conferences in progress at the moment.</p>
-          )}
-        </section>
+          <section className="conference-list px-8 py-6">
+            <h2 className="text-2xl font-bold mb-4">Conferences In Progress</h2>
+
+            {loading ? (
+              <p>Loading conferences...</p>
+            ) : conferences.length > 0 ? (
+              <div
+                className="overflow-x-auto"
+                // style={{
+                //   backgroundImage: `url(${dashboard_bg})`,
+                //   backgroundSize: 'cover',
+                //   backgroundPosition: 'center',
+                // }}
+              >
+                <table className="min-w-full table-auto border-collapse border border-gray-300 mt-6">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-2 text-left border-b">#</th>
+                      <th className="px-4 py-2 text-left border-b">Conference Title</th>
+                      <th className="px-4 py-2 text-left border-b">Description</th>
+                      <th className="px-4 py-2 text-left border-b">Conference Date</th>
+                      <th className="px-4 py-2 text-left border-b">Submitted Papers</th>
+                      <th className="px-4 py-2 text-left border-b">Paper Submission Deadline</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {conferences.map((conference, index) => (
+                      <tr
+                        key={conference.id}
+                        className="border-b hover:bg-gray-50 cursor-pointer"
+                        onClick={() => handleConferenceClick(conference.id)}
+                      >
+                        <td className="px-4 py-2">{index + 1}</td>
+                        <td className="px-4 py-2">{conference.Conference_title}</td>
+                        <td className="px-4 py-2">{conference.Description}</td>
+                        <td className="px-4 py-2">{conference.Start_date}</td>
+                        <td className="px-4 py-2">{conference.Papers.length}</td>
+                        <td className="px-4 py-2">{conference.Submission_deadline}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>No conferences in progress at the moment.</p>
+            )}
+          </section>
+
 
         {/* About Us Section */}
         <section className="about-us">
