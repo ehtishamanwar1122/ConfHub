@@ -207,7 +207,7 @@ const OrganizerDashboard = () => {
               {paperReviews.length === 0 ? (
                 <p className="text-gray-600">No reviews available.</p>
               ) : (
-                paperReviews.map((paper, idx) => (
+                paperReviews.map((paper, idx) => ( 
                   <div key={idx} className="mb-8">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">{paper.title}</h3>
                     <div className="overflow-x-auto">

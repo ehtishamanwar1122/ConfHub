@@ -46,7 +46,7 @@
     },
     "review": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::review.review",
       "mappedBy": "reviewer"
     }

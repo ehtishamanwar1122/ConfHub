@@ -31,7 +31,7 @@ const AuthorDashboard = () => {
                 setRecentConferences(conferenceResponse.data.data);
 
                 const papersResponse = await axios.get(
-                    `http://localhost:1337/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*,reviews.organizer`
+                    `http://localhost:1337/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*`
                 );
                 setSubmittedPapers(papersResponse.data?.data);
                 setLoading(false);
@@ -65,9 +65,9 @@ const AuthorDashboard = () => {
                     <Tab active={activeTab === 'papers'} onClick={() => setActiveTab('papers')}>
                         Submitted Papers
                     </Tab>
-                    <Tab active={activeTab === 'decisions'} onClick={() => setActiveTab('decisions')}>
+                    {/* <Tab active={activeTab === 'decisions'} onClick={() => setActiveTab('decisions')}>
                         Paper Reviews
-                    </Tab>
+                    </Tab> */}
                 </div>
 
                 {/* Tab Content */}
@@ -140,12 +140,22 @@ const AuthorDashboard = () => {
                                                     <td className="py-3 px-4 text-sm text-gray-700">{paper.conference?.Conference_title || 'N/A'}</td>
                                                     <td className="py-3 px-4 text-sm text-gray-700">{paper.conference?.Review_deadline || 'N/A'}</td>
                                                     <td className="py-3 px-4 text-sm">
-                                                        <button
-                                                            onClick={() => handleShowReview(paper.id)}
-                                                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-                                                        >
-                                                            View Review
-                                                        </button>
+                                                    {paper.finalDecisionByOrganizer ? (
+  <button
+    onClick={() => handleShowReview(paper.id)}
+    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+  >
+    View Review
+  </button>
+) : (
+  <button
+    disabled
+    className="bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed"
+  >
+    Organizer Decision pending
+  </button>
+)}
+
                                                     </td>
                                                 </tr>
                                             ))}

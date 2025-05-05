@@ -73,6 +73,9 @@
       "relation": "oneToMany",
       "target": "api::review.review",
       "mappedBy": "paper"
+    },
+    "finalDecisionByOrganizer": {
+      "type": "string"
     }
   }
 }
