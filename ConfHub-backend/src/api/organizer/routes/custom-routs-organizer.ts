@@ -61,5 +61,14 @@ export default {
         },
         
       },
+      {
+        method: 'POST',
+        path: '/organizers/final-decision', // Custom endpoint for registration
+        handler: 'organizer.updateFinalDecision',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
     ],
   };

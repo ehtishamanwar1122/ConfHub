@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre&display=swap');
 /* Styles for the conference details container */
 .conference-details {
-  max-width: 1000px;
+  max-width: 1500px;
   margin: 50px auto;
   padding: 20px;
   background-color: #fff;
@@ -12,6 +12,226 @@
  font-family: 'Abhaya Libre', cursive;
   min-height: 60vh;
 }
+.conference-details {
+  padding: 2rem;
+  background-color: #1b2a3a;
+}
+
+.conference-info {
+  margin-bottom: 2rem;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.papers-section {
+  margin-top: 2rem;
+}
+
+.papers-container {
+  display: flex;
+  flex-direction: column; /* Ensures one card per row */
+  gap: 1.5rem;
+}
+
+.paper-card {
+  width: 100%; /* Ensures the card takes full width */
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Adjusts the layout for better spacing */
+}
+
+.paper-info h4 {
+  margin-top: 0;
+  text-align: center; 
+  font-size: 25px;
+  font-weight:900;
+}
+.paperheading {
+  margin-top: 0;
+  text-align: center; 
+  font-size: 25px;
+  font-weight:900;
+  color: white;
+}
+
+.paper-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center; /* Centers the button */
+}
+
+.paper-actions button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.paper-actions button:hover {
+  background-color: #0056b3;
+}
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 80%; /* Increased width */
+  max-height: 80%; /* Increased height */
+  overflow-y: auto;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow for modal */
+  position: relative;
+  z-index: 10000;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close Button */
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-modal-btn:hover {
+  color: red;
+}
+
+/* Review Card Styling */
+.modal-content .review-card {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Strong box-shadow */
+  transition: transform 0.3s, box-shadow 0.3s ease-in-out; /* Added transition */
+}
+
+.modal-content .review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Stronger hover shadow */
+}
+
+/* Differentiate reviews with colors */
+.modal-content .review-card:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.modal-content .review-card:nth-child(even) {
+  background-color: #e6f7ff;
+}
+
+/* Inside Review Card Styling */
+.review-card .review-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.review-card .review-section div {
+  background-color: #fafafa;
+  border-radius: 5px;
+  padding: 10px;
+  flex: 1;
+  margin: 0 5px;
+  text-align: center;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); /* Box-shadow for individual sections */
+}
+
+.review-card .review-section div span {
+  font-weight: bold;
+  color: #333;
+}
+
+.review-card .review-section div p {
+  margin-top: 5px;
+  color: #555;
+}
+
+.review-card .review-section div p {
+  font-size: 14px;
+}
+
+/* Overall Score Styling */
+.review-card .overall-score {
+  font-size: 18px;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: 15px;
+}
+
+/* Comments Section Styling */
+.review-card .comments-section {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1); /* Box-shadow for comments */
+}
+
+.review-card .comments-section p {
+  color: #666;
+  font-size: 15px;
+}
+
+/* Smooth Scroll Styling */
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #e0e0e0;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background-color: #e0e0e0;
+}
+button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.final-decision {
+  font-weight: bold;
+  color: green;
+}
+
 
 /* Title styling */
 .conference-details h2 {

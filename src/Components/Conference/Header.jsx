@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 const Header = () => {
   const navigate = useNavigate();
 
-  const handleLoginClick = () => {
+  const handleLogoutClick = () => {
     navigate("/login");
+    localStorage.clear();
   };
 
   return (
@@ -16,8 +17,8 @@ const Header = () => {
         <li><a href="#services">Our Services</a></li>
         <li><a href="#contact">Contact Us</a></li>
       </ul>
-      <button className="login-button" onClick={handleLoginClick}>
-        Login
+      <button className="login-button" onClick={handleLogoutClick}>
+        Logout
       </button>
     </nav>
   );

@@ -524,6 +524,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Domain: Schema.Attribute.String;
     file: Schema.Attribute.Media<'files'>;
+    finalDecisionByOrganizer: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'> &
       Schema.Attribute.Private;
@@ -582,7 +583,7 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
     presentation: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     Recommendations: Schema.Attribute.String;
-    reviewer: Schema.Attribute.Relation<'oneToOne', 'api::reviewer.reviewer'>;
+    reviewer: Schema.Attribute.Relation<'manyToOne', 'api::reviewer.reviewer'>;
     Score: Schema.Attribute.Integer;
     significance: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
@@ -620,7 +621,7 @@ export interface ApiReviewerReviewer extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     password: Schema.Attribute.Password;
     publishedAt: Schema.Attribute.DateTime;
-    review: Schema.Attribute.Relation<'oneToOne', 'api::review.review'>;
+    review: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
     subDomain: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

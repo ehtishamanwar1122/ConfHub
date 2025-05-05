@@ -601,6 +601,88 @@ const reviewerEmail=reviewer.email;
         authors: authorsData,
         reviewers: reviewersData,
     });
+},
+
+
+async updateFinalDecision(ctx) {
+  const { paperId, decision } = ctx.request.body;
+
+  console.log('Request Body:', ctx.request.body); // Log the request to inspect the data
+
+  try {
+    // Fetch the paper by paperId and populate the submitted_by field
+    const paper = await strapi.entityService.findOne(
+      'api::paper.paper',
+      paperId,
+      {
+        populate: {
+          submitted_by: { // Populate the 'submitted_by' relation (which points to the author)
+            fields: ['authorEmail'], // You can also specify which fields to include, like 'email'
+          },
+        },
+      }
+    )as any;
+    console.log('paper',paper);
+    // Check if the paper was found
+    if (!paper) {
+      return ctx.throw(404, 'Paper not found');
+    }
+
+    // Update the paper with the final decision
+    await strapi.entityService.update(
+      'api::paper.paper',
+      paperId, // Paper ID
+      {
+        data: {
+          finalDecisionByOrganizer: decision, // Set the final decision
+        },
+      }
+    );
+
+    // Extract the email of the user who submitted the paper (assuming submitted_by is the user object)
+    const userEmail = (paper.submitted_by && paper.submitted_by.authorEmail) || null;
+  const papertitle= paper.Paper_Title;
+    // Send an email to the user with the final decision
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'mudassiralishah555@gmail.com', // Your Gmail address
+        pass: 'mfrm qmsz yiey pgzp', // Your Gmail password (or App Password if 2FA is enabled)
+      },
+    });
+
+    // Function to send email
+    const sendEmail = async (to, subject, text, html) => {
+      const mailOptions = {
+        from: 'mudassiralishah555@gmail.com', // Sender address
+        to, // Recipient address
+        subject, // Subject line
+        text, // Plain text body
+        html, // HTML body
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully');
+      } catch (error) {
+        console.error('Error sending email:', error);
+      }
+    };
+
+    // Compose the email
+    const subject = 'Your Paper Decision';
+    const text = `Final decision for your submitted paper ${papertitle} is ${decision}.`;
+    const html = `<p>Final decision for your submitted paper "<strong>${papertitle}</strong>" is "<strong>${decision}</strong>" check details by logging in to your author's account.</p>`;
+
+    // Send the email
+    await sendEmail(userEmail, subject, text, html);
+
+    // Respond with success
+    return { message: 'Decision updated and email sent successfully' };
+  } catch (error) {
+    console.error('Error updating decision:', error);
+    return ctx.throw(500, 'Internal server error');
+  }
 }
 
 

@@ -114,7 +114,7 @@ const PaperReviewPage = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <p><span className="font-semibold">Conference:</span> {reviewData[0]?.SubmittedTo?.Conference_title}</p>
-          <p><span className="font-semibold">Status:</span> {reviewData[0]?.status || 'N/A'}</p>
+          <p><span className="font-semibold">Final Decision By Organizer: </span> {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</p>
         </div>
   
         {/* Loop through each review */}

@@ -21,12 +21,6 @@
     "Score": {
       "type": "integer"
     },
-    "reviewer": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::reviewer.reviewer",
-      "inversedBy": "review"
-    },
     "significance": {
       "type": "integer"
     },
@@ -43,6 +37,12 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::paper.paper",
+      "inversedBy": "review"
+    },
+    "reviewer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::reviewer.reviewer",
       "inversedBy": "review"
     }
   }
