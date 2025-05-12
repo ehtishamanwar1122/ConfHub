@@ -1,6 +1,5 @@
 import { factories } from '@strapi/strapi';
-//import path from 'path';
-//const { sendEmail } = require(path.resolve(__dirname, '../../../api/email/email'));
+const sendEmail = require('../../email/email');
 const nodemailer = require('nodemailer');
 
 export default factories.createCoreController('api::organizer.organizer', ({ strapi }) => ({
@@ -66,36 +65,11 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           },
         }
       );
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
-          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
-        },
-      });
-      
-      // Function to send email
-      const sendEmail = async (to, subject, text, html) => {
-        const mailOptions = {
-          from: 'mudassiralishah555@gmail.com',    // Sender address
-          to,                              // Recipient address
-          subject,                         // Subject line
-          text,                            // Plain text body
-          html,                            // HTML body
-        };
-      
-        try {
-          await transporter.sendMail(mailOptions);
-          console.log('Email sent successfully');
-        } catch (error) {
-          console.error('Error sending email:', error);
-        }
-      };
       await sendEmail(
         email,
         'Your Account has been created',
-        'Hello, Your request for a organizer account in Confhub  has been recieved now wait for the admin approval to login to your account.  ',
-        `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been recieved now wait for the admin's approval to login to your account.</p>`
+        'Hello, Your request for an organizer account in Confhub has been received. Please wait for admin approval.',
+        `<p>Hello,</p><p>Your request for an organizer account in Confhub has been received. Please wait for the admin's approval to login.</p>`
       );
   
         // Return the new organizer (without password)
@@ -243,31 +217,6 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
         if (!updatedOrganizer) {
           return ctx.notFound('Organizer not found');
         }
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: 'mudassiralishah555@gmail.com',  // Your Gmail address
-            pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
-          },
-        });
-        
-        // Function to send email
-        const sendEmail = async (to, subject, text, html) => {
-          const mailOptions = {
-            from: 'mudassiralishah555@gmail.com',    // Sender address
-            to,                              // Recipient address
-            subject,                         // Subject line
-            text,                            // Plain text body
-            html,                            // HTML body
-          };
-        
-          try {
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully');
-          } catch (error) {
-            console.error('Error sending email:', error);
-          }
-        };
         
     
         if (status === 'approved') {
@@ -321,31 +270,7 @@ const reviewerEmail=reviewer.email;
         return ctx.badRequest("Reviewer not found.");
     }
       console.log('Request Body:', ctx.request.body); // Log the request to inspect the data
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
-          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
-        },
-      });
       
-      // Function to send email
-      const sendEmail = async (to, subject, text, html) => {
-        const mailOptions = {
-          from: 'mudassiralishah555@gmail.com',    // Sender address
-          to,                              // Recipient address
-          subject,                         // Subject line
-          text,                            // Plain text body
-          html,                            // HTML body
-        };
-      
-        try {
-          await transporter.sendMail(mailOptions);
-          console.log('Email sent successfully');
-        } catch (error) {
-          console.error('Error sending email:', error);
-        }
-      };
       
       try {
         //for reviewr collection typee
@@ -403,40 +328,7 @@ const reviewerEmail=reviewer.email;
      if (!reviewer) {
         return ctx.badRequest("Reviewer not found.");
      }
-      console.log('Request Body:', ctx.request.body); // Log the request to inspect the data
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'mudassiralishah555@gmail.com',  // Your Gmail address
-          pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
-        },
-      });
-      
-      // Function to send email
-      const sendEmail = async (to, subject, text, html) => {
-        const mailOptions = {
-          from: 'mudassiralishah555@gmail.com',    // Sender address
-          to,                              // Recipient address
-          subject,                         // Subject line
-          text,                            // Plain text body
-          html,                            // HTML body
-        };
-         const sendEmail = async (to, subject, text, html) => {
-        const mailOptions = {
-          from: 'mudassiralishah555@gmail.com',    // Sender address
-          to,                              // Recipient address
-          subject,                         // Subject line
-          text,                            // Plain text body
-          html,                            // HTML body
-        };
-      
-        try {
-          await transporter.sendMail(mailOptions);
-          console.log('Email sent successfully');
-        } catch (error) {
-          console.error('Error sending email:', error);
-        }
-       };
+      console.log('Request Body:', ctx.request.body); // Log the request to inspect the data   
       
        try {
         
@@ -475,7 +367,7 @@ const reviewerEmail=reviewer.email;
         console.error("Error during paper assignment  :", err);
         return ctx.internalServerError("Error during paper assignment.");
       }
-    }
+    
   },
 
 
@@ -484,7 +376,18 @@ const reviewerEmail=reviewer.email;
 
     // Log the request body to inspect the data
     console.log('Request Body:', ctx.request.body);
-
+    const conference = await strapi.entityService.findOne(
+      'api::conference.conference',
+      conferenceId,
+      { fields: ['Conference_title'] } // Only fetch the name to keep it efficient
+    );
+    
+    if (!conference) {
+      throw new Error('Conference not found');
+    }
+    
+    const conferenceName = conference.Conference_title
+    ;
     // Initialize arrays to hold the populated authors and reviewers
     let authorsData = [];
     let reviewersData = [];
@@ -519,7 +422,7 @@ const reviewerEmail=reviewer.email;
             console.error('Error fetching reviewers:', error);
             return ctx.send({ message: 'Error fetching reviewers' }, 500);
         }
-    }
+    } 
 
     console.log('authorsData:', authorsData);
     console.log('reviewersData:', reviewersData);
@@ -545,12 +448,19 @@ const reviewerEmail=reviewer.email;
                         },
                     },
                 });
-                console.log(`Assigned role to author with user ID: ${author.UserID.id}`);
+                console.log(`Assigned role to author with user ID: ${author.UserID.id} ${author.UserID.email}`);
                 
                 // Collect author UserIDs
                 authorsUserIds.push(author.UserID.id);
+                await sendEmail(
+                  author.UserID.email,
+                  'You have been assigned as a Sub-Organizer',
+                  `You have been assigned as a Sub-Organizer for "${conferenceName}" in Confhub log in to your account and see details by switching role.`,
+                  `<p>Hello ${author.UserID.username},</p>
+                   <p>You have been assigned as a Sub-Organizer for the conference "<strong>${conferenceName}</strong>" in Confhub log in to your account and see details by switching role.</p>`
+                );
             } catch (error) {
-                console.error(`Error assigning role to author with ID: ${author.UserID.id}`, error);
+                console.error(`Error assigning role to author with user ID: ${author.UserID.id}`, error);
             }
         }
     }
@@ -570,6 +480,13 @@ const reviewerEmail=reviewer.email;
                 
                 // Collect reviewer UserIDs
                 reviewersUserIds.push(reviewer.UserID.id);
+                await sendEmail(
+                  reviewer.UserID.email,
+                  'You have been assigned as a Sub-Organizer',
+                  `You have been assigned as a Sub-Organizer for "${conferenceName}" in Confhub log in to your account and see details by switching role.`,
+                  `<p>Hello ${reviewer.UserID.username},</p>
+                   <p>You have been assigned as a Sub-Organizer for the conference "<strong>${conferenceName}</strong>" in Confhub log in to your account and see details by switching role.</p>`
+                );
             } catch (error) {
                 console.error(`Error assigning role to reviewer with ID: ${reviewer.UserID.id}`, error);
             }
@@ -640,42 +557,36 @@ async updateFinalDecision(ctx) {
     );
 
     // Extract the email of the user who submitted the paper (assuming submitted_by is the user object)
-    const userEmail = (paper.submitted_by && paper.submitted_by.authorEmail) || null;
+    const userEmail = paper.submitted_by.authorEmail
   const papertitle= paper.Paper_Title;
-    // Send an email to the user with the final decision
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'mudassiralishah555@gmail.com', // Your Gmail address
-        pass: 'mfrm qmsz yiey pgzp', // Your Gmail password (or App Password if 2FA is enabled)
-      },
-    });
+  const authors = paper.submitted_by;
 
-    // Function to send email
-    const sendEmail = async (to, subject, text, html) => {
-      const mailOptions = {
-        from: 'mudassiralishah555@gmail.com', // Sender address
-        to, // Recipient address
-        subject, // Subject line
-        text, // Plain text body
-        html, // HTML body
-      };
-
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-      } catch (error) {
-        console.error('Error sending email:', error);
-      }
-    };
-
-    // Compose the email
-    const subject = 'Your Paper Decision';
-    const text = `Final decision for your submitted paper ${papertitle} is ${decision}.`;
-    const html = `<p>Final decision for your submitted paper "<strong>${papertitle}</strong>" is "<strong>${decision}</strong>" check details by logging in to your author's account.</p>`;
-
-    // Send the email
-    await sendEmail(userEmail, subject, text, html);
+  if (!authors || authors.length === 0) {
+    return ctx.throw(400, 'No authors found for the submitted paper');
+  }
+  
+  for (const author of authors) {
+    const email = author.authorEmail;
+    
+    if (!email) {
+      console.warn(`No email found for author with ID: ${author.id}`);
+      continue;
+    }
+  
+    try {
+      await sendEmail(
+        email,
+        'Your Paper Decision',
+        `Final decision for your submitted paper "${papertitle}" is "${decision}". Log in to your account and see details.`,
+        `<p>Hello,</p>
+         <p>The final decision for your submitted paper "<strong>${papertitle}</strong>" is "<strong>${decision}</strong>".</p>
+         <p>Please log in to your author account to view the detailed feedback and next steps.</p>`
+      );
+      console.log(`Email sent to author ${email}`);
+    } catch (err) {
+      console.error(`Failed to send email to ${email}`, err);
+    }
+  }
 
     // Respond with success
     return { message: 'Decision updated and email sent successfully' };

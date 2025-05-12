@@ -22,15 +22,17 @@ const OrganizerDashboard = () => {
     const [paperReviews, setPaperReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
-
+    const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+    const organizerName= userDetails.username;
     useEffect(() => {
         const fetchConferences = async () => {
             try {
                 const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+                const organizerName= userDetails.username;
                 const organizerId = userDetails?.organizerId?.id;
                 const subOrganizerRoles = userDetails?.SubOrganizerRole || [];
                 const userId = userDetails?.id;
-                
+               
                 if (subOrganizerRoles.length > 0) {
                     const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[AssignedSubOrganizer][id][$eq]=${userId}&populate=*`);
                     setConferences(response.data.data);
@@ -84,6 +86,7 @@ const OrganizerDashboard = () => {
     
     return (
         <Layout>
+            <h4 className="text-3xl font-semibold text-blue-600 text-center my-6 font-sans">Welcome <strong>{organizerName}</strong> in organizer dashboard</h4>
             <div className="p-6">
                 <div className="mb-6 flex gap-4">
                     <Tab active={activeTab === 'inProgress'} onClick={() => setActiveTab('inProgress')}>
@@ -95,9 +98,9 @@ const OrganizerDashboard = () => {
                     <Tab active={activeTab === 'assignSubOrganizer'} onClick={() => setActiveTab('assignSubOrganizer')}>
                         Assign Sub-Organizers
                     </Tab>
-                    <Tab active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')}>
+                    {/* <Tab active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')}>
                         Reviews
-                    </Tab>
+                    </Tab> */}
 
                 </div>
 

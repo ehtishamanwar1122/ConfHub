@@ -39,7 +39,7 @@
     },
     "submittedPapers": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::paper.paper",
       "mappedBy": "submitted_by"
     }

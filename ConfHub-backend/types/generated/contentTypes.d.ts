@@ -397,7 +397,10 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     researchInterest: Schema.Attribute.String;
-    submittedPapers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
+    submittedPapers: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::paper.paper'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -544,7 +547,7 @@ export interface ApiPaperPaper extends Struct.CollectionTypeSchema {
       'api::reviewer.reviewer'
     >;
     submissionDate: Schema.Attribute.DateTime;
-    submitted_by: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
+    submitted_by: Schema.Attribute.Relation<'manyToMany', 'api::author.author'>;
     SubmittedTo: Schema.Attribute.Relation<
       'oneToOne',
       'api::conference.conference'

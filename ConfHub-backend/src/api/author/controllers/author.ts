@@ -17,19 +17,55 @@ export default factories.createCoreController('api::author.author', ({ strapi })
             }
       console.log('authorr', ctx.request.body);
       
-           
+      const existingUser= await strapi.query('plugin::users-permissions.user').findOne({
+        where: { email:email },
+      });
       
             // Check if the organizer already exists by email
             const existingAuthor= await strapi.query('api::author.author').findOne({
               where: { authorEmail:email },
             });
       
-            if (existingAuthor) {
-              return ctx.badRequest('Organizer with this email already exists.');
+            if (existingAuthor && existingUser) {
+              return ctx.badRequest('Author and user with this email already exist.');
             }
-      
-            // Create the new organizer (you can hash the password before saving it)
-           
+
+            //for author that were created when multiple author in submitted paper and these were un registered
+            if (existingAuthor && !existingUser) {
+              const fullName = `${firstName} ${lastName}`;
+        
+              const newUser = await strapi.entityService.create(
+                'plugin::users-permissions.user',
+                {
+                  data: {
+                    email: email,
+                    password: password, 
+                    username: fullName,
+                    confirmed:true,
+                    blocked:false,
+                    Type:'author',
+                    authorId: existingAuthor.id,
+                  },
+                }
+              );
+              await strapi.entityService.update('api::author.author', existingAuthor.id, {
+                data: {
+                  firstName:firstName,
+                  lastName:lastName,
+                  alternativeContact: alternativeContact,
+                  country:country,
+                  biography:biography,
+                  researchInterest:researchInterests,
+                  UserID: newUser.id,
+                },
+              });
+             console.log('in condition when  author that were created when multiple author in submitted paper ');
+             
+              return ctx.send({ message: 'Author linked and user created.' });
+            }    
+            // Create the new author 
+            if (!existingAuthor && !existingUser) {
+              console.log('in condition new author');   
             const fullName = `${firstName} ${lastName}`;
             let newAuthor:any;
             const newUser = await strapi.entityService.create(
@@ -65,25 +101,15 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                 authorId: newAuthor.id, // Add the organizer ID to the user
               },
             }
-          );
-            // Return the new organizer (without password)
-            ctx.send({
-              message: 'Author registered successfully!',
-              author: {
-                firstName: newAuthor.firstName,
-                lastName: newAuthor.lastName,
-                email: newAuthor.authorEmail,
-              },
-              user: {
-                username: newUser.username,
-                email: newUser.email,
-               
-              },
-            });
-          } catch (error) {
-            console.error('Error during registration:', error);
-            ctx.internalServerError('Something went wrong while registering the author.');
-          }
+          ); return ctx.send({ message: 'Author and user created.' });
+        }
+    
+        // If user exists but author doesn't — likely invalid scenario
+        return ctx.badRequest('User already exists but no linked author.');
+      } catch (err) {
+        console.error('Registration error:', err);
+        return ctx.internalServerError('Something went wrong during registration.');
+      }
     
     
     },
@@ -147,12 +173,9 @@ export default factories.createCoreController('api::author.author', ({ strapi })
     },
     async submitPaper(ctx) {
       try {
-        const { paperTitle, abstract, submittedBy, submittedTo ,domain} = ctx.request.body;
+        const { paperTitle, abstract, submittedBy, submittedTo ,domain,authors} = ctx.request.body;
         const files = ctx.request.files ;
-  console.log('papper',ctx.request.body);
-  console.log('fille',ctx.request.files);
-  console.log('fillsse',files);
-          
+  console.log('papper',ctx.request.body);    
 
   const author = await strapi.entityService.findOne('api::author.author', submittedBy, {
     populate: '*'
@@ -162,7 +185,7 @@ if (!author) {
     return ctx.badRequest('Invalid SubmittedBy ID: Author not found');
 }
 const authorName = `${author.firstName} ${author.lastName}`;
-
+const authorEmail = author.authorEmail
           const newPaper = await strapi.entityService.create('api::paper.paper', {
               data: {
                   Paper_Title: paperTitle,
@@ -175,7 +198,92 @@ const authorName = `${author.firstName} ${author.lastName}`;
                   Author:authorName
               },
           });
-  
+          console.log('ctx.request.body.authors', ctx.request.body.authors);
+
+          //for multiple authorss
+          if (authors) {
+            let parsedAuthors;
+
+            try {
+              const parsedAuthors = Array.isArray(ctx.request.body.authors)
+                ? ctx.request.body.authors
+                : JSON.parse(ctx.request.body.authors);
+
+              // Step 2: Check it's not empty
+              const emails = parsedAuthors.map((author) => author.email); // Step 3: Extract emails
+
+              // Step 4: Check if these authors already exist in DB
+              const existingAuthors = await strapi.db
+                .query("api::author.author")
+                .findMany({
+                  where: {
+                    authorEmail: {
+                      $in: emails,
+                    },
+                  },
+                });
+              const foundEmails = existingAuthors.map(
+                (author) => author.authorEmail
+              );
+
+              // Get not registered emails
+              const notRegistered = parsedAuthors
+                .filter((author) => !foundEmails.includes(author.email))
+                .map((author) => author.email);
+
+              console.log("Existing authors found:", existingAuthors);
+              console.log("Authors not registered:", notRegistered);
+              const newAuthorIds = [];
+              for (const author of notRegistered) {
+                const newAuthor = await strapi.db.query("api::author.author").create({
+                  data: {
+                    authorEmail: author,
+                  },
+                });
+                newAuthorIds.push({ id: newAuthor.id });
+                try {
+                  const registerUrl = 'http://localhost:5173/register';
+                  await sendEmail(
+                    author,
+                    'You have been added as a Co-Author in Confhub',
+                    `You have been added as a co-author for a paper submission in Confhub with paper title ${newPaper.Paper_Title}. Please register using this email (${author}) to access your paper.`,
+                    `<p>Hello,</p>
+                     <p>You have been added as a co-author for a paper submission in <strong>Confhub</strong> with paper title ${newPaper.Paper_Title}.</p>
+                     <p>Please <a href="${registerUrl}">register</a> using this email address (<strong>${author}</strong>) to view your paper and participate.</p>`
+                );
+                  console.log(`Invitation email sent to ${authorEmail}`);
+                } catch (err) {
+                  console.error(`Failed to send email to ${authorEmail}`, err);
+                }
+              }
+              const existingAuthorIds = existingAuthors.map((author) => ({
+                id: author.id,
+              }));
+
+              console.log("authoreee", existingAuthorIds);
+              
+              // Step 4: Combine all authors to connect
+              const allAuthorsToConnect = [...existingAuthorIds, ...newAuthorIds];
+              console.log("Connecting authors:", allAuthorsToConnect);
+              
+              await strapi.db.query("api::paper.paper").update({
+                where: { id: newPaper.id },
+                data: {
+                  submitted_by: {
+                    connect: allAuthorsToConnect,
+                  },
+                },
+              });
+            } catch (err) {
+              console.error("Invalid authors JSON format:", err);
+            }
+          } else {
+            console.log("No Multiple authors.");
+          }
+        
+
+
+          
           // If files are uploaded, associate them with the new paper
           if (files && files.file) {
             const uploadedFiles = await strapi.plugins.upload.services.upload.upload({
@@ -193,7 +301,7 @@ const authorName = `${author.firstName} ${author.lastName}`;
               },
             });
             
-            console.log('New Paper:', newPaper);
+           // console.log('New Paper:', newPaper);
           }
    
           if (submittedTo) {
@@ -204,7 +312,7 @@ const authorName = `${author.firstName} ${author.lastName}`;
           
             if (conference) {
              
-              console.log('conn',conference);
+             // console.log('conn',conference);
               // Add the new paper ID to the conference's Papers field
              // const updatedPapers = conference.Papers.id ? [...conference.Papers, newPaper.id] : [newPaper.id];
               // await strapi.entityService.update('api::conference.conference',

@@ -13,6 +13,9 @@ const PaperSubmissionForm = () => {
   const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
   const [recentConferences, setRecentConferences] = useState([]);
+  const [authors, setAuthors] = useState([
+    { name: '', email: '', affiliation: '' }
+  ]);
   const [formData, setFormData] = useState({
     paperTitle: "",
     abstract: "",
@@ -39,7 +42,21 @@ const PaperSubmissionForm = () => {
     }));
     setFileName(selectedFile.name);
   };
+  const handleAuthorChange = (index, field, value) => {
+    const updated = [...authors];
+    updated[index][field] = value;
+    setAuthors(updated);
+  };
 
+  const addAuthor = () => {
+    setAuthors([...authors, { name: '', email: '', affiliation: '' }]);
+  };
+
+  const removeAuthor = (index) => {
+    const updated = [...authors];
+    updated.splice(index, 1);
+    setAuthors(updated);
+  };
   useEffect(() => {
     const fetchAuthorData = async () => {
       try {
@@ -80,17 +97,16 @@ const PaperSubmissionForm = () => {
         alert('Author ID is missing. Please log in again.');
         return;
       }
-  
-      const formDataToSend = {
-        paperTitle: formData.paperTitle,
-        abstract: formData.abstract,
-        domain: formData.domain,
-        file: formData.file,
-        submittedBy: authorId,
-        submittedTo: id,
-      };
-  
-      const response = await submitPaper(formDataToSend);
+      const submissionData = new FormData();
+      submissionData.append('paperTitle', formData.paperTitle);
+      submissionData.append('abstract', formData.abstract);
+      submissionData.append('domain', formData.domain);
+      submissionData.append('file', formData.file);
+      submissionData.append('submittedBy', authorId);
+      submissionData.append('submittedTo', id);
+      submissionData.append('authors', JSON.stringify(authors));
+
+      await submitPaper(submissionData);
       alert("Paper submitted successfully!");
       navigate("/AuthorDashboard");
   
@@ -99,7 +115,9 @@ const PaperSubmissionForm = () => {
       alert("Failed to submit the paper. Please try again.");
     }
   };
-
+ 
+  
+ 
   return recentConferences.map((conference) => (
     <Layout>
       <div className="paper-submission-container">
@@ -175,6 +193,57 @@ const PaperSubmissionForm = () => {
             </div>
             <p className="mt-1 text-xs text-gray-500">PDF format required</p>
           </div>
+          <div className="form-group mt-4">
+  <h3 className="text-md font-semibold mb-2">Multiple Authors (Optional)</h3>
+  {authors.map((author, index) => (
+    <div key={index} className="mb-4 border p-4 rounded-md bg-gray-50">
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Author Name</label>
+        <input
+          type="text"
+          value={author.name}
+          onChange={(e) => handleAuthorChange(index, 'name', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Author Email</label>
+        <input
+          type="email"
+          value={author.email}
+          onChange={(e) => handleAuthorChange(index, 'email', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Affiliation</label>
+        <input
+          type="text"
+          value={author.affiliation}
+          onChange={(e) => handleAuthorChange(index, 'affiliation', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      {index > 0 && (
+        <button
+          type="button"
+          onClick={() => removeAuthor(index)}
+          className="mt-2 text-red-600 text-sm underline"
+        >
+          Remove Author
+        </button>
+      )}
+    </div>
+  ))}
+
+  <button
+    type="button"
+    onClick={addAuthor}
+    className="mt-2 text-blue-600 font-medium underline"
+  >
+    + Add Another Author
+  </button>
+</div>
 
           <button 
             type="submit" 
