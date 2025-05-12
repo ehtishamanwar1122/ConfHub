@@ -18,7 +18,8 @@ const AuthorDashboard = () => {
     const [submittedPapers, setSubmittedPapers] = useState([]);
     const [activeTab, setActiveTab] = useState('conferences');
     const [loading, setLoading] = useState(true);
-
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    const authorname = userDetails?.username;
     useEffect(() => {
         const userDetails = JSON.parse(localStorage.getItem('userDetails'));
         const authorId = userDetails?.authorId?.id;
@@ -55,7 +56,7 @@ const AuthorDashboard = () => {
     return (
         <Layout>
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-6 text-gray-800">Author Dashboard</h1>
+                <h1 className="text-2xl font-bold mb-6 text-gray-800">Welcome <strong>{authorname}</strong> in Author Dashboard</h1>
 
                 {/* Tab Buttons */}
                 <div className="mb-6 flex gap-4">

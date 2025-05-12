@@ -14,7 +14,7 @@
   "attributes": {
     "submitted_by": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::author.author",
       "inversedBy": "submittedPapers"
     },

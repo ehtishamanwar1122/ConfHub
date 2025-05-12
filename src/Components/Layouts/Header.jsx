@@ -66,7 +66,7 @@ const Header = () => {
 
     const usertype = JSON.parse(localStorage.getItem('userDetails'));
 
-let availableRoles = ['Author', 'Reviewer', 'SubOrganizer'];
+let availableRoles = [];
 
 if (usertype?.Type === 'reviewer') {
     availableRoles = ['Reviewer', 'SubOrganizer'];
