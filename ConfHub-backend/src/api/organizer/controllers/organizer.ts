@@ -303,8 +303,8 @@ const reviewerEmail=reviewer.email;
         await sendEmail(
           reviewerEmail,
           `Your request for paper review with title "${updatedPaper.Paper_Title}" has been Approved`,
-          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been approved by the admin. You can now log in to your account and proceed with the review process. `,
-          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been approved by the admin.</p><p>You can now log in to your account and proceed with the review process.</p>`
+          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been approved by the organizer. You can now log in to your account and proceed with the review process. `,
+          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been approved by the organizer.</p><p>You can now log in to your account and proceed with the review process.</p>`
         );
         
         
@@ -354,8 +354,8 @@ const reviewerEmail=reviewer.email;
         await sendEmail(
           reviewerEmail,
           `Your request for paper review with title "${updatedPaper.Paper_Title}" has been Rejected`,
-          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been rejected by the admin. If you have any questions, please contact support.`,
-          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been rejected by the admin.</p><p>If you have any questions, please contact support.</p>`
+          `Hello, Your request to review the paper titled "${updatedPaper.Paper_Title}" has been rejected by the orgaizer. If you have any questions, please contact support.`,
+          `<p>Hello,</p><p>Your request to review the paper titled <strong>"${updatedPaper.Paper_Title}"</strong> has been rejected by the organizer.</p><p>If you have any questions, please contact support.</p>`
         );
         
        

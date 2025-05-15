@@ -47,26 +47,26 @@ const CreateConference = () => {
     // } else if (formData.startDate && formData.endDate < formData.startDate) {
     //   newErrors.endDate = 'End Date cannot be earlier than Start Date.';
     // }
-    if (!formData.conferenceLocation.trim()) {
-      newErrors.conferenceLocation = 'Conference Location is required.';
-    }
-    if (!formData.trackTitle.trim()) {
-      newErrors.trackTitle = 'Track Title is required.';
-    }
-    if (!formData.sessionTitle.trim()) {
-      newErrors.sessionTitle = 'Session Title is required.';
-    }
-    if (!formData.speakerNames.trim()) {
-      newErrors.speakerNames = 'Speaker Names are required.';
-    }
+    // if (!formData.conferenceLocation.trim()) {
+    //   newErrors.conferenceLocation = 'Conference Location is required.';
+    // }
+    // if (!formData.trackTitle.trim()) {
+    //   newErrors.trackTitle = 'Track Title is required.';
+    // }
+    // if (!formData.sessionTitle.trim()) {
+    //   newErrors.sessionTitle = 'Session Title is required.';
+    // }
+    // if (!formData.speakerNames.trim()) {
+    //   newErrors.speakerNames = 'Speaker Names are required.';
+    // }
     if (!formData.submissionDeadline) {
       newErrors.submissionDeadline = 'Submission Deadline is required.';
     }
-    if (!formData.reviewDeadline) {
-      newErrors.reviewDeadline = 'Review Deadline is required.';
-    } else if (formData.submissionDeadline && formData.reviewDeadline < formData.submissionDeadline) {
-      newErrors.reviewDeadline = 'Review Deadline cannot be earlier than Submission Deadline.';
-    }
+    // if (!formData.reviewDeadline) {
+    //   newErrors.reviewDeadline = 'Review Deadline is required.';
+    // } else if (formData.submissionDeadline && formData.reviewDeadline < formData.submissionDeadline) {
+    //   newErrors.reviewDeadline = 'Review Deadline cannot be earlier than Submission Deadline.';
+    // }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -138,7 +138,7 @@ const CreateConference = () => {
               />
               {errors.startDate && <p className="error">{errors.startDate}</p>}
             </div>
-            <div>
+            {/* <div>
               <label htmlFor="conferenceTime">Conference Time</label>
               <input
                 type="time"
@@ -147,9 +147,9 @@ const CreateConference = () => {
                 onChange={handleChange}
               />
               {errors.conferenceTime && <p className="error">{errors.conferenceTime}</p>}
-            </div>
+            </div> */}
           </div>
-
+{/* 
           <div>
             <label htmlFor="conferenceLocation">Conference Location</label>
             <input
@@ -160,9 +160,9 @@ const CreateConference = () => {
               onChange={handleChange}
             />
             {errors.conferenceLocation && <p className="error">{errors.conferenceLocation}</p>}
-          </div>
+          </div> */}
 
-          <h5>Track Details</h5>
+          {/* <h5>Track Details</h5>
           <div>
             <label htmlFor="trackTitle">Track Title</label>
             <input
@@ -184,9 +184,9 @@ const CreateConference = () => {
               onChange={handleChange}
             ></textarea>
           </div>
-          <button type="button">Add Track</button>
+          <button type="button">Add Track</button> */}
 
-          <h5>Session Details</h5>
+          {/* <h5>Session Details</h5>
           <div>
             <label htmlFor="sessionTitle">Session Title</label>
             <input
@@ -208,12 +208,12 @@ const CreateConference = () => {
               onChange={handleChange}
             />
             {errors.speakerNames && <p className="error">{errors.speakerNames}</p>}
-          </div>
+          </div> */}
 
           <h5>Deadlines</h5>
           <div className="grid grid-cols-1 md:grid-cols-3">
             <div>
-              <label htmlFor="submissionDeadline">Submission Deadline</label>
+              <label htmlFor="submissionDeadline">Paper Submission Deadline</label>
               <input
                 type="date"
                 id="submissionDeadline"
@@ -222,7 +222,7 @@ const CreateConference = () => {
               />
               {errors.submissionDeadline && <p className="error">{errors.submissionDeadline}</p>}
             </div>
-            <div>
+            {/* <div>
               <label htmlFor="reviewDeadline">Review Deadline</label>
               <input
                 type="date"
@@ -231,7 +231,7 @@ const CreateConference = () => {
                 onChange={handleChange}
               />
               {errors.reviewDeadline && <p className="error">{errors.reviewDeadline}</p>}
-            </div>
+            </div> */}
           </div>
 
           <div className="text-left">

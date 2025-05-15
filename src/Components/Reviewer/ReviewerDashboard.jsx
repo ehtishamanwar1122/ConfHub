@@ -87,6 +87,7 @@ const renderOngoing = () =>
     <table className="min-w-full bg-white border border-gray-200">
       <thead>
         <tr className="bg-gray-100 text-left">
+        <th className="p-3 border">paper Id</th>
           <th className="p-3 border">Title</th>
           <th className="p-3 border">Conference</th>
           <th className="p-3 border">Domain</th>
@@ -97,6 +98,7 @@ const renderOngoing = () =>
       <tbody>
         {ongoingPapers.map((paper) => (
           <tr key={paper.id} className="border-t">
+             <td className="p-3 border">{paper.id}</td>
             <td className="p-3 border">{paper.Paper_Title}</td>
             <td className="p-3 border">{paper.conference?.Conference_title}</td>
             <td className="p-3 border">{paper.Domain}</td>
@@ -122,6 +124,7 @@ const renderAssigned = () => (
   <table className="min-w-full bg-white border border-gray-200">
     <thead>
       <tr className="bg-gray-100 text-left">
+      <th className="p-3 border">Paper Id</th>
         <th className="p-3 border">Title</th>
         <th className="p-3 border">Author</th>
         <th className="p-3 border">Conference</th>
@@ -132,6 +135,7 @@ const renderAssigned = () => (
     <tbody>
       {assignedPapers.map((paper) => (
         <tr key={paper.id} className="border-t">
+           <td className="p-3 border">{paper.id}</td>
           <td className="p-3 border">{paper.Paper_Title}</td>
           <td className="p-3 border">{paper.Author}</td>
           <td className="p-3 border">{paper.SubmittedTo?.Conference_title}</td>

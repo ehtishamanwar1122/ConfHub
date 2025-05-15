@@ -109,6 +109,7 @@ const SubmitReview = () => {
 
           {paperDetails ? (
             <div className="mb-6 text-sm text-gray-700 space-y-1">
+               <p><strong>Paper Id:</strong> {paperDetails.id}</p>
               <p><strong>Title:</strong> {paperDetails.Paper_Title}</p>
               <p><strong>Author:</strong> {paperDetails.Author}</p>
               <p><strong>Conference:</strong> {paperDetails.conference?.Conference_title}</p>
@@ -119,16 +120,7 @@ const SubmitReview = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block font-medium mb-1">Review Comments</label>
-              <textarea
-                className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                rows="4"
-                value={reviewComments}
-                onChange={(e) => setReviewComments(e.target.value)}
-                placeholder="Write your review..."
-              />
-            </div>
+            
 
             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputField
@@ -158,6 +150,17 @@ const SubmitReview = () => {
               <ScoreSelect label="Significance of Topic" value={significance} onChange={setSignificance} options={ratingOptions} />
               <ScoreSelect label="Presentation" value={presentation} onChange={setPresentation} options={ratingOptions} />
               <ScoreSelect label="Overall Recommendation" value={overall} onChange={setOverall} options={ratingOptions} />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Review Comments</label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-md p-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={reviewComments}
+                onChange={(e) => setReviewComments(e.target.value)}
+                placeholder="Write your review..."
+              />
+
             </div>
 
             {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}

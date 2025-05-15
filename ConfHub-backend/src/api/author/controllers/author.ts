@@ -1,7 +1,7 @@
 /**
  * author controller
  */
-
+const sendEmail = require('../../email/email');
 import { factories } from '@strapi/strapi'
 
 export default factories.createCoreController('api::author.author', ({ strapi }) => ({
@@ -251,9 +251,9 @@ const authorEmail = author.authorEmail
                      <p>You have been added as a co-author for a paper submission in <strong>Confhub</strong> with paper title ${newPaper.Paper_Title}.</p>
                      <p>Please <a href="${registerUrl}">register</a> using this email address (<strong>${author}</strong>) to view your paper and participate.</p>`
                 );
-                  console.log(`Invitation email sent to ${authorEmail}`);
+                  console.log(`Invitation email sent to ${author}`);
                 } catch (err) {
-                  console.error(`Failed to send email to ${authorEmail}`, err);
+                  console.error(`Failed to send email to ${author}`, err);
                 }
               }
               const existingAuthorIds = existingAuthors.map((author) => ({
