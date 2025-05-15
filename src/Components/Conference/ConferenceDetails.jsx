@@ -98,10 +98,10 @@ const ConferenceDetails = () => {
                           <td className="px-6 py-4 font-semibold">Submission Deadline</td>
                           <td className="px-6 py-4">{conf.Submission_deadline}</td>
                         </tr>
-                        <tr className="bg-gray-50">
+                        {/* <tr className="bg-gray-50">
                           <td className="px-6 py-4 font-semibold">Location</td>
                           <td className="px-6 py-4">{conf.Conference_location}</td>
-                        </tr>
+                        </tr> */}
                       </tbody>
                     </table>
                   </div>

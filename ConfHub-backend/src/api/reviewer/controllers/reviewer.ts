@@ -1,7 +1,7 @@
 /**
  * reviewer controller
  */
-
+const sendEmail = require('../../email/email');
 import { factories } from '@strapi/strapi'
 
 export default factories.createCoreController('api::reviewer.reviewer', ({ strapi }) => ({
@@ -151,7 +151,15 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
         const { paperId, reviewerId, status } = ctx.request.body;
     
         console.log("Request Body:", ctx.request.body);
-       
+        const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
+          fields: ['email', 'firstName', 'lastName'],
+        });
+        
+        const reviewerEmail = reviewer?.email;
+        
+        if (!reviewerEmail) {
+          return ctx.throw(400, 'Reviewer email not found');
+        }
         const updatedPaper = await strapi.db.query("api::paper.paper").update({
           where: { id: paperId },
           data: {
@@ -160,8 +168,13 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
             },
           },
         });
-        
-       
+        const paperTitle= updatedPaper.Paper_Title;
+        await sendEmail(
+          reviewerEmail,
+          'Your Request for Paper Review Revieved',
+          `Hello, Your request to review paper with title "${paperTitle}" is recieved now wait for Organizer decision for further actions.`,
+          `<p>Hello,</p><p>Hello, Your request to review paper with title <strong>${paperTitle}</strong> is recieved now wait for Organizer decision for further actions. `
+        );
         return ctx.send({
           message: "Request received successfully!",
           paper: updatedPaper,
@@ -177,7 +190,15 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
         const { comments, recommendation, score ,paperId,reviewerId,significance,overall,presentation,originality} = ctx.request.body;
     
         console.log("Request Body:", ctx.request.body);
-       
+        const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
+          fields: ['email', 'firstName', 'lastName'],
+        });
+        
+        const reviewerEmail = reviewer?.email;
+        
+        if (!reviewerEmail) {
+          return ctx.throw(400, 'Reviewer email not found');
+        }
         const review = await strapi.entityService.create('api::review.review', {
           data: {
             Comments: comments,
@@ -198,6 +219,13 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
             disconnect: [{ id: reviewerId }],
           },
         },});
+        const paperTitle= updatedPaper.Paper_Title;
+        await sendEmail(
+          reviewerEmail,
+          'Review Submitted Sussessfully',
+          `Hello, your review for paper "${paperTitle}"  is recieved.`,
+          `<p>Hello,</p><p>Hello, Your review for paper <strong>${paperTitle}</strong> is recieved. `
+        );
        
         return ctx.send({
           message: "Request received successfully!",

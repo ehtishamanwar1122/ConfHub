@@ -15,6 +15,12 @@ const OrgConfDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReviews, setSelectedReviews] = useState(null);
   const [selectedPaper, setSelectedPaper] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [newDeadline, setNewDeadline] = useState('');
+
+const [showReviewModal, setShowReviewModal] = useState(false);
+const [reviewDeadline, setReviewDeadline] = useState(false);
+
   useEffect(() => {
     const fetchConferenceDetails = async () => {
       try {
@@ -81,6 +87,38 @@ const OrgConfDetails = () => {
       console.error('Error sending decision:', error);
     }
   };
+  const handleReviewDeadlineSubmit = async () => {
+    const payload = {
+     
+        id: conference[0].id,
+        Review_deadline: reviewDeadline,
+      
+    };
+  
+    try {
+      const response = await axios.post('http://localhost:1337/api/conferences/updateReviewDeadline', payload);
+  
+      if (response.status === 200) {
+        const updatedConference = [...conference];
+        updatedConference[0].Review_deadline = reviewDeadline;
+        setConference(updatedConference);
+        setShowReviewModal(false);
+      }
+    } catch (error) {
+      console.error("Error updating review deadline:", error);
+    }
+  };
+  
+
+  const openEditModal = () => {
+    setNewDeadline(conference[0]?.Submission_deadline || '');
+    setIsEditModalOpen(true);
+  };
+  
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+  
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -101,11 +139,38 @@ const OrgConfDetails = () => {
             <p><strong>Conference Description:</strong> {conference.Description}</p>
             <p><strong>Status:</strong> {conference.Status}</p>
             <p><strong>Start Date:</strong> {conference.Start_date}</p>
-            <p><strong>Time:</strong> {conference.Conference_time}</p>
-            <p><strong>Paper Submission Deadline:</strong> {conference.Submission_deadline}</p>
-            <p><strong>Review Deadline:</strong> {conference.Review_deadline}</p>
-            <p><strong>Location:</strong> {conference.Conference_location}</p>
+            {/* <p><strong>Time:</strong> {conference.Conference_time}</p> */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap:'20px' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+    <p style={{ margin: 0 }}>
+      <strong>Paper Submission Deadline:</strong> {conference.Submission_deadline}
+    </p>
+    <button onClick={openEditModal}>Edit</button>
+  </div>
+  {/* Review Deadline (if exists) */}
+  {conference.Review_deadline && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ margin: 0 }}>
+          <strong>Review Deadline:</strong> {conference.Review_deadline}
+        </p>
+        <button onClick={() => setShowReviewModal(true)}>Edit</button>
+      </div>
+    )}
+</div>
+  {/* If no Review Deadline, show Add button */}
+  {!conference.Review_deadline && (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+      <button onClick={() => setShowReviewModal(true)}>
+        Add Review Deadline
+      </button>
+    </div>
+    
+    )}
+
+
+
           </div>
+
         ))}
       </div>
 
@@ -118,6 +183,7 @@ const OrgConfDetails = () => {
       .map(paper => (
         <div key={paper.id} className="paper-card">
           <div className="paper-info">
+          <p><strong>Paper Id:</strong> {paper.id || "N/A"}</p>
             <h4>Paper Title: {paper.Paper_Title}</h4>
             <p><strong>Author:</strong> {paper.Author || "N/A"}</p>
             <p><strong>Submission Date:</strong> {new Date(paper.submissionDate).toLocaleDateString()}</p>
@@ -233,6 +299,66 @@ const OrgConfDetails = () => {
     
   </div>
 )}
+{isEditModalOpen && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h3>Edit Submission Deadline</h3>
+      <input
+        type="date"
+        value={newDeadline}
+        onChange={(e) => setNewDeadline(e.target.value)}
+      />
+      <div style={{ marginTop: '1rem' }}>
+        <button
+          onClick={async () => {
+            try {
+              const payload = {
+                
+                  id: conference[0].id,  // Conference ID
+                  Submission_deadline: newDeadline,  // The new submission deadline to be updated
+                
+              };
+              const response = await axios.post('http://localhost:1337/api/conferences/updateSubmissiondate', payload);
+
+            
+              if (response.status === 200) {
+                const updatedConference = [...conference];
+                updatedConference[0].Submission_deadline = newDeadline;
+                setConference(updatedConference);
+                closeEditModal();
+              }
+            } catch (error) {
+              console.error("Error updating submission deadline:", error.response?.data || error.message);
+            }
+          }}
+        >
+          Save
+        </button>
+        <button onClick={closeEditModal} style={{ marginLeft: '10px' }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{showReviewModal && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+      <h3>Set Review Deadline</h3>
+      <input
+        type="date"
+        value={reviewDeadline}
+        onChange={(e) => setReviewDeadline(e.target.value)}
+      />
+      <div className="modal-actions">
+        <button onClick={handleReviewDeadlineSubmit}>Save</button>
+        <button onClick={() => setShowReviewModal(false)}>Cancel</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
         </div>
   <Footer />

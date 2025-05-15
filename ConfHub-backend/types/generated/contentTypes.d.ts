@@ -426,8 +426,8 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
       'oneToMany',
       'plugin::users-permissions.user'
     >;
-    Conference_location: Schema.Attribute.String & Schema.Attribute.Required;
-    Conference_time: Schema.Attribute.Time & Schema.Attribute.Required;
+    Conference_location: Schema.Attribute.String;
+    Conference_time: Schema.Attribute.Time;
     Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -449,14 +449,14 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
     requestStatus: Schema.Attribute.Enumeration<
       ['pending', 'approved', 'rejected']
     >;
-    Review_deadline: Schema.Attribute.Date & Schema.Attribute.Required;
-    Session_title: Schema.Attribute.String & Schema.Attribute.Required;
-    Speaker_names: Schema.Attribute.String & Schema.Attribute.Required;
+    Review_deadline: Schema.Attribute.Date;
+    Session_title: Schema.Attribute.String;
+    Speaker_names: Schema.Attribute.String;
     Start_date: Schema.Attribute.Date & Schema.Attribute.Required;
     Status: Schema.Attribute.Enumeration<['inProgress', 'completed']>;
     Submission_deadline: Schema.Attribute.Date & Schema.Attribute.Required;
     Track_description: Schema.Attribute.Text;
-    Track_title: Schema.Attribute.String & Schema.Attribute.Required;
+    Track_title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

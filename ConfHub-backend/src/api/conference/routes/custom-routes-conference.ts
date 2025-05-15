@@ -16,5 +16,17 @@ export default {
           policies: [],
         },
       },
+      {
+        method: 'POST',
+        path: '/conferences/updateSubmissiondate',
+        handler: 'conference.updateSubmissiondate',
+       
+      },
+      {
+        method: 'POST',
+        path: '/conferences/updateReviewDeadline',
+        handler: 'conference.updateReviewDeadline',
+       
+      },
     ],
   };

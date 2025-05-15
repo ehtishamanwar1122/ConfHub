@@ -35,9 +35,9 @@ export default factories.createCoreController('api::conference.conference', ({ s
               // }
           
               // Ensure review deadline is not earlier than submission deadline
-              if (new Date(submissionDeadline) > new Date(reviewDeadline)) {
-                return ctx.badRequest("Review deadline cannot be earlier than submission deadline.");
-              }
+              // if (new Date(submissionDeadline) > new Date(reviewDeadline)) {
+              //   return ctx.badRequest("Review deadline cannot be earlier than submission deadline.");
+              // }
           
               // Check if a conference with the same title already exists
               const existingConference = await strapi.query("api::conference.conference").findOne({
@@ -55,14 +55,7 @@ export default factories.createCoreController('api::conference.conference', ({ s
                     Conference_title: conferenceTitle,
                     Description:conferenceDescription,
                   Start_date:startDate,
-                  Conference_time:conferenceTime,
-                  Conference_location:conferenceLocation,
-                  Track_title:trackTitle,
-                  Track_description:trackDescription,
-                  Session_title:sessionTitle,
-                  Speaker_names:speakerNames,
                   Submission_deadline:submissionDeadline,
-                  Review_deadline: reviewDeadline,
                   Organizer: organizerId,
                   requestStatus:'pending',
                 }, 
@@ -215,4 +208,48 @@ console.log('Conference Title:', conferenceTitle);
           ctx.internalServerError('An error occurred while updating status');
         }
       },
+
+      async updateSubmissiondate(ctx) {
+        try {
+          const { id, Submission_deadline } = ctx.request.body;
+    console.log('pop', ctx.request.body);
+    console.log('popo',id, Submission_deadline);
+    
+          if (!id || !Submission_deadline) {
+            return ctx.badRequest('Missing id or newDeadline');
+          }
+    
+          const updated = await strapi.entityService.update('api::conference.conference', id, {
+            data: {
+              Submission_deadline: Submission_deadline,
+            },
+          });
+    
+          ctx.send({ message: 'Submission deadline updated', data: updated });
+        } catch (err) {
+          ctx.internalServerError('Failed to update submission deadline');
+        }
+      },
+      async updateReviewDeadline(ctx) {
+        try {
+          const { id, Review_deadline } = ctx.request.body;
+    console.log('pop', ctx.request.body);
+    console.log('popo',id, Review_deadline);
+    
+          if (!id || !Review_deadline) {
+            return ctx.badRequest('Missing id or newDeadline');
+          }
+    
+          const updated = await strapi.entityService.update('api::conference.conference', id, {
+            data: {
+              Review_deadline: Review_deadline,
+            },
+          });
+    
+          ctx.send({ message: 'review deadline added', data: updated });
+        } catch (err) {
+          ctx.internalServerError('Failed to update submission deadline');
+        }
+      },
+    
 }));

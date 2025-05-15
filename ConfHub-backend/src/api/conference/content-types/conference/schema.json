@@ -25,15 +25,15 @@
     },
     "Conference_time": {
       "type": "time",
-      "required": true
+      "required": false
     },
     "Conference_location": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "Track_title": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "Track_description": {
       "type": "text",
@@ -41,11 +41,11 @@
     },
     "Session_title": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "Speaker_names": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "Submission_deadline": {
       "type": "date",
@@ -53,7 +53,7 @@
     },
     "Review_deadline": {
       "type": "date",
-      "required": true
+      "required": false
     },
     "requestStatus": {
       "type": "enumeration",
