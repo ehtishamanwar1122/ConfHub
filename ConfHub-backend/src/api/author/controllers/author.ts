@@ -171,9 +171,9 @@ export default factories.createCoreController('api::author.author', ({ strapi })
             }
           
     },
-    async submitPaper(ctx) {
+   async submitPaper(ctx) {
       try {
-        const { paperTitle, abstract, submittedBy, submittedTo ,domain,authors} = ctx.request.body;
+        const { paperTitle, abstract, submittedBy, submittedTo ,authors} = ctx.request.body;
         const files = ctx.request.files ;
   console.log('papper',ctx.request.body);    
 
@@ -184,6 +184,16 @@ export default factories.createCoreController('api::author.author', ({ strapi })
 if (!author) {
     return ctx.badRequest('Invalid SubmittedBy ID: Author not found');
 }
+let domain;
+try {
+  domain = await predictDomain(paperTitle, abstract);
+  console.log("Predicted Domain:", domain);
+} catch (error) {
+  console.error("Failed to predict domain", error);
+  domain = "Unknown"; // fallback if AI fails
+}
+
+
 const authorName = `${author.firstName} ${author.lastName}`;
 const authorEmail = author.authorEmail
           const newPaper = await strapi.entityService.create('api::paper.paper', {
@@ -198,7 +208,7 @@ const authorEmail = author.authorEmail
                   Author:authorName
               },
           });
-          console.log('ctx.request.body.authors', ctx.request.body.authors);
+         // console.log('ctx.request.body.authors', ctx.request.body.authors);
 
           //for multiple authorss
           if (authors) {
@@ -231,8 +241,8 @@ const authorEmail = author.authorEmail
                 .filter((author) => !foundEmails.includes(author.email))
                 .map((author) => author.email);
 
-              console.log("Existing authors found:", existingAuthors);
-              console.log("Authors not registered:", notRegistered);
+              // console.log("Existing authors found:", existingAuthors);
+              // console.log("Authors not registered:", notRegistered);
               const newAuthorIds = [];
               for (const author of notRegistered) {
                 const newAuthor = await strapi.db.query("api::author.author").create({
@@ -260,7 +270,7 @@ const authorEmail = author.authorEmail
                 id: author.id,
               }));
 
-              console.log("authoreee", existingAuthorIds);
+            //  console.log("authoreee", existingAuthorIds);
               
               // Step 4: Combine all authors to connect
               const allAuthorsToConnect = [...existingAuthorIds, ...newAuthorIds];
