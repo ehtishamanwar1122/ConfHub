@@ -22,7 +22,7 @@ const PaperSubmissionForm = () => {
     submittedBy: "",
     file: null,
     submittedTo: "",
-    domain: "",
+    //domain: "",
   });
 
   const handleInputChange = (e) => {
@@ -75,7 +75,7 @@ const PaperSubmissionForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.paperTitle || !formData.abstract || !formData.domain || !formData.file) {
+    if (!formData.paperTitle || !formData.abstract  || !formData.file) {
       alert("Please fill in all fields and upload a file.");
       return;
     }
@@ -100,7 +100,7 @@ const PaperSubmissionForm = () => {
       const submissionData = new FormData();
       submissionData.append('paperTitle', formData.paperTitle);
       submissionData.append('abstract', formData.abstract);
-      submissionData.append('domain', formData.domain);
+     // submissionData.append('domain', formData.domain);
       submissionData.append('file', formData.file);
       submissionData.append('submittedBy', authorId);
       submissionData.append('submittedTo', id);
@@ -143,7 +143,7 @@ const PaperSubmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          {/* <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Domain</label>
             <select 
               name="domain" 
@@ -158,7 +158,7 @@ const PaperSubmissionForm = () => {
               <option value="DataScience">Data Science</option>
               <option value="Other">Other</option>
             </select>
-          </div>
+          </div> */}
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-1">Abstract</label>
             <textarea
