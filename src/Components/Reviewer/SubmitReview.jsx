@@ -4,15 +4,24 @@ import Layout from "./Layouts/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import { submitReview } from "../../Services/reviewerService";
 
+// Rating options used across the component
+const ratingOptions = [
+  { label: "Strongly Disagree", value: 0 },
+  { label: "Disagree", value: 2 },
+  { label: "Neutral", value: 5 },
+  { label: "Agree", value: 7 },
+  { label: "Strongly Agree", value: 10 },
+];
+
 const SubmitReview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [reviewerId, setReviewerId] = useState(null);
   const [paperDetails, setPaperDetails] = useState(null);
+  const [existingReview, setExistingReview] = useState(null);
 
   const [reviewComments, setReviewComments] = useState("");
-  const [score, setScore] = useState("");
   const [recommendation, setRecommendation] = useState("Accept");
 
   const [originality, setOriginality] = useState("");
@@ -24,77 +33,83 @@ const SubmitReview = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const ratingOptions = [
-    { label: "Strongly Disagree", value: 0 },
-    { label: "Disagree", value: 2 },
-    { label: "Neutral", value: 5 },
-    { label: "Agree", value: 7 },
-    { label: "Strongly Agree", value: 10 },
-  ];
-
+  // Get reviewerId from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userDetails"));
     if (storedUser?.reviewerId?.id) {
       setReviewerId(storedUser.reviewerId.id);
     } else {
-      setErrorMessage("Reviewer not found. Please log in.");
+      setErrorMessage("Reviewer not found. Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
     }
   }, []);
 
+  // Fetch paper details
   useEffect(() => {
     const fetchPaperDetails = async () => {
       try {
-        const response = await axios.get(
+        const res = await axios.get(
           `http://localhost:1337/api/papers?filters[id][$eq]=${id}&populate=*`
         );
-        setPaperDetails(response.data.data[0]);
-      } catch (error) {
+        setPaperDetails(res.data.data[0]);
+      } catch {
         setErrorMessage("Failed to load paper details.");
       }
     };
-
     fetchPaperDetails();
   }, [id]);
 
+  // Fetch existing review
+  useEffect(() => {
+    const fetchExistingReview = async () => {
+      if (!reviewerId || !id) return;
+      try {
+        const res = await axios.get(
+          `http://localhost:1337/api/reviews?filters[paperId][$eq]=${id}&filters[reviewerId][$eq]=${reviewerId}&populate=*`
+        );
+        if (res.data.data.length > 0) {
+          setExistingReview(res.data.data[0].attributes);
+        }
+      } catch (err) {
+        console.error("Error fetching existing review:", err);
+      }
+    };
+    fetchExistingReview();
+  }, [reviewerId, id]);
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
-    // if (
-    //   !reviewComments ||
-    //   // !score ||
-    //   originality === "" ||
-    //   significance === "" ||
-    //   presentation === "" ||
-    //   overall === "" ||
-    //   !reviewerId
-    // ) {
-    //   setErrorMessage("Please fill in all fields.");
-    //   setLoading(false);
-    //   return;
-    // }
+    if (
+      originality === "" ||
+      significance === "" ||
+      presentation === "" ||
+      overall === "" ||
+      !reviewComments
+    ) {
+      setErrorMessage("Please fill in all review fields.");
+      return;
+    }
 
     const reviewData = {
       paperId: id,
       reviewerId,
       comments: reviewComments,
-      //score: parseInt(score),
       recommendation,
       originality: parseInt(originality),
       significance: parseInt(significance),
       presentation: parseInt(presentation),
       overall: parseInt(overall),
     };
- console.log('pay',reviewData);
- 
+
+    setLoading(true);
     try {
-      const response = await submitReview(reviewData);
+      await submitReview(reviewData);
       setSuccessMessage("Review submitted successfully.");
-    } catch (error) {
-      console.error("Failed to submit review:", error);
+    } catch (err) {
       setErrorMessage("An error occurred while submitting the review.");
     } finally {
       setLoading(false);
@@ -109,7 +124,7 @@ const SubmitReview = () => {
 
           {paperDetails ? (
             <div className="mb-6 text-sm text-gray-700 space-y-1">
-               <p><strong>Paper Id:</strong> {paperDetails.id}</p>
+              <p><strong>Paper Id:</strong> {paperDetails.id}</p>
               <p><strong>Title:</strong> {paperDetails.Paper_Title}</p>
               <p><strong>Author:</strong> {paperDetails.Author}</p>
               <p><strong>Conference:</strong> {paperDetails.conference?.Conference_title}</p>
@@ -120,47 +135,32 @@ const SubmitReview = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            
-
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
-                label="Score (1–10)"
-                type="number"
-                value={score}
-                onChange={(e) => setScore(e.target.value)}
-                min="1"
-                max="10"
-              />
-              <SelectField
-                label="Recommendation"
-                value={recommendation}
-                onChange={setRecommendation}
-                options={["Accept", "Minor Revision", "Major Revision", "Reject"]}
-              />
-            </div> */}
-
-            <hr className="mt-6" />
-
             <h3 className="text-lg font-semibold mb-2">
               Rate the Following (Based on Agreement)
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ScoreSelect label="Originality" value={originality} onChange={setOriginality} options={ratingOptions} />
-              <ScoreSelect label="Significance of Topic" value={significance} onChange={setSignificance} options={ratingOptions} />
-              <ScoreSelect label="Presentation" value={presentation} onChange={setPresentation} options={ratingOptions} />
-              <ScoreSelect label="Overall Recommendation" value={overall} onChange={setOverall} options={ratingOptions} />
+              <ScoreSelect label="Originality" value={originality} onChange={setOriginality} />
+              <ScoreSelect label="Significance of Topic" value={significance} onChange={setSignificance} />
+              <ScoreSelect label="Presentation" value={presentation} onChange={setPresentation} />
+              <ScoreSelect label="Overall Recommendation" value={overall} onChange={setOverall} />
             </div>
+
+            <SelectField
+              label="Recommendation"
+              value={recommendation}
+              onChange={setRecommendation}
+              options={["Accept", "Minor Revision", "Major Revision", "Reject"]}
+            />
+
             <div>
               <label className="block font-medium mb-1">Review Comments</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-md p-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              <textarea
+                className="w-full border border-gray-300 rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={reviewComments}
                 onChange={(e) => setReviewComments(e.target.value)}
-                placeholder="Write your review..."
+                placeholder="Write your detailed comments..."
+                rows={5}
               />
-
             </div>
 
             {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
@@ -182,19 +182,7 @@ const SubmitReview = () => {
   );
 };
 
-// 🔧 Reusable Components
-
-const InputField = ({ label, type = "text", ...props }) => (
-  <div>
-    <label className="block font-medium mb-1">{label}</label>
-    <input
-      type={type}
-      className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      {...props}
-    />
-  </div>
-);
-
+// Reusable field components
 const SelectField = ({ label, value, onChange, options }) => (
   <div>
     <label className="block font-medium mb-1">{label}</label>
@@ -203,8 +191,8 @@ const SelectField = ({ label, value, onChange, options }) => (
       onChange={(e) => onChange(e.target.value)}
       className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
     >
-      {options.map((opt, i) => (
-        <option key={i} value={opt}>
+      {options.map((opt, idx) => (
+        <option key={idx} value={opt}>
           {opt}
         </option>
       ))}
@@ -212,7 +200,7 @@ const SelectField = ({ label, value, onChange, options }) => (
   </div>
 );
 
-const ScoreSelect = ({ label, value, onChange, options }) => (
+const ScoreSelect = ({ label, value, onChange }) => (
   <div>
     <label className="block font-medium mb-1">{label}</label>
     <select
@@ -221,8 +209,8 @@ const ScoreSelect = ({ label, value, onChange, options }) => (
       className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
     >
       <option value="">Select rating</option>
-      {options.map((opt, i) => (
-        <option key={i} value={opt.value}>
+      {ratingOptions.map((opt) => (
+        <option key={opt.value} value={opt.value}>
           {opt.label} ({opt.value})
         </option>
       ))}
