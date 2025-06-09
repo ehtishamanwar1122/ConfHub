@@ -78,7 +78,7 @@ if (usertype?.Type === 'reviewer') {
         <div className="flex items-center relative">
           <button
             onClick={toggleDropdown}
-            className="text-gray-600 text-2xl mr-5"
+            className="bg-inherit text-gray-600 text-2xl mr-5"
           >
             <FaBars />
           </button>
@@ -140,7 +140,7 @@ if (usertype?.Type === 'reviewer') {
           </span>
           <button
             onClick={handleLogout}
-            className="border border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
+            className="border bg-inherit border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
           >
             Logout
           </button>

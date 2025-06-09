@@ -1,8 +1,8 @@
-import React, { useState,useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import Layout from './Layouts/Layout';
-import '../styles/CreateConference.css'; // Import the CSS file
 import { createConference } from '../Services/conference-service';
+
 const CreateConference = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -17,228 +17,406 @@ const CreateConference = () => {
     speakerNames: '',
     submissionDeadline: '',
     reviewDeadline: '',
-    organizerId:'',
+    organizerId: '',
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+
   useEffect(() => {
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
     if (userDetails && userDetails.organizerId && userDetails.organizerId.id) {
       setFormData((prev) => ({
         ...prev,
-        organizerId: userDetails.organizerId.id, // Extract the id from the organizerId object
+        organizerId: userDetails.organizerId.id,
       }));
     }
   }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+    
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors(prev => ({ ...prev, [id]: '' }));
+    }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.conferenceTitle.trim()) {
-      newErrors.conferenceTitle = 'Conference Title is required.';
+ const validateForm = () => {
+  const newErrors = {};
+  
+  // Required fields
+  if (!formData.conferenceTitle.trim()) {
+    newErrors.conferenceTitle = 'Conference title is required';
+  }
+  if (!formData.startDate) {
+    newErrors.startDate = 'Conference date is required';
+  }
+  if (!formData.submissionDeadline) {
+    newErrors.submissionDeadline = 'Submission deadline is required';
+  }
+  
+  // Date validation
+  if (formData.startDate && formData.submissionDeadline) {
+    const startDate = new Date(formData.startDate);
+    const submissionDate = new Date(formData.submissionDeadline);
+    
+    if (submissionDate > startDate) {
+      newErrors.submissionDeadline = 'Submission deadline must be before conference date';
     }
-    if (!formData.startDate) {
-      newErrors.startDate = 'Start Date is required.';
-    }
-    // if (!formData.endDate) {
-    //   newErrors.endDate = 'End Date is required.';
-    // } else if (formData.startDate && formData.endDate < formData.startDate) {
-    //   newErrors.endDate = 'End Date cannot be earlier than Start Date.';
-    // }
-    // if (!formData.conferenceLocation.trim()) {
-    //   newErrors.conferenceLocation = 'Conference Location is required.';
-    // }
-    // if (!formData.trackTitle.trim()) {
-    //   newErrors.trackTitle = 'Track Title is required.';
-    // }
-    // if (!formData.sessionTitle.trim()) {
-    //   newErrors.sessionTitle = 'Session Title is required.';
-    // }
-    // if (!formData.speakerNames.trim()) {
-    //   newErrors.speakerNames = 'Speaker Names are required.';
-    // }
-    if (!formData.submissionDeadline) {
-      newErrors.submissionDeadline = 'Submission Deadline is required.';
-    }
-    // if (!formData.reviewDeadline) {
-    //   newErrors.reviewDeadline = 'Review Deadline is required.';
-    // } else if (formData.submissionDeadline && formData.reviewDeadline < formData.submissionDeadline) {
-    //   newErrors.reviewDeadline = 'Review Deadline cannot be earlier than Submission Deadline.';
-    // }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  }
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
   
-    // Validate the form
-    if (!validateForm()) {
-      return;
-    }
-    const formattedFormData = {
-      ...formData,
-      conferenceTime: formData.conferenceTime ? `${formData.conferenceTime}:00.000` : "", // Append seconds and milliseconds
+  if (!validateForm()) {
+    return;
+  }
+
+  setIsSubmitting(true);
+  
+  const formattedFormData = {
+    ...formData,
+    conferenceTime: formData.conferenceTime ? `${formData.conferenceTime}:00.000` : "",
   };
-  
-    try {
-      console.log("Form data before submitting:", formattedFormData); // Debugging
-  
-      // Call the service function with formData
-      const response = await createConference(formattedFormData);
-      console.log("Response:", response); // Handle the response (e.g., success message)
-      alert("Conference created successfully! Now wait till your conference is approved by the admin");
+
+  // Add this debug log
+  console.log("Submitting conference data:", formattedFormData);
+
+  try {
+    const response = await createConference(formattedFormData);
+    setCurrentStep(3);
+    setTimeout(() => {
       navigate("/OrganizerDashboard");
-    } catch (err) {
-      console.error("Error during conference creation:", err);
-      alert("Failed to create the conference. Please try again.");
+    }, 2000);
+  } catch (err) {
+    console.error("Error during conference creation:", err);
+    // Add more detailed error handling
+    if (err.response) {
+      console.error("Server response:", err.response.data);
+      setErrors({ 
+        submit: err.response.data.message || "Failed to create conference. Please check your data and try again."
+      });
+    } else {
+      setErrors({ submit: "Failed to create conference. Please try again." });
     }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  const nextStep = () => {
+    if (currentStep === 1) {
+      // Validate basic info before proceeding
+      const basicErrors = {};
+      if (!formData.conferenceTitle.trim()) {
+        basicErrors.conferenceTitle = 'Conference title is required';
+      }
+      if (!formData.startDate) {
+        basicErrors.startDate = 'Conference date is required';
+      }
+      
+      if (Object.keys(basicErrors).length > 0) {
+        setErrors(basicErrors);
+        return;
+      }
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 2));
   };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  if (currentStep === 3) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full mx-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Conference Created!</h2>
+            <p className="text-gray-600 mb-4">Your conference has been submitted for admin approval.</p>
+            <div className="animate-pulse text-blue-600">Redirecting to dashboard...</div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <h1>
-        <span>Create new</span> <span>Conference</span>
-      </h1>
-      <div className="container">
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="conferenceTitle">Conference Title</label>
-            <input
-              type="text"
-              id="conferenceTitle"
-              placeholder="Enter conference title"
-              value={formData.conferenceTitle}
-              onChange={handleChange}
-            />
-            {errors.conferenceTitle && <p className="error">{errors.conferenceTitle}</p>}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              Create New Conference
+            </h1>
+            <p className="text-gray-600 text-lg">Set up your academic conference in just a few steps</p>
           </div>
 
-          <div>
-            <label htmlFor="conferenceDescription">Conference Description</label>
-            <textarea
-              id="conferenceDescription"
-              rows="3"
-              placeholder="Enter conference description"
-              value={formData.conferenceDescription}
-              onChange={handleChange}
-            ></textarea>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <div>
-              <label htmlFor="startDate">Conference Date</label>
-              <input
-                type="date"
-                id="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-              />
-              {errors.startDate && <p className="error">{errors.startDate}</p>}
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center space-x-4">
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 ${
+                currentStep >= 1 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 text-gray-400'
+              }`}>
+                1
+              </div>
+              <div className={`w-16 h-1 transition-all duration-300 ${
+                currentStep > 1 ? 'bg-blue-600' : 'bg-gray-300'
+              }`}></div>
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 ${
+                currentStep >= 2 ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 text-gray-400'
+              }`}>
+                2
+              </div>
             </div>
-            {/* <div>
-              <label htmlFor="conferenceTime">Conference Time</label>
-              <input
-                type="time"
-                id="conferenceTime"
-                value={formData.conferenceTime}
-                onChange={handleChange}
-              />
-              {errors.conferenceTime && <p className="error">{errors.conferenceTime}</p>}
-            </div> */}
-          </div>
-{/* 
-          <div>
-            <label htmlFor="conferenceLocation">Conference Location</label>
-            <input
-              type="text"
-              id="conferenceLocation"
-              placeholder="Enter conference location"
-              value={formData.conferenceLocation}
-              onChange={handleChange}
-            />
-            {errors.conferenceLocation && <p className="error">{errors.conferenceLocation}</p>}
-          </div> */}
-
-          {/* <h5>Track Details</h5>
-          <div>
-            <label htmlFor="trackTitle">Track Title</label>
-            <input
-              type="text"
-              id="trackTitle"
-              placeholder="Enter track title"
-              value={formData.trackTitle}
-              onChange={handleChange}
-            />
-            {errors.trackTitle && <p className="error">{errors.trackTitle}</p>}
-          </div>
-          <div>
-            <label htmlFor="trackDescription">Track Description</label>
-            <textarea
-              id="trackDescription"
-              rows="3"
-              placeholder="Enter track description"
-              value={formData.trackDescription}
-              onChange={handleChange}
-            ></textarea>
-          </div>
-          <button type="button">Add Track</button> */}
-
-          {/* <h5>Session Details</h5>
-          <div>
-            <label htmlFor="sessionTitle">Session Title</label>
-            <input
-              type="text"
-              id="sessionTitle"
-              placeholder="Enter session title"
-              value={formData.sessionTitle}
-              onChange={handleChange}
-            />
-            {errors.sessionTitle && <p className="error">{errors.sessionTitle}</p>}
-          </div>
-          <div>
-            <label htmlFor="speakerNames">Speaker Names</label>
-            <input
-              type="text"
-              id="speakerNames"
-              placeholder="Enter speakers' names"
-              value={formData.speakerNames}
-              onChange={handleChange}
-            />
-            {errors.speakerNames && <p className="error">{errors.speakerNames}</p>}
-          </div> */}
-
-          <h5>Deadlines</h5>
-          <div className="grid grid-cols-1 md:grid-cols-3">
-            <div>
-              <label htmlFor="submissionDeadline">Paper Submission Deadline</label>
-              <input
-                type="date"
-                id="submissionDeadline"
-                value={formData.submissionDeadline}
-                onChange={handleChange}
-              />
-              {errors.submissionDeadline && <p className="error">{errors.submissionDeadline}</p>}
-            </div>
-            {/* <div>
-              <label htmlFor="reviewDeadline">Review Deadline</label>
-              <input
-                type="date"
-                id="reviewDeadline"
-                value={formData.reviewDeadline}
-                onChange={handleChange}
-              />
-              {errors.reviewDeadline && <p className="error">{errors.reviewDeadline}</p>}
-            </div> */}
           </div>
 
-          <div className="text-left">
-            <button type="submit">Submit Request</button>
+          {/* Form Container */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <form onSubmit={handleSubmit} className="p-8">
+              
+              {/* Step 1: Basic Information */}
+              {currentStep === 1 && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Basic Information</h2>
+                    <p className="text-gray-600">Tell us about your conference</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label htmlFor="conferenceTitle" className="block text-sm font-medium text-gray-700 mb-2">
+                        Conference Title *
+                      </label>
+                      <input
+                        type="text"
+                        id="conferenceTitle"
+                        placeholder="Enter your conference title"
+                        value={formData.conferenceTitle}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          errors.conferenceTitle ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      />
+                      {errors.conferenceTitle && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {errors.conferenceTitle}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="conferenceDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                        Conference Description
+                      </label>
+                      <textarea
+                        id="conferenceDescription"
+                        rows="4"
+                        placeholder="Describe your conference, its themes, and objectives"
+                        value={formData.conferenceDescription}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                          Conference Date *
+                        </label>
+                        <input
+                          type="date"
+                          id="startDate"
+                          value={formData.startDate}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                            errors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        />
+                        {errors.startDate && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.startDate}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* <div>
+                        <label htmlFor="conferenceTime" className="block text-sm font-medium text-gray-700 mb-2">
+                          Conference Time
+                        </label>
+                        <input
+                          type="time"
+                          id="conferenceTime"
+                          value={formData.conferenceTime}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div> */}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6">
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      Next Step
+                      <svg className="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Deadlines & Submit */}
+              {currentStep === 2 && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Deadlines & Finalize</h2>
+                    <p className="text-gray-600">Set important dates for your conference</p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      Important Deadlines
+                    </h3>
+                    
+                    <div>
+                      <label htmlFor="submissionDeadline" className="block text-sm font-medium text-gray-700 mb-2">
+                        Paper Submission Deadline *
+                      </label>
+                      <input
+                        type="date"
+                        id="submissionDeadline"
+                        value={formData.submissionDeadline}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          errors.submissionDeadline ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      />
+                      {errors.submissionDeadline && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {errors.submissionDeadline}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Conference Summary */}
+                  <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Conference Summary</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Title:</span>
+                        <span className="font-medium text-gray-900">{formData.conferenceTitle || 'Not specified'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Date:</span>
+                        <span className="font-medium text-gray-900">{formData.startDate || 'Not specified'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Submission Deadline:</span>
+                        <span className="font-medium text-gray-900">{formData.submissionDeadline || 'Not specified'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {errors.submit && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                      <p className="text-red-600 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {errors.submit}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between pt-6">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                      </svg>
+                      Previous
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-xl hover:from-green-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          Create Conference
+                          <svg className="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </form>
           </div>
-        </form>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </Layout>
   );
 };

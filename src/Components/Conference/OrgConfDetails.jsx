@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import './ConferenceDetails.css'
-import Header from "./Header";
+import Header from "../Layouts/Header"
 import Footer from "./Footer";
 import axios from "axios";
 import { dashboard_bg } from "../../assets/Images";
+
 const OrgConfDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -16,26 +17,47 @@ const OrgConfDetails = () => {
   const [selectedReviews, setSelectedReviews] = useState(null);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-const [newDeadline, setNewDeadline] = useState('');
+  const [newDeadline, setNewDeadline] = useState('');
 
-const [showReviewModal, setShowReviewModal] = useState(false);
-const [reviewDeadline, setReviewDeadline] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewDeadline, setReviewDeadline] = useState(false);
+
+  // New states for review form fields
+  const [showReviewFormModal, setShowReviewFormModal] = useState(false);
+  const [reviewFormFields, setReviewFormFields] = useState([]);
+  const [newCustomField, setNewCustomField] = useState('');
+  
+  // Default review criteria options
+  const defaultReviewCriteria = [
+    { id: 'significance', label: 'Significance', enabled: true },
+    { id: 'originality', label: 'Originality', enabled: true },
+    { id: 'presentation', label: 'Presentation Quality', enabled: true },
+    { id: 'technical_quality', label: 'Technical Quality', enabled: false },
+    { id: 'clarity', label: 'Clarity', enabled: false },
+    { id: 'novelty', label: 'Novelty', enabled: false },
+    { id: 'reproducibility', label: 'Reproducibility', enabled: false },
+    { id: 'related_work', label: 'Related Work Coverage', enabled: false },
+    { id: 'experimental_validation', label: 'Experimental Validation', enabled: false },
+    { id: 'writing_quality', label: 'Writing Quality', enabled: false }
+  ];
 
   useEffect(() => {
     const fetchConferenceDetails = async () => {
       try {
-          
         const response = await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*`);
- const confData = response.data.data;
+        const confData = response.data.data;
         setConference(confData);
         setLoading(false);
- console.log('ddd',confData);
- 
- if (confData.length > 0) {
-  const papers = confData[0].Papers || []; // No `.data` here
-  setSubmittedPapers(papers);
-}
-
+        console.log('ddd',confData);
+        
+        if (confData.length > 0) {
+          const papers = confData[0].Papers || []; // No `.data` here
+          setSubmittedPapers(papers);
+          
+          // Initialize review form fields from conference data or use defaults
+          const existingFields = confData[0].reviewFormFields || defaultReviewCriteria;
+          setReviewFormFields(existingFields);
+        }
       } catch (error) {
         console.error("Error fetching conference details:", error);
         setLoading(false);
@@ -44,6 +66,7 @@ const [reviewDeadline, setReviewDeadline] = useState(false);
 
     fetchConferenceDetails();
   }, [id]);
+
   const handleShowReviews = (paperId) => {
     const paper = submittedPapers.find((p) => p.id === paperId);
     console.log('rr',paper.review);
@@ -61,18 +84,18 @@ const [reviewDeadline, setReviewDeadline] = useState(false);
     setSelectedReviews(null); 
     setSelectedPaper(null);
   };
+
   const handleJoinConference = () => {
-  
     navigate("/register");
   };
+
   const handleDecision = async (decision) => {
     try {
       const payload = {
         paperId:selectedPaper.id, 
         decision, 
       };
-  console.log('payy',payload);
-  
+      console.log('payy',payload);
       
       const response = await axios.post('http://localhost:1337/api/organizers/final-decision', payload);
   
@@ -87,12 +110,11 @@ const [reviewDeadline, setReviewDeadline] = useState(false);
       console.error('Error sending decision:', error);
     }
   };
+
   const handleReviewDeadlineSubmit = async () => {
     const payload = {
-     
-        id: conference[0].id,
-        Review_deadline: reviewDeadline,
-      
+      id: conference[0].id,
+      Review_deadline: reviewDeadline,
     };
   
     try {
@@ -108,7 +130,56 @@ const [reviewDeadline, setReviewDeadline] = useState(false);
       console.error("Error updating review deadline:", error);
     }
   };
-  
+
+  // New functions for review form fields management
+  const handleReviewFormFieldToggle = (fieldId) => {
+    setReviewFormFields(prev => 
+      prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, enabled: !field.enabled }
+          : field
+      )
+    );
+  };
+
+  const handleAddCustomField = () => {
+    if (newCustomField.trim()) {
+      const customFieldId = `custom_${Date.now()}`;
+      const newField = {
+        id: customFieldId,
+        label: newCustomField.trim(),
+        enabled: true,
+        isCustom: true
+      };
+      setReviewFormFields(prev => [...prev, newField]);
+      setNewCustomField('');
+    }
+  };
+
+  const handleRemoveCustomField = (fieldId) => {
+    setReviewFormFields(prev => prev.filter(field => field.id !== fieldId));
+  };
+
+  const handleSaveReviewFormFields = async () => {
+    try {
+      const payload = {
+        id: conference[0].id,
+        reviewFormFields: reviewFormFields
+      };
+      
+      // Replace with your actual API endpoint
+      const response = await axios.post('http://localhost:1337/api/conferences/updateReviewFormFields', payload);
+      
+      if (response.status === 200) {
+        const updatedConference = [...conference];
+        updatedConference[0].reviewFormFields = reviewFormFields;
+        setConference(updatedConference);
+        setShowReviewFormModal(false);
+      }
+    } catch (error) {
+      console.error("Error updating review form fields:", error);
+    }
+  };
 
   const openEditModal = () => {
     setNewDeadline(conference[0]?.Submission_deadline || '');
@@ -121,249 +192,585 @@ const [reviewDeadline, setReviewDeadline] = useState(false);
   
   if (loading) return <p>Loading...</p>;
 
-  return (
+ return (
     <>
-  <Header />
-  <div >
-    
-  <section className="conference-details">
-  {loading ? (
-    <p>Loading conferences...</p>
-  ) : conference.length > 0 ? (
-    <>
-      <div className="conference-info">
-        {conference.map((conference) => (
-          <div key={conference.id}>
-            <h2>{conference.Conference_title}</h2>
-            <p><strong>Organizer's Name:</strong> {conference.Organizer?.Organizer_FirstName} {conference.Organizer?.Organizer_LastName}</p>
-            <p><strong>Conference Description:</strong> {conference.Description}</p>
-            <p><strong>Status:</strong> {conference.Status}</p>
-            <p><strong>Start Date:</strong> {conference.Start_date}</p>
-            {/* <p><strong>Time:</strong> {conference.Conference_time}</p> */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap:'20px' }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-    <p style={{ margin: 0 }}>
-      <strong>Paper Submission Deadline:</strong> {conference.Submission_deadline}
-    </p>
-    <button onClick={openEditModal}>Edit</button>
-  </div>
-  {/* Review Deadline (if exists) */}
-  {conference.Review_deadline && (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <p style={{ margin: 0 }}>
-          <strong>Review Deadline:</strong> {conference.Review_deadline}
-        </p>
-        <button onClick={() => setShowReviewModal(true)}>Edit</button>
-      </div>
-    )}
-</div>
-  {/* If no Review Deadline, show Add button */}
-  {!conference.Review_deadline && (
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-      <button onClick={() => setShowReviewModal(true)}>
-        Add Review Deadline
-      </button>
-    </div>
-    
-    )}
+      <Header />
+      <div className="min-h-screen bg-gray-50">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : conference.length > 0 ? (
+            <>
+              <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                <div className="p-8">
+                  {conference.map((conf) => (
+                    <div key={conf.id} className="space-y-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h1 className="text-3xl font-bold text-gray-900">{conf.Conference_title}</h1>
+                          <p className="mt-2 text-lg text-gray-600">{conf.Description}</p>
+                        </div>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                          {conf.Status}
+                        </span>
+                      </div>
 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-medium text-gray-500">Organizer</h3>
+                          <p className="text-lg font-medium text-gray-900">
+                            {conf.Organizer?.Organizer_FirstName} {conf.Organizer?.Organizer_LastName}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-medium text-gray-500">Start Date</h3>
+                          <p className="text-lg font-medium text-gray-900">{conf.Start_date}</p>
+                        </div>
+                      </div>
 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-medium text-gray-500">Paper Submission Deadline</h3>
+                            <button 
+                              onClick={openEditModal}
+                              className="  text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                          <p className="text-lg font-medium text-gray-900">{conf.Submission_deadline}</p>
+                        </div>
+                        
+                        {conf.Review_deadline ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-sm font-medium text-gray-500">Review Deadline</h3>
+                              <button 
+                                onClick={() => setShowReviewModal(true)}
+                                className=" text-sm font-medium"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                            <p className="text-lg font-medium text-gray-900">{conf.Review_deadline}</p>
+                          </div>
+                        ) : (
+                          <div className="flex items-end">
+                            <button 
+                              onClick={() => setShowReviewModal(true)}
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                            >
+                              Add Review Deadline
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
-          </div>
-
-        ))}
-      </div>
-
-      <div className="papers-section">
-        <h3 class='paperheading'>Submitted Papers</h3>
-        {submittedPapers.length > 0 ? (
-  <div className="papers-container">
-    {[...submittedPapers]
-      .sort((a, b) => b.review.length - a.review.length) // Sort papers by review count (descending)
-      .map(paper => (
-        <div key={paper.id} className="paper-card">
-          <div className="paper-info">
-          <p><strong>Paper Id:</strong> {paper.id || "N/A"}</p>
-            <h4>Paper Title: {paper.Paper_Title}</h4>
-            <p><strong>Author:</strong> {paper.Author || "N/A"}</p>
-            <p><strong>Submission Date:</strong> {new Date(paper.submissionDate).toLocaleDateString()}</p>
-            <p><strong>Abstract:</strong> {paper.Abstract.slice(0, 100)}...</p>
-            <p><strong>Reviews Submitted:</strong> {paper.review.length}</p>
-          </div>
-          <div className="paper-actions">
-            {paper.finalDecisionByOrganizer ? (
-              <span className="final-decision">Final Decision Submitted</span>
-            ) : (
-              <button
-                onClick={() => handleShowReviews(paper.id)}
-                disabled={paper.review.length === 0}
-                className={paper.review.length === 0 ? 'disabled-button' : ''}
-              >
-                Show Submitted Reviews
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
-  </div>
-) : (
-  <p>No papers submitted yet.</p>
-)}
-
-      </div>
-    </>
-  ) : (
-    <p>No conferences in progress at the moment.</p>
-  )}
-</section>
-
-{isModalOpen && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <button onClick={handleCloseModal} className="close-modal-btn">Close</button>
-
-      {selectedReviews && selectedReviews.length > 0 ? (
-        selectedReviews.map((reviews, index) => (
-          <div
-            key={index}
-            className={`mt-10 p-6 bg-white rounded-lg shadow-xl m-10 ${index !== 0 ? 'border-t-2 border-gray-500' : ''}`}
-          >
-            <h3 className="text-lg font-semibold mb-4">Review {index + 1}</h3>
-
-            {/* First Row: Significance, Originality, Presentation, and Recommendation */}
-            <div className="flex space-x-6 mb-6">
-              <div className="bg-gray-100 p-4 rounded-lg flex-1">
-                <span className="font-medium">Significance:</span> 
-                {reviews.significance || 'N/A'}/10
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-800">Review Form Configuration</h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Customize the review criteria for submitted papers
+                            </p>
+                            <div className="mt-3">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {reviewFormFields.filter(f => f.enabled).length} criteria enabled
+                              </span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setShowReviewFormModal(true)}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                          >
+                            Configure Review Form
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="bg-gray-100 p-4 rounded-lg flex-1">
-                <span className="font-medium">Originality:</span> 
-                {reviews.originality || 'N/A'}/10
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <h3 className="text-lg font-medium leading-6 text-gray-900">Submitted Papers</h3>
+                </div>
+                <div className="p-6">
+                  {submittedPapers.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                      {[...submittedPapers]
+                        .sort((a, b) => b.review.length - a.review.length)
+                        .map(paper => (
+                          <div key={paper.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                            <div className="p-6">
+                              <div className="flex justify-between">
+                                <div>
+                                  <h4 className="text-lg font-medium text-gray-900">{paper.Paper_Title}</h4>
+                                  <p className="mt-1 text-sm text-gray-500">ID: {paper.id || "N/A"}</p>
+                                </div>
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  {paper.review.length} reviews
+                                </span>
+                              </div>
+                              <p className="mt-2 text-sm text-gray-600"><strong>Author:</strong> {paper.Author || "N/A"}</p>
+                              <p className="mt-1 text-sm text-gray-600"><strong>Submitted:</strong> {new Date(paper.submissionDate).toLocaleDateString()}</p>
+                              <p className="mt-3 text-sm text-gray-600 line-clamp-2">{paper.Abstract}</p>
+                              <div className="mt-4 flex justify-end">
+                                {paper.finalDecisionByOrganizer ? (
+                                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                    Decision Submitted
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleShowReviews(paper.id)}
+                                    disabled={paper.review.length === 0}
+                                    className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${paper.review.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                  >
+                                    View Reviews
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">No papers submitted</h3>
+                      <p className="mt-1 text-sm text-gray-500">Papers submitted to this conference will appear here.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No conference found</h3>
+              <p className="mt-1 text-sm text-gray-500">There are no conferences available at the moment.</p>
+            </div>
+          )}
+        </section>
+
+        {/* Existing modals remain unchanged */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold">Paper Reviews</h2>
+                    <p className="text-indigo-100 mt-1">Review details for: {selectedPaper?.Paper_Title}</p>
+                  </div>
+                  <button 
+                    onClick={handleCloseModal}
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              <div className="bg-gray-100 p-4 rounded-lg flex-1">
-                <span className="font-medium">Presentation:</span> 
-                {reviews.presentation || 'N/A'}/10
-              </div>
+              {/* Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(95vh-250px)]">
+                {selectedReviews && selectedReviews.length > 0 ? (
+                  <div className="space-y-8">
+                    {selectedReviews.map((reviews, index) => (
+                      <div
+                        key={index}
+                        className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200 shadow-sm"
+                      >
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                              {index + 1}
+                            </div>
+                            Review {index + 1}
+                          </h3>
+                          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                            Overall: {reviews.overall || 'N/A'}/10
+                          </div>
+                        </div>
 
-              <div className="bg-gray-100 p-4 rounded-lg flex-1">
-                <span className="font-medium">Recommendation:</span> 
-                {reviews.Recommendations || 'N/A'}
+                        {/* Metrics Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                              <span className="font-semibold text-gray-700">Significance</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-600">
+                              {reviews.significance || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <span className="font-semibold text-gray-700">Originality</span>
+                            </div>
+                            <div className="text-2xl font-bold text-green-600">
+                              {reviews.originality || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                              <span className="font-semibold text-gray-700">Presentation</span>
+                            </div>
+                            <div className="text-2xl font-bold text-orange-600">
+                              {reviews.presentation || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                              <span className="font-semibold text-gray-700">Recommendation</span>
+                            </div>
+                            <div className="text-lg font-bold text-purple-600">
+                              {reviews.Recommendations || 'N/A'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Comments Section */}
+                        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                          <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-2.9-.471L8 21l1.529-1.529A8.956 8.956 0 0121 12z" />
+                            </svg>
+                            Reviewer Comments
+                          </h4>
+                          <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                            <p className="text-gray-700 leading-relaxed">
+                              {reviews.Comments || 'No comments available'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-gray-500 text-lg">No reviews available for this paper.</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Decision Buttons Footer */}
+              <div className="bg-gray-50 p-6 border-t">
+                <div className="flex justify-center space-x-4">
+                  <button
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    onClick={() => handleDecision('Accept')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Accept Paper
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    onClick={() => handleDecision('Minor Revision')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Minor Revision
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    onClick={() => handleDecision('Reject')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Reject Paper
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Second Row: Overall Score */}
-            <div className="mt-6">
-              <p className="text-blue-600 font-bold">
-                Overall Score: {reviews.overall || 'N/A'}/10
-              </p>
-            </div>
+        {isEditModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-bold">Edit Submission Deadline</h3>
+                    <p className="text-blue-100 text-sm mt-1">Update the paper submission deadline</p>
+                  </div>
+                  <button 
+                    onClick={closeEditModal}
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
-            {/* Third Row: Reviewer Comments */}
-            <div className="mt-6">
-              <p className="font-semibold mb-2">Reviewer Comments:</p>
-              <p className="bg-gray-100 p-6 rounded-lg">
-                {reviews.Comments || 'No comments available'}
-              </p>
+              {/* Content */}
+              <div className="p-6">
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    New Submission Deadline
+                  </label>
+                  <input
+                    type="date"
+                    value={newDeadline}
+                    onChange={(e) => setNewDeadline(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const payload = {
+                          id: conference[0].id,
+                          Submission_deadline: newDeadline,
+                        };
+                        const response = await axios.post('http://localhost:1337/api/conferences/updateSubmissiondate', payload);
+
+                        if (response.status === 200) {
+                          const updatedConference = [...conference];
+                          updatedConference[0].Submission_deadline = newDeadline;
+                          setConference(updatedConference);
+                          closeEditModal();
+                        }
+                      } catch (error) {
+                        console.error("Error updating submission deadline:", error.response?.data || error.message);
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Save Changes
+                  </button>
+                  <button 
+                    onClick={closeEditModal}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        ))
-      ) : (
-        <p>No reviews available for this paper.</p>
-      )}
-      
-      {/* Organizer Decision Buttons - Centered */}
-      <div className="mt-6 flex justify-center space-x-4">
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-          onClick={() => handleDecision('Accept')}
-        >
-          Accept Paper
-        </button>
-        <button
-          className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
-          onClick={() => handleDecision('Minor Revision')}
-        >
-          Minor Revision
-        </button>
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-          onClick={() => handleDecision('Reject')}
-        >
-          Reject Paper
-        </button>
-      </div>
+        )}
+
+        {showReviewModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-bold">Set Review Deadline</h3>
+                    <p className="text-purple-100 text-sm mt-1">Configure the deadline for paper reviews</p>
+                  </div>
+                  <button 
+                    onClick={() => setShowReviewModal(false)}
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Review Deadline Date
+                  </label>
+                  <input
+                    type="date"
+                    value={reviewDeadline}
+                    onChange={(e) => setReviewDeadline(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button 
+                    onClick={handleReviewDeadlineSubmit}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Save Deadline
+                  </button>
+                  <button 
+                    onClick={() => setShowReviewModal(false)}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* New Review Form Fields Modal */}
+        {showReviewFormModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-white text-2xl font-bold">Configure Review Form</h2>
+                    <p className="text-blue-100 mt-1">Customize the criteria reviewers will use to evaluate papers</p>
+                  </div>
+                  <button 
+                    onClick={() => setShowReviewFormModal(false)}
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+                {/* Standard Criteria Section */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Standard Review Criteria
+                  </h3>
                   
-    </div>
-    
-  </div>
-)}
-{isEditModalOpen && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h3>Edit Submission Deadline</h3>
-      <input
-        type="date"
-        value={newDeadline}
-        onChange={(e) => setNewDeadline(e.target.value)}
-      />
-      <div style={{ marginTop: '1rem' }}>
-        <button
-          onClick={async () => {
-            try {
-              const payload = {
-                
-                  id: conference[0].id,  // Conference ID
-                  Submission_deadline: newDeadline,  // The new submission deadline to be updated
-                
-              };
-              const response = await axios.post('http://localhost:1337/api/conferences/updateSubmissiondate', payload);
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {reviewFormFields.filter(field => !field.isCustom).map((field) => (
+                      <label key={field.id} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200">
+                        <input
+                          type="checkbox"
+                          checked={field.enabled}
+                          onChange={() => handleReviewFormFieldToggle(field.id)}
+                          className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <span className="text-gray-700 font-medium">{field.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-            
-              if (response.status === 200) {
-                const updatedConference = [...conference];
-                updatedConference[0].Submission_deadline = newDeadline;
-                setConference(updatedConference);
-                closeEditModal();
-              }
-            } catch (error) {
-              console.error("Error updating submission deadline:", error.response?.data || error.message);
-            }
-          }}
-        >
-          Save
-        </button>
-        <button onClick={closeEditModal} style={{ marginLeft: '10px' }}>
-          Cancel
-        </button>
+                {/* Custom Criteria Section */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Custom Review Criteria
+                  </h3>
+                  
+                  {/* Add Custom Field Input */}
+                  <div className="flex gap-3 mb-4">
+                    <input
+                      type="text"
+                      value={newCustomField}
+                      onChange={(e) => setNewCustomField(e.target.value)}
+                      placeholder="Enter custom criteria name..."
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddCustomField()}
+                    />
+                    <button
+                      onClick={handleAddCustomField}
+                      disabled={!newCustomField.trim()}
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-6 py-3 rounded-xl transition-colors font-medium disabled:cursor-not-allowed"
+                    >
+                      Add Criteria
+                    </button>
+                  </div>
+
+                  {/* Custom Fields List */}
+                  {reviewFormFields.filter(field => field.isCustom).length > 0 && (
+                    <div className="space-y-3">
+                      {reviewFormFields.filter(field => field.isCustom).map((field) => (
+                        <div key={field.id} className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={field.enabled}
+                              onChange={() => handleReviewFormFieldToggle(field.id)}
+                              className="w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                            />
+                            <span className="text-gray-700 font-medium">{field.label}</span>
+                            <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">Custom</span>
+                          </label>
+                          <button
+                            onClick={() => handleRemoveCustomField(field.id)}
+                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Summary Section */}
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">Configuration Summary</h4>
+                  <p className="text-blue-700 text-sm">
+                    <span className="font-medium">{reviewFormFields.filter(f => f.enabled).length}</span> criteria will be included in the review form.
+                    Reviewers will evaluate papers based on these selected criteria.
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="bg-gray-50 p-6 flex justify-end gap-3 border-t">
+                <button
+                  onClick={() => setShowReviewFormModal(false)}
+                  className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveReviewFormFields}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium"
+                >
+                  Save Configuration
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  </div>
-)}
-{showReviewModal && (
-  <div className="modal-overlay">
-    <div className="modal-box">
-      <h3>Set Review Deadline</h3>
-      <input
-        type="date"
-        value={reviewDeadline}
-        onChange={(e) => setReviewDeadline(e.target.value)}
-      />
-      <div className="modal-actions">
-        <button onClick={handleReviewDeadlineSubmit}>Save</button>
-        <button onClick={() => setShowReviewModal(false)}>Cancel</button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
-        </div>
-  <Footer />
-</>
-
+      <Footer />
+    </>
   );
 };
 
