@@ -34,6 +34,10 @@ export interface AdminApiToken extends Struct.CollectionTypeSchema {
         minLength: 1;
       }> &
       Schema.Attribute.DefaultTo<''>;
+    encryptedKey: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 1;
+      }>;
     expiresAt: Schema.Attribute.DateTime;
     lastUsedAt: Schema.Attribute.DateTime;
     lifespan: Schema.Attribute.BigInteger;
@@ -450,6 +454,7 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
       ['pending', 'approved', 'rejected']
     >;
     Review_deadline: Schema.Attribute.Date;
+    reviewFormFields: Schema.Attribute.JSON;
     Session_title: Schema.Attribute.String;
     Speaker_names: Schema.Attribute.String;
     Start_date: Schema.Attribute.Date & Schema.Attribute.Required;
@@ -570,28 +575,35 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    clarity: Schema.Attribute.Integer;
     Comments: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    experimental_validation: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::review.review'
     > &
       Schema.Attribute.Private;
+    novelty: Schema.Attribute.Integer;
     originality: Schema.Attribute.Integer;
     overall: Schema.Attribute.Integer;
     paper: Schema.Attribute.Relation<'manyToOne', 'api::paper.paper'>;
     presentation: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     Recommendations: Schema.Attribute.String;
+    related_work: Schema.Attribute.Integer;
+    reproducibility: Schema.Attribute.Integer;
     reviewer: Schema.Attribute.Relation<'manyToOne', 'api::reviewer.reviewer'>;
     Score: Schema.Attribute.Integer;
     significance: Schema.Attribute.Integer;
+    technical_quality: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    writing_quality: Schema.Attribute.Integer;
   };
 }
 

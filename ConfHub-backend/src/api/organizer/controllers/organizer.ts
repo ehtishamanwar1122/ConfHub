@@ -594,7 +594,37 @@ async updateFinalDecision(ctx) {
     console.error('Error updating decision:', error);
     return ctx.throw(500, 'Internal server error');
   }
+},
+
+
+
+async updateReviewFormFields(ctx) {
+  const { id, reviewFormFields } = ctx.request.body;
+
+  console.log('Request Body:', ctx.request.body); // Optional: Debug logging
+
+  try {
+    // Update the conference with the provided reviewFormFields
+    const updatedConference = await strapi.entityService.update(
+      'api::conference.conference',
+      id,
+      {
+        data: {
+          reviewFormFields: reviewFormFields,
+        },
+      }
+    );
+
+    return {
+      message: 'Form fields updated successfully',
+      data: updatedConference,
+    };
+  } catch (error) {
+    console.error('Error updating form fields:', error);
+    return ctx.throw(500, 'Internal server error');
+  }
 }
+
 
 
   }));
