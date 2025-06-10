@@ -70,5 +70,14 @@ export default {
         },
         
       },
+       {
+        method: 'POST',
+        path: '/organizers/updateReviewFormFields', // Custom endpoint for registration
+        handler: 'organizer.updateReviewFormFields',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
     ],
   };

@@ -4,7 +4,7 @@ import Layout from "./Layouts/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import { submitReview } from "../../Services/reviewerService";
 
-// Rating options used across the component
+// Rating options
 const ratingOptions = [
   { label: "Strongly Disagree", value: 0 },
   { label: "Disagree", value: 2 },
@@ -20,20 +20,23 @@ const SubmitReview = () => {
   const [reviewerId, setReviewerId] = useState(null);
   const [paperDetails, setPaperDetails] = useState(null);
   const [existingReview, setExistingReview] = useState(null);
-
   const [reviewComments, setReviewComments] = useState("");
   const [recommendation, setRecommendation] = useState("Accept");
 
-  const [originality, setOriginality] = useState("");
-  const [significance, setSignificance] = useState("");
-  const [presentation, setPresentation] = useState("");
-  const [overall, setOverall] = useState("");
+  const [dynamicScores, setDynamicScores] = useState({});
+  const [reviewFields, setReviewFields] = useState([
+    // fallback static fields (optional)
+    { id: "originality", label: "Originality", enabled: true },
+    { id: "significance", label: "Significance", enabled: true },
+    { id: "presentation", label: "Presentation", enabled: true },
+    { id: "overall", label: "Overall Recommendation", enabled: true }
+  ]);
 
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Get reviewerId from localStorage
+  // Load reviewerId
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userDetails"));
     if (storedUser?.reviewerId?.id) {
@@ -44,15 +47,24 @@ const SubmitReview = () => {
     }
   }, []);
 
-  // Fetch paper details
+  // Fetch paper and conference details
   useEffect(() => {
     const fetchPaperDetails = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:1337/api/papers?filters[id][$eq]=${id}&populate=*`
+          `http://localhost:1337/api/papers?filters[id][$eq]=${id}&populate=conference`
         );
-        setPaperDetails(res.data.data[0]);
-      } catch {
+        const paper = res.data.data[0];
+        setPaperDetails(paper);
+
+        const conf = paper.conference;
+        const fields = conf?.reviewFormFields;
+
+        if (fields && Array.isArray(fields) && fields.length > 0) {
+          setReviewFields(fields.filter(f => f.enabled));
+        }
+      } catch (err) {
+        console.error(err);
         setErrorMessage("Failed to load paper details.");
       }
     };
@@ -77,20 +89,26 @@ const SubmitReview = () => {
     fetchExistingReview();
   }, [reviewerId, id]);
 
-  // Handle form submission
+  // Handle dynamic score change
+  const handleScoreChange = (fieldId, value) => {
+    setDynamicScores((prev) => ({ ...prev, [fieldId]: value }));
+  };
+
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (
-      originality === "" ||
-      significance === "" ||
-      presentation === "" ||
-      overall === "" ||
-      !reviewComments
-    ) {
-      setErrorMessage("Please fill in all review fields.");
+    // Validation
+    for (const field of reviewFields) {
+      if (!dynamicScores[field.id]) {
+        setErrorMessage(`Please rate ${field.label}.`);
+        return;
+      }
+    }
+    if (!reviewComments) {
+      setErrorMessage("Please add review comments.");
       return;
     }
 
@@ -99,10 +117,9 @@ const SubmitReview = () => {
       reviewerId,
       comments: reviewComments,
       recommendation,
-      originality: parseInt(originality),
-      significance: parseInt(significance),
-      presentation: parseInt(presentation),
-      overall: parseInt(overall),
+      ...Object.fromEntries(
+        Object.entries(dynamicScores).map(([key, val]) => [key, parseInt(val)])
+      ),
     };
 
     setLoading(true);
@@ -110,6 +127,7 @@ const SubmitReview = () => {
       await submitReview(reviewData);
       setSuccessMessage("Review submitted successfully.");
     } catch (err) {
+      console.error(err);
       setErrorMessage("An error occurred while submitting the review.");
     } finally {
       setLoading(false);
@@ -139,10 +157,14 @@ const SubmitReview = () => {
               Rate the Following (Based on Agreement)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ScoreSelect label="Originality" value={originality} onChange={setOriginality} />
-              <ScoreSelect label="Significance of Topic" value={significance} onChange={setSignificance} />
-              <ScoreSelect label="Presentation" value={presentation} onChange={setPresentation} />
-              <ScoreSelect label="Overall Recommendation" value={overall} onChange={setOverall} />
+              {reviewFields.map((field) => (
+                <ScoreSelect
+                  key={field.id}
+                  label={field.label}
+                  value={dynamicScores[field.id] || ""}
+                  onChange={(value) => handleScoreChange(field.id, value)}
+                />
+              ))}
             </div>
 
             <SelectField
@@ -182,7 +204,7 @@ const SubmitReview = () => {
   );
 };
 
-// Reusable field components
+// Reusable Components
 const SelectField = ({ label, value, onChange, options }) => (
   <div>
     <label className="block font-medium mb-1">{label}</label>

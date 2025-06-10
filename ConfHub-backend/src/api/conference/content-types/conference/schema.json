@@ -87,6 +87,11 @@
       "relation": "oneToMany",
       "target": "plugin::users-permissions.user",
       "required": false
-    }
+    },
+    "reviewFormFields": {
+  "type": "json",
+  "required": false
+}
+
   }
 }

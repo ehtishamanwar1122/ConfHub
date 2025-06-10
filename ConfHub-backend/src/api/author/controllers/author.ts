@@ -2,6 +2,7 @@
  * author controller
  */
 const sendEmail = require('../../email/email');
+const { predictDomain } = require('../../predictPaperDomain/predictDomain');
 import { factories } from '@strapi/strapi'
 
 export default factories.createCoreController('api::author.author', ({ strapi }) => ({
@@ -211,7 +212,7 @@ const authorEmail = author.authorEmail
          // console.log('ctx.request.body.authors', ctx.request.body.authors);
 
           //for multiple authorss
-          if (authors) {
+          if (authors!==0) {
             let parsedAuthors;
 
             try {

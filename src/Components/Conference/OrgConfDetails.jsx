@@ -44,7 +44,7 @@ const OrgConfDetails = () => {
   useEffect(() => {
     const fetchConferenceDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*`);
+        const response = await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*&populate[Organizer][populate]=*`);
         const confData = response.data.data;
         setConference(confData);
         setLoading(false);
@@ -132,15 +132,13 @@ const OrgConfDetails = () => {
   };
 
   // New functions for review form fields management
-  const handleReviewFormFieldToggle = (fieldId) => {
-    setReviewFormFields(prev => 
-      prev.map(field => 
-        field.id === fieldId 
-          ? { ...field, enabled: !field.enabled }
-          : field
-      )
-    );
-  };
+ const handleReviewFormFieldToggle = (id) => {
+  const updatedFields = reviewFormFields.map(field =>
+    field.id === id ? { ...field, enabled: !field.enabled } : field
+  );
+  setReviewFormFields(updatedFields);
+};
+
 
   const handleAddCustomField = () => {
     if (newCustomField.trim()) {
@@ -162,13 +160,15 @@ const OrgConfDetails = () => {
 
   const handleSaveReviewFormFields = async () => {
     try {
-      const payload = {
-        id: conference[0].id,
-        reviewFormFields: reviewFormFields
-      };
+        const checkedFields = reviewFormFields.filter(field => field.enabled); // use 'enabled'
+
+    const payload = {
+      id: conference[0].id,
+      reviewFormFields: checkedFields
+    };
       
       // Replace with your actual API endpoint
-      const response = await axios.post('http://localhost:1337/api/conferences/updateReviewFormFields', payload);
+      const response = await axios.post('http://localhost:1337/api/organizers/updateReviewFormFields', payload);
       
       if (response.status === 200) {
         const updatedConference = [...conference];
@@ -685,15 +685,15 @@ const OrgConfDetails = () => {
 
                 {/* Custom Criteria Section */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  {/* <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Custom Review Criteria
-                  </h3>
+                  </h3> */}
                   
                   {/* Add Custom Field Input */}
-                  <div className="flex gap-3 mb-4">
+                  {/* <div className="flex gap-3 mb-4">
                     <input
                       type="text"
                       value={newCustomField}
@@ -709,10 +709,10 @@ const OrgConfDetails = () => {
                     >
                       Add Criteria
                     </button>
-                  </div>
+                  </div> */}
 
                   {/* Custom Fields List */}
-                  {reviewFormFields.filter(field => field.isCustom).length > 0 && (
+                  {/* {reviewFormFields.filter(field => field.isCustom).length > 0 && (
                     <div className="space-y-3">
                       {reviewFormFields.filter(field => field.isCustom).map((field) => (
                         <div key={field.id} className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
@@ -737,7 +737,7 @@ const OrgConfDetails = () => {
                         </div>
                       ))}
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 {/* Summary Section */}

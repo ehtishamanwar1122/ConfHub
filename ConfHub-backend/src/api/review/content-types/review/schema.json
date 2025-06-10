@@ -33,6 +33,27 @@
     "overall": {
       "type": "integer"
     },
+    "technical_quality": {
+      "type": "integer"
+    },
+    "clarity": {
+      "type": "integer"
+    },
+    "novelty": {
+      "type": "integer"
+    },
+    "reproducibility": {
+      "type": "integer"
+    },
+    "related_work": {
+      "type": "integer"
+    },
+    "experimental_validation": {
+      "type": "integer"
+    },
+    "writing_quality": {
+      "type": "integer"
+    },
     "paper": {
       "type": "relation",
       "relation": "manyToOne",

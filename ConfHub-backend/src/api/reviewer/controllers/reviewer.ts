@@ -187,8 +187,25 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
     },
     async submitReview(ctx) {
       try {
-        const { comments, recommendation, score ,paperId,reviewerId,significance,overall,presentation,originality} = ctx.request.body;
-    
+         const {
+      comments,
+      recommendation,
+      score,
+      paperId,
+      reviewerId,
+      significance,
+      overall,
+      presentation,
+      originality,
+      technical_quality,
+      clarity,
+      novelty,
+      reproducibility,
+      related_work,
+      experimental_validation,
+      writing_quality
+    } = ctx.request.body;
+
         console.log("Request Body:", ctx.request.body);
         const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
           fields: ['email', 'firstName', 'lastName'],
@@ -199,19 +216,30 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
         if (!reviewerEmail) {
           return ctx.throw(400, 'Reviewer email not found');
         }
-        const review = await strapi.entityService.create('api::review.review', {
-          data: {
-            Comments: comments,
-          Recommendations: recommendation,
-          // Score: score,
-          paper: paperId,
-          reviewer:reviewerId,
-          overall:overall,
-          originality:originality,
-          presentation:presentation,
-          significance:significance
-        },
-      });
+         const reviewData: Record<string, any> = {
+  paper: paperId,
+  reviewer: reviewerId,
+};
+
+    // Optional fields — only add if provided
+    if (comments !== undefined) reviewData.Comments = comments;
+    if (recommendation !== undefined) reviewData.Recommendations = recommendation;
+    if (score !== undefined) reviewData.Score = score;
+    if (significance !== undefined) reviewData.significance = significance;
+    if (overall !== undefined) reviewData.overall = overall;
+    if (presentation !== undefined) reviewData.presentation = presentation;
+    if (originality !== undefined) reviewData.originality = originality;
+    if (technical_quality !== undefined) reviewData.technical_quality = technical_quality;
+    if (clarity !== undefined) reviewData.clarity = clarity;
+    if (novelty !== undefined) reviewData.novelty = novelty;
+    if (reproducibility !== undefined) reviewData.reproducibility = reproducibility;
+    if (related_work !== undefined) reviewData.related_work = related_work;
+    if (experimental_validation !== undefined) reviewData.experimental_validation = experimental_validation;
+    if (writing_quality !== undefined) reviewData.writing_quality = writing_quality;
+
+    const review = await strapi.entityService.create('api::review.review', {
+      data: reviewData,
+    });
       const updatedPaper = await strapi.db.query("api::paper.paper").update({
         where: { id: paperId },
         data: {
