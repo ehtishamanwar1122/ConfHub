@@ -48,7 +48,7 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
               data: {
                 firstName: firstName,
               lastName: lastName,
-              authorEmail: email,
+              email: email,
               alternativeContact: alternativeContact,
               domain:domain,
               subDoimain:subDomain,

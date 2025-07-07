@@ -189,14 +189,14 @@ const SubmitReview = () => {
             {successMessage && <p className="text-green-600 text-sm">{successMessage}</p>}
 
             <button
-              type="submit"
-              disabled={loading}
-              className={`w-full mt-4 bg-blue-600 text-white py-3 rounded-md font-semibold transition duration-200 ${
-                loading ? "opacity-60 cursor-not-allowed" : "hover:bg-blue-700"
-              }`}
-            >
-              {loading ? "Submitting..." : "Submit Review"}
-            </button>
+  type="submit"
+  disabled={loading || successMessage} // disable on success too
+  className={`w-full mt-4 bg-blue-600 text-white py-3 rounded-md font-semibold transition duration-200 ${
+    loading || successMessage ? "opacity-60 cursor-not-allowed" : "hover:bg-blue-700"
+  }`}
+>
+  {loading ? "Submitting..." : "Submit Review"}
+</button>
           </form>
         </div>
       </div>

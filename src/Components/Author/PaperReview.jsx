@@ -109,15 +109,17 @@ const PaperReviewPage = () => {
   return (
     <Layout>
     <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Review for: {reviewData[0]?.Paper_Title}</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">Paper Title: {reviewData[0]?.Paper_Title}</h2>
   
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <h3 className="text-3xl font-bold mb-6 text-center">Conference: {reviewData[0]?.SubmittedTo?.Conference_title}</h3>
+       <h2 className="text-3xl font-bold mb-6 text-center">Final Decision By Organizer: {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</h2>
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <p><span className="font-semibold">Conference:</span> {reviewData[0]?.SubmittedTo?.Conference_title}</p>
           <p><span className="font-semibold">Final Decision By Organizer: </span> {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</p>
-        </div>
+        </div> */}
   
-        {/* Loop through each review */}
+        {/* Loop through each review */}      
         {reviewData[0]?.review.map((reviews, index) => (
   <div
     key={index}
@@ -126,33 +128,79 @@ const PaperReviewPage = () => {
     <h3 className="text-lg font-semibold mb-4">Review {index + 1}</h3>
 
     {/* First Row: Significance, Originality, Presentation, and Recommendation */}
-    <div className="flex space-x-6 mb-6">
-      <div className="bg-gray-100 p-4 rounded-lg flex-1">
-        <span className="font-medium">Significance:</span> 
-        {reviews.significance || 'N/A'}/10
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  {reviewData[0]?.SubmittedTo?.reviewFormFields?.length > 0 ? (
+    reviewData[0].SubmittedTo.reviewFormFields.map((field, index) => {
+      const colorMap = ['blue', 'green', 'orange', 'purple', 'red', 'teal'];
+      const color = colorMap[index % colorMap.length];
+      return (
+        <div key={field.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-3 h-3 bg-${color}-500 rounded-full`}></div>
+            <span className="font-semibold text-gray-700">{field.label}</span>
+          </div>
+          <div className={`text-2xl font-bold text-${color}-600`}>
+            {reviews[field.id] || 'N/A'}
+            {field.id.toLowerCase() !== 'recommendations' && (
+              <span className="text-sm text-gray-500">/10</span>
+            )}
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <>
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span className="font-semibold text-gray-700">Significance</span>
+        </div>
+        <div className="text-2xl font-bold text-blue-600">
+          {reviews.significance || 'N/A'}
+          <span className="text-sm text-gray-500">/10</span>
+        </div>
       </div>
 
-      <div className="bg-gray-100 p-4 rounded-lg flex-1">
-        <span className="font-medium">Originality:</span> 
-        {reviews.originality || 'N/A'}/10
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span className="font-semibold text-gray-700">Originality</span>
+        </div>
+        <div className="text-2xl font-bold text-green-600">
+          {reviews.originality || 'N/A'}
+          <span className="text-sm text-gray-500">/10</span>
+        </div>
       </div>
 
-      <div className="bg-gray-100 p-4 rounded-lg flex-1">
-        <span className="font-medium">Presentation:</span> 
-        {reviews.presentation || 'N/A'}/10
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+          <span className="font-semibold text-gray-700">Presentation</span>
+        </div>
+        <div className="text-2xl font-bold text-orange-600">
+          {reviews.presentation || 'N/A'}
+          <span className="text-sm text-gray-500">/10</span>
+        </div>
       </div>
 
-      <div className="bg-gray-100 p-4 rounded-lg flex-1">
-        <span className="font-medium">Recommendation:</span> 
-        {reviews.Recommendations || 'N/A'}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+          <span className="font-semibold text-gray-700">Recommendation</span>
+        </div>
+        <div className="text-lg font-bold text-purple-600">
+          {reviews.Recommendations || 'N/A'}
+        </div>
       </div>
-    </div>
+    </>
+  )}
+</div>
 
     {/* Second Row: Overall Score */}
     <div className="mt-6">
-      <p className="text-blue-600 font-bold">
+      {/* <p className="text-blue-600 font-bold">
         Overall Score: {reviews.overall || 'N/A'}/10
-      </p>
+      </p> */}
     </div>
 
     {/* Third Row: Reviewer Comments */}
