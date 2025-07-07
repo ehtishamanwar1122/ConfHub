@@ -27,9 +27,27 @@ const AuthorDashboard = () => {
         const fetchAuthorData = async () => {
             try {
                 const conferenceResponse = await axios.get(
-                    'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate=*'
+                    'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate[Papers][populate]=submitted_by'
                 );
-                setRecentConferences(conferenceResponse.data.data);
+                console.log('recentt',conferenceResponse.data.data);
+                
+                 const allConferences = conferenceResponse.data.data;
+
+         const filteredConferences = allConferences.filter(conference => {
+            const papers = conference.Papers || [];
+
+            // Check if any paper's submitted_by array includes authorId
+            const hasSubmittedByCurrentAuthor = papers.some(paper => {
+                const submittedAuthors = Array.isArray(paper.submitted_by) ? paper.submitted_by : [];
+                return submittedAuthors.some(author => author?.id === authorId);
+            });
+
+            // Include conference ONLY if no papers are submitted by this author
+            return !hasSubmittedByCurrentAuthor;
+        });
+
+        setRecentConferences(filteredConferences);
+        console.log('Filtered Recent Conferences', filteredConferences);
 
                 const papersResponse = await axios.get(
                     `http://localhost:1337/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*`
@@ -87,7 +105,7 @@ const AuthorDashboard = () => {
                                                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Conference Title</th>
                                                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Description</th>
                                                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Start Date</th>
-                                                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Location</th>
+                                                {/* <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Location</th> */}
                                                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Submission Deadline</th>
                                                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Action</th>
                                             </tr>
@@ -99,7 +117,7 @@ const AuthorDashboard = () => {
                                                     <td className="py-3 px-4 text-sm text-gray-700">{conference.Description}</td>
                                                     <td className="py-3 px-4 text-sm text-gray-700">{conference.Start_date}</td>
                                                     <td className="py-3 px-4 text-sm text-gray-700">{conference.Conference_location}</td>
-                                                    <td className="py-3 px-4 text-sm text-gray-700">{conference.Submission_deadline}</td>
+                                                    {/* <td className="py-3 px-4 text-sm text-gray-700">{conference.Submission_deadline}</td> */}
                                                     <td className="py-3 px-4 text-sm">
                                                         <button
                                                             onClick={() => handleSubmitPaper(conference.id)}

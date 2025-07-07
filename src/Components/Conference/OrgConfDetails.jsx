@@ -40,12 +40,12 @@ const OrgConfDetails = () => {
     { id: 'experimental_validation', label: 'Experimental Validation', enabled: false },
     { id: 'writing_quality', label: 'Writing Quality', enabled: false }
   ];
-
+ let confData 
   useEffect(() => {
     const fetchConferenceDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:1337/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*&populate[Organizer][populate]=*`);
-        const confData = response.data.data;
+         confData = response.data.data;
         setConference(confData);
         setLoading(false);
         console.log('ddd',confData);
@@ -55,7 +55,11 @@ const OrgConfDetails = () => {
           setSubmittedPapers(papers);
           
           // Initialize review form fields from conference data or use defaults
-          const existingFields = confData[0].reviewFormFields || defaultReviewCriteria;
+          const existingFields = [
+  ...(confData[0].reviewFormFields || []),
+  ...defaultReviewCriteria
+];
+
           setReviewFormFields(existingFields);
         }
       } catch (error) {
@@ -321,7 +325,7 @@ const OrgConfDetails = () => {
                               <p className="mt-3 text-sm text-gray-600 line-clamp-2">{paper.Abstract}</p>
                               <div className="mt-4 flex justify-end">
                                 {paper.finalDecisionByOrganizer ? (
-                                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                  <span  onClick={() => handleShowReviews(paper.id)} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
                                     Decision Submitted
                                   </span>
                                 ) : (
@@ -399,53 +403,78 @@ const OrgConfDetails = () => {
                             </div>
                             Review {index + 1}
                           </h3>
-                          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                          {/* <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
                             Overall: {reviews.overall || 'N/A'}/10
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Metrics Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                              <span className="font-semibold text-gray-700">Significance</span>
-                            </div>
-                            <div className="text-2xl font-bold text-blue-600">
-                              {reviews.significance || 'N/A'}<span className="text-sm text-gray-500">/10</span>
-                            </div>
-                          </div>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  {
+    conference[0].reviewFormFields && conference[0].reviewFormFields.length > 0 ? (
+      conference[0].reviewFormFields.map((field, index) => {
+        // Assign colors based on index or field ID (optional logic to customize)
+        const colorMap = ['blue', 'green', 'orange', 'purple', 'red', 'teal'];
+        const color = colorMap[index % colorMap.length];
+        return (
+          <div key={field.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`w-3 h-3 bg-${color}-500 rounded-full`}></div>
+              <span className="font-semibold text-gray-700">{field.label}</span>
+            </div>
+            <div className={`text-2xl font-bold text-${color}-600`}>
+              {reviews[field.id] || 'N/A'}
+              {field.id !== 'Recommendations' && <span className="text-sm text-gray-500">/10</span>}
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span className="font-semibold text-gray-700">Significance</span>
+          </div>
+          <div className="text-2xl font-bold text-blue-600">
+            {reviews.significance || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+          </div>
+        </div>
 
-                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                              <span className="font-semibold text-gray-700">Originality</span>
-                            </div>
-                            <div className="text-2xl font-bold text-green-600">
-                              {reviews.originality || 'N/A'}<span className="text-sm text-gray-500">/10</span>
-                            </div>
-                          </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="font-semibold text-gray-700">Originality</span>
+          </div>
+          <div className="text-2xl font-bold text-green-600">
+            {reviews.originality || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+          </div>
+        </div>
 
-                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                              <span className="font-semibold text-gray-700">Presentation</span>
-                            </div>
-                            <div className="text-2xl font-bold text-orange-600">
-                              {reviews.presentation || 'N/A'}<span className="text-sm text-gray-500">/10</span>
-                            </div>
-                          </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+            <span className="font-semibold text-gray-700">Presentation</span>
+          </div>
+          <div className="text-2xl font-bold text-orange-600">
+            {reviews.presentation || 'N/A'}<span className="text-sm text-gray-500">/10</span>
+          </div>
+        </div>
 
-                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                              <span className="font-semibold text-gray-700">Recommendation</span>
-                            </div>
-                            <div className="text-lg font-bold text-purple-600">
-                              {reviews.Recommendations || 'N/A'}
-                            </div>
-                          </div>
-                        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+            <span className="font-semibold text-gray-700">Recommendation</span>
+          </div>
+          <div className="text-lg font-bold text-purple-600">
+            {reviews.Recommendations || 'N/A'}
+          </div>
+        </div>
+      </>
+    )
+  }
+</div>
+
 
                         {/* Comments Section */}
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">

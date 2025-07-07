@@ -160,12 +160,26 @@ const RegisterOrganizer = () => {
     
               <select name="domain" value={formData.domain} onChange={handleInputChange}>
                 <option value="">Select Domain</option>
-                <option value="AI">Artificial Intelligence</option>
-                <option value="ML">Machine Learning</option>
-                <option value="DataScience">Data Science</option>
-                <option value="Other">Other</option>
+                <option value="">Select Domain</option>
+  <option value="Artificial Intelligence">Artificial Intelligence</option>
+  <option value="Machine Learning">Machine Learning</option>
+  <option value="Cybersecurity">Cybersecurity</option>
+  <option value="Data Science">Data Science</option>
+  <option value="Cloud Computing">Cloud Computing</option>
+  <option value="Internet of Things">Internet of Things</option>
+  <option value="Software Engineering">Software Engineering</option>
+  <option value="Computer Networks">Computer Networks</option>
+  <option value="Blockchain">Blockchain</option>
+  <option value="Human-Computer Interaction">Human-Computer Interaction</option>
+  <option value="Natural Language Processing">Natural Language Processing</option>
+  <option value="Computer Vision">Computer Vision</option>
+  <option value="Big Data">Big Data</option>
+  <option value="DevOps">DevOps</option>
+  <option value="Robotics">Robotics</option>
+  <option value="Edge Computing">Edge Computing</option>
+  <option value="Quantum Computing">Quantum Computing</option>
               </select>
-              <input type="text" placeholder="Sub Domain" name="subDomain" value={formData.subDomain} onChange={handleInputChange} />
+              {/* <input type="text" placeholder="Sub Domain" name="subDomain" value={formData.subDomain} onChange={handleInputChange} /> */}
             </div>
           )}
 

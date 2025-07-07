@@ -13,6 +13,13 @@ async function predictDomain(paperTitle, abstract) {
 - Computer Networks
 - Blockchain
 - Human-Computer Interaction
+- Natural Language Processing
+- Computer Vision
+- Big Data
+- DevOps
+- Robotics
+- Edge Computing
+- Quantum Computing
 
 Title: ${paperTitle}
 Abstract: ${abstract}

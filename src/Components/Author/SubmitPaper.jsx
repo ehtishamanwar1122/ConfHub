@@ -104,7 +104,11 @@ const PaperSubmissionForm = () => {
       submissionData.append('file', formData.file);
       submissionData.append('submittedBy', authorId);
       submissionData.append('submittedTo', id);
-      submissionData.append('authors', JSON.stringify(authors));
+      const filteredAuthors = authors.filter(author => 
+  author.name.trim() !== '' || author.email.trim() !== '' || author.affiliation.trim() !== ''
+);
+      submissionData.append('authors', JSON.stringify(filteredAuthors));
+console.log('papp',submissionData);
 
       await submitPaper(submissionData);
       alert("Paper submitted successfully!");
