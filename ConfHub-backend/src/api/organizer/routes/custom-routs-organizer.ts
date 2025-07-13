@@ -79,5 +79,14 @@ export default {
         },
         
       },
+        {
+        method: 'POST',
+        path: '/organizers/assign-reviewers', // Custom endpoint for registration
+        handler: 'organizer.assignReviewersToPaper',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+        
+      },
     ],
   };

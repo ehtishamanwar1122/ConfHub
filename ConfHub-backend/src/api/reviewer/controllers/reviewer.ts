@@ -19,15 +19,25 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
            
       
            
-            const existingReviwer= await strapi.query('api::reviewer.reviewer').findOne({
-              where: { email:email },
-            });
-      
-            if (existingReviwer) {
-              return ctx.badRequest('Reviewer with this email already exists.');
-            }
-      
-            
+             const existingReviewer = await strapi.db.query('api::reviewer.reviewer').findOne({
+      where: { email },
+    });
+
+    if (!existingReviewer) {
+      return ctx.badRequest('No reviewer record found for this email. Only reviewer that have invitation by the organizer can register to the system.');
+    }
+
+    // ✅ Check if user already registered
+    const existingUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return ctx.badRequest('A user with this email is already registered.');
+    }
+             if (!existingReviewer && !existingUser) {
+      return ctx.badRequest('Only invited reviewers can register.');
+    }
            
             const fullName = `${firstName} ${lastName}`;
             let newReviewer:any;
@@ -44,33 +54,30 @@ export default factories.createCoreController('api::reviewer.reviewer', ({ strap
                 },
               }
             );
-            newReviewer = await strapi.entityService.create('api::reviewer.reviewer', {
-              data: {
+const updatedReviewer = await strapi.entityService.update('api::reviewer.reviewer', existingReviewer.id, {
+  data: {
                 firstName: firstName,
               lastName: lastName,
-              email: email,
               alternativeContact: alternativeContact,
               domain:domain,
               subDoimain:subDomain,
               UserID: newUser.id,
-            },
-          });
-          await strapi.entityService.update(
-            'plugin::users-permissions.user',
-            newUser.id, 
-            {
-              data: {
-                reviewerId: newReviewer.id, 
-              },
-            }
-          );
+  },
+});
+
+// ✅ Step 3: Link reviewerId in the user table (back-reference)
+await strapi.entityService.update('plugin::users-permissions.user', newUser.id, {
+  data: {
+    reviewerId: updatedReviewer.id,
+  },
+});
             
             ctx.send({
               message: 'Reviewer registered successfully!',
               reviewer: {
-                firstName: newReviewer.firstName,
-                lastName: newReviewer.lastName,
-                email: newReviewer.authorEmail,
+                firstName: updatedReviewer.firstName,
+                lastName: updatedReviewer.lastName,
+                email: updatedReviewer.email,
               },
               user: {
                 username: newUser.username,
