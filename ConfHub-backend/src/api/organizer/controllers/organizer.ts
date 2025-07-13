@@ -623,8 +623,173 @@ async updateReviewFormFields(ctx) {
     console.error('Error updating form fields:', error);
     return ctx.throw(500, 'Internal server error');
   }
-}
+},
 
+ async assignReviewersToPaper(ctx) {
+  const { paperId, reviewers = [], newReviewerEmails = [] } = ctx.request.body;
+
+  console.log('Request Body:', ctx.request.body);
+
+  if (!paperId || (reviewers.length === 0 && newReviewerEmails.length === 0)) {
+    return ctx.badRequest('Paper ID and at least one reviewer or email are required.');
+  }
+
+  try {
+    
+    // 🟡 Get paper info and conference details
+    const paper = await strapi.entityService.findOne('api::paper.paper', paperId, {
+  populate: '*'
+});
+
+console.log('pp',paper);
+
+    const paperTitle = paper.Paper_Title;
+    // const conferenceName = paper.SubmittedTo?.Conference_title || 'the conference';
+    // const reviewDeadline = paper.SubmittedTo?.Review_deadline || 'N/A';
+
+    // ✅ 1. Loop through existing reviewer IDs
+      if (reviewers && reviewers.length > 0) {
+
+    for (const reviewerId of reviewers) {
+      const reviewer = await strapi.entityService.findOne('api::reviewer.reviewer', reviewerId, {
+        fields: ['email'],
+      });
+
+      if (!reviewer) {
+        console.warn(`Reviewer with ID ${reviewerId} not found.`);
+        continue;
+      }
+
+      // Assign paper to reviewer
+      await strapi.db.query('api::reviewer.reviewer').update({
+        where: { id: reviewerId },
+        data: {
+          AssignedPapers: {
+            connect: [{ id: paperId }],
+          },
+        },
+      });
+
+      // Assign reviewer to paper
+      await strapi.db.query('api::paper.paper').update({
+        where: { id: paperId },
+        data: {
+          reviewRequestsConfirmed: {
+            connect: [{ id: reviewerId }],
+          },
+        },
+      });
+
+      // ✅ Email body and send
+      const textBody = `Hello ${reviewer.firstName + reviewer.lastName || ''},
+
+You have been assigned to review the paper:
+
+Paper ID: ${paperId}
+Title: "${paperTitle}"
+
+
+You can now log in to your account and begin the review process.
+
+Thank you,
+The Organizing Committee`;
+
+      const htmlBody = `
+        <p>Hello ${reviewer.firstName + reviewer.lastName || ''},</p>
+        <p>You have been assigned to review the following paper:</p>
+        <ul>
+          <li><strong>Paper ID:</strong> ${paperId}</li>
+          <li><strong>Title:</strong> "${paperTitle}"</li>
+         
+        </ul>
+        <p>You can now <a href="https://your-reviewer-portal.com/login" style="color:blue;">log in to your account</a> and begin the review process.</p>
+        <p>Thank you,<br/>The Organizing Committee</p>
+      `;
+
+      await sendEmail(
+        reviewer.email,
+        `Review Assignment: "${paperTitle}" (ID: ${paperId})`,
+        textBody,
+        htmlBody
+      );
+    }}
+
+    if (newReviewerEmails && newReviewerEmails.length > 0) {
+    for (const email of newReviewerEmails) {
+      const existingReviewer = await strapi.db.query('api::reviewer.reviewer').findOne({
+        where: { email },
+      });
+
+      let newReviewerId;
+
+      if (existingReviewer) {
+        console.log('reviewer with this email already exists');
+        
+      } else {
+        const newReviewer = await strapi.entityService.create('api::reviewer.reviewer', {
+          data: {
+            email,
+            AssignedPapers:paperId
+          },
+        });
+        newReviewerId = newReviewer.id;
+      }
+
+      await strapi.db.query('api::paper.paper').update({
+        where: { id: paperId },
+        data: {
+          reviewRequestsConfirmed: {
+            connect: [{ id: newReviewerId }],
+          },
+        },
+      });
+
+      const textBody = `Hello,
+
+You have been assigned to review the following paper on ConfHub:
+
+Paper ID: ${paperId}
+Title: "${paperTitle}"
+
+Please register your reviewer account at ConfHub to begin the review process:
+http://localhost:5173/register
+
+Thank you,
+The Organizing Committee`;
+
+      const htmlBody = `
+        <p>Hello,</p>
+        <p>You have been assigned to review the following paper on <strong>ConfHub</strong>:</p>
+        <ul>
+          <li><strong>Paper ID:</strong> ${paperId}</li>
+          <li><strong>Title:</strong> "${paperTitle}"</li>
+        </ul>
+        <p>Please <a href="http://localhost:5173/register" style="color:blue;">register your reviewer account</a> to begin the review process.</p>
+        <p>Thank you,<br/>The Organizing Committee</p>
+      `;
+
+      await sendEmail(
+        email,
+        `Review Invitation: "${paperTitle}" (ID: ${paperId})`,
+        textBody,
+        htmlBody
+      );
+    }
+  }
+
+ 
+
+
+
+    return ctx.send({
+      message: 'Reviewers assigned successfully.',
+    });
+
+  } catch (error) {
+    console.error('Assignment error:', error);
+    return ctx.internalServerError('Failed to assign reviewers.');
+  }
+}
 
 
   }));
