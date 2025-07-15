@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaBars, FaBell } from 'react-icons/fa';
 import { ConfHub } from '../../../assets/Images';
 import RoleSwitcherButton from '../../RoleSwitcher';
+import ChangePasswordModal from '../../ChangePasswordModal';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Header = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [availableRoles, setAvailableRoles] = useState([]);
     const dropdownRef = useRef(null);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const toggleDropdown = () => {
         setDropdownVisible((prev) => !prev);
@@ -71,6 +73,12 @@ const Header = () => {
                     <Link to="#" className="block p-2 text-gray-700 hover:bg-gray-200">
                         Help
                     </Link>
+                    <button
+                      className="block w-full text-left p-2 bg-white text-black hover:bg-gray-100"
+                      onClick={() => { setShowChangePasswordModal(true); setDropdownVisible(false); }}
+                    >
+                      Change Password
+                    </button>
                 </div>
             </div>
 
@@ -96,6 +104,7 @@ const Header = () => {
                     Logout
                 </button>
             </div>
+            <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
         </header>
     );
 };

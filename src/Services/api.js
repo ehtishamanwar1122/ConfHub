@@ -72,3 +72,22 @@ export const assignSubOrganizerRole = async (data) => {
     throw error; // Handle error accordingly
   }
 };
+
+export const changePassword = async (data) => {
+  try {
+    const token = localStorage.getItem('jwt');
+    const response = await axios.post(
+      `${BASE_API_URL}/change-password`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error changing password', error);
+    throw error;
+  }
+};
