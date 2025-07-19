@@ -186,8 +186,6 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           // Password doesn't match
           return ctx.badRequest('Invalid credentials');
         }
-    
-       
         return ctx.send({
           message: 'Login successful',
           user: user,
@@ -790,6 +788,35 @@ The Organizing Committee`;
     return ctx.internalServerError('Failed to assign reviewers.');
   }
 }
+
+    async changePassword(ctx) {
+      const userId = ctx.state.user?.id; // Authenticated user
+      const { currentPassword, newPassword, confirmNewPassword } = ctx.request.body;
+      if (!userId) {
+        return ctx.unauthorized('User not authenticated');
+      }
+      if (!currentPassword || !newPassword || !confirmNewPassword) {
+        return ctx.badRequest('All fields are required');
+      }
+      if (newPassword !== confirmNewPassword) {
+        return ctx.badRequest('New passwords do not match');
+      }
+      // Fetch user
+      const user = await strapi.query('plugin::users-permissions.user').findOne({ where: { id: userId } });
+      if (!user) {
+        return ctx.notFound('User not found');
+      }
+      // Validate current password
+      const validPassword = await strapi.plugins['users-permissions'].services.user.validatePassword(currentPassword, user.password);
+      if (!validPassword) {
+        return ctx.badRequest('Current password is incorrect');
+      }
+      // Update password
+      await strapi.entityService.update('plugin::users-permissions.user', userId, {
+        data: { password: newPassword },
+      });
+      ctx.send({ message: 'Password changed successfully' });
+    },
 
 
   }));

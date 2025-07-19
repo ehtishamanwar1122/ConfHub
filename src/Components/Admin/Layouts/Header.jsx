@@ -4,12 +4,14 @@ import { FaBars, FaBell } from 'react-icons/fa'; // Import icons
 import { useNavigate } from 'react-router-dom';
 import { ConfHub } from "../../../assets/Images";
 import RoleSwitcherButton from '../../RoleSwitcher'; // Import RoleSwitcherButton
+import ChangePasswordModal from '../../ChangePasswordModal';
 
 const Header = () => {
     const navigate = useNavigate();
     const [role, setRole] = useState('Admin'); // Default role
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const dropdownRef = useRef(null); // To detect click outside dropdown
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const toggleDropdown = () => {
         setDropdownVisible((prev) => !prev);
@@ -80,6 +82,12 @@ const Header = () => {
                     <Link to="/AdminDashboard" className="block py-3 px-4 text-gray-700 hover:bg-gray-100">Organizer Requests</Link>
                     <Link to="/AdminConferenceManager" className="block py-3 px-4 text-gray-700 hover:bg-gray-100">Conference Requests</Link>
                     <Link to="#" className="block py-3 px-4 text-gray-500 cursor-not-allowed">Help</Link>
+                    <button
+                      className="block w-full text-left py-3 px-4 bg-white text-black hover:bg-gray-100"
+                      onClick={() => { setShowChangePasswordModal(true); setDropdownVisible(false); }}
+                    >
+                      Change Password
+                    </button>
                 </div>
 
             </div>
@@ -104,6 +112,7 @@ const Header = () => {
                     Logout
                 </button>
             </div>
+            <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
         </header>
     );
 };
