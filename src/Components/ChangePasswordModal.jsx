@@ -15,12 +15,26 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if (form.newPassword.length < 6 || form.confirmNewPassword.length < 6) {
+    alert("Password must be at least 6 characters long!");
+    return;
+  }
     if (form.newPassword !== form.confirmNewPassword) {
       alert("New passwords do not match!");
       return;
     }
+
+     const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+      const userId = userDetails?.id;
+      const userType = userDetails?.Type;
+ console.log('uuu',userId,userType);
+ console.log('det',userDetails);
+ 
+       
     try {
-      await changePassword({
+       await changePassword({
+        userId,
+        userType,
         currentPassword: form.currentPassword,
         newPassword: form.newPassword,
         confirmNewPassword: form.confirmNewPassword,
@@ -29,7 +43,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
       onClose();
       setForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
     } catch (error) {
-      const msg = error?.response?.data?.error || error?.response?.data?.message || error.message || 'Failed to change password';
+      const msg = error?.response?.data?.error.message;
       alert(msg);
     }
   };

@@ -1,7 +1,7 @@
 const createDefaultAdmin = async (strapi: any) => {
-  const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@confhub.com';
-  const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || 'admin';
-  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
+  const adminEmail =  'admin@confhub.com';
+  const adminUsername = 'admin';
+  const adminPassword =  'admin123';
 
   const existingAdmin = await strapi.query('plugin::users-permissions.user').findOne({
     where: { email: adminEmail },

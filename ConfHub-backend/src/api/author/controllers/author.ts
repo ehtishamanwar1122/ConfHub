@@ -314,29 +314,50 @@ const authorEmail = author.authorEmail
             
            // console.log('New Paper:', newPaper);
           }
-   
+   let conferenceTitle = '';
+
           if (submittedTo) {
             // Fetch the conference (submittedTo) by ID
             const conference = await strapi.entityService.findOne('api::conference.conference', submittedTo, {
               populate: ['Papers'],
             });
-          
-            if (conference) {
-             
-             // console.log('conn',conference);
-              // Add the new paper ID to the conference's Papers field
-             // const updatedPapers = conference.Papers.id ? [...conference.Papers, newPaper.id] : [newPaper.id];
-              // await strapi.entityService.update('api::conference.conference',
-              //    submittedTo,
-              //     {
-              //   data:
-              //    {
-              //     Papers: newPaper.id, // Assuming Papers is an array
-              //   },
-              // });
-          
-              // console.log('Updated Conference with New Paper:', conference);
-            }}
+              if (conference) {
+    conferenceTitle = conference.Conference_title || '';
+  }
+
+          }
+          const textBody = `Dear ${authorName},
+
+Your paper has been successfully submitted.
+
+Paper ID: ${newPaper.id}
+Title: "${paperTitle}"
+Conference: ${conferenceTitle}
+
+Thank you for your contribution.
+
+Best regards,  
+The Organizing Committee`;
+
+const htmlBody = `
+  <p>Dear ${authorName},</p>
+  <p>Your paper has been successfully submitted.</p>
+  <ul>
+    <li><strong>Paper ID:</strong> ${newPaper.id}</li>
+    <li><strong>Title:</strong> "${paperTitle}"</li>
+    <li><strong>Conference:</strong> ${conferenceTitle}</li>
+  </ul>
+  <p>Thank you for your contribution.</p>
+  <p>Best regards,<br/>The Organizing Committee</p>
+`;
+
+// 4. Send the email
+await sendEmail(
+  authorEmail,
+  `Paper Submission Confirmation: "${paperTitle}"`,
+  textBody,
+  htmlBody
+);
           ctx.send({
               message: 'Paper submitted successfully',
               paper: newPaper,

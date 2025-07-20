@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginPageImage } from "../assets/Images";
-import { loginOrganizer, loginAdmin } from "../Services/api.js";
+import { loginOrganizer, loginAdmin ,sendOtp,verifyOtp, resetPassword} from "../Services/api.js";
 import { loginAuthor } from "../Services/author.js";
 import { loginReviewer } from "../Services/reviewerService.js";
 
@@ -14,6 +14,13 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+const [showForgotModal, setShowForgotModal] = useState(false);
+const [email, setEmail] = useState("");
+const [otpSent, setOtpSent] = useState(false);
+const [otp, setOtp] = useState("");
+const [otpVerified, setOtpVerified] = useState(false);
+const [newPassword, setNewPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,9 +40,8 @@ const Login = () => {
       if (formData.role === "admin") {
         result = await loginAdmin(formData);
         console.log("Admin Login successful", result);
-        if (result.jwt) {
-          localStorage.setItem("jwt", result.jwt);
-        }
+      loggedInUserData = result.user;
+        localStorage.setItem("userDetails", JSON.stringify(loggedInUserData));
         navigate("/AdminDashboard");
       } else if (formData.role === "organizer") {
         result = await loginOrganizer(formData);
@@ -58,7 +64,7 @@ const Login = () => {
       } else if (formData.role === "reviewer") {
         result = await loginReviewer(formData);
         loggedInUserData = result.user;
-        localStorage.setItem("userDetails", JSON.stringify(logedInUserData));
+        localStorage.setItem("userDetails", JSON.stringify(loggedInUserData));
         if (result.jwt) {
           localStorage.setItem("jwt", result.jwt);
         }
@@ -69,11 +75,60 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login failed", error.response?.data?.message || error.message);
-      alert("Login failed: " + (error.response?.data?.message || error.message || "An error occurred during login"));
+      alert("Login failed: " + (error.response?.data?.message));
     } finally {
       setIsLoading(false);
     }
   };
+const handleSendOtp = async () => {
+ try {
+  const res = await sendOtp(email);
+  console.log("OTP sent successfully:", res);
+   setOtpSent(true);
+  // Handle success (e.g., show OTP input)
+} catch (error) {
+  console.error("Failed to send OTP", error);
+  // Show error to user
+}
+
+    
+  
+};
+
+const handleVerifyOtp = async () => {
+  try {
+    const res = await verifyOtp({ email, otp });
+    alert("OTP verified successfully.");
+    setOtpVerified(true);
+  } catch (error) {
+    console.error("OTP verification failed", error);
+    alert("Invalid OTP or verification failed.");
+  }
+};
+
+const handleResetPassword = async () => {
+  if (newPassword !== confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  try {
+    const res = await resetPassword({ email, newPassword });
+    alert("Password reset successful. Please log in.");
+
+    // Reset modal states
+    setShowForgotModal(false);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setEmail("");
+    setOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
+  } catch (error) {
+    console.error("Password reset failed", error);
+    alert("Failed to reset password.");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-cyan-100 px-2">
@@ -85,7 +140,7 @@ const Login = () => {
             alt="Academic Login Portal"
             className="w-48 h-48 md:w-60 md:h-60 object-contain rounded-2xl shadow-lg mb-4 border-4 border-white"
           />
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">Academic Portal</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">ConfHub</h3>
           <p className="text-white/90 mb-4 text-center text-xs md:text-sm">Streamline your research and publication workflow</p>
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2 bg-white/10 rounded-lg p-2">
@@ -184,7 +239,17 @@ const Login = () => {
                   />
                   <span className="ml-2">Remember me</span>
                 </label>
-                <a href="#" className="text-xs text-blue-500 hover:underline">Forgot Password?</a>
+              <a
+  href="#"
+  className="text-xs text-blue-500 hover:underline"
+  onClick={(e) => {
+    e.preventDefault();
+    setShowForgotModal(true);
+  }}
+>
+  Forgot Password?
+</a>
+
               </div>
               {/* Login Button */}
               <button
@@ -218,7 +283,88 @@ const Login = () => {
           </div>
         </div>
       </div>
+  {showForgotModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md space-y-4 animate-fade-in">
+      <h2 className="text-xl font-semibold text-center text-gray-800">Forgot Password</h2>
+
+      {!otpSent && (
+        <>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Enter your email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            onClick={handleSendOtp}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-medium transition-colors"
+          >
+            Send OTP
+          </button>
+        </>
+      )}
+
+      {otpSent && !otpVerified && (
+        <>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Enter OTP</label>
+          <input
+            type="text"
+            value={otp}
+            onChange={e => setOtp(e.target.value)}
+            placeholder="6-digit OTP"
+            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
+          <button
+            onClick={handleVerifyOtp}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium transition-colors"
+          >
+            Verify OTP
+          </button>
+        </>
+      )}
+
+      {otpVerified && (
+        <>
+          <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+          <input
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            placeholder="New Password"
+            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+          <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            placeholder="Confirm Password"
+            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+          <button
+            onClick={handleResetPassword}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md font-medium transition-colors"
+          >
+            Reset Password
+          </button>
+        </>
+      )}
+
+      <button
+        onClick={() => setShowForgotModal(false)}
+        className="w-full mt-4 text-sm text-white-500  transition"
+      >
+        Cancel
+      </button>
     </div>
+  </div>
+)}
+
+    </div>
+    
   );
 };
 

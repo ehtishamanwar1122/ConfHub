@@ -38,6 +38,30 @@ export const loginAdmin = async (data) => {
     throw error; // Handle error accordingly
   }
 };
+export const sendOtp = async (email) => {
+  try {
+    const response = await axios.post(`${BASE_API_URL}/send-otp`, { email });
+    return response.data; // Return success message or data
+  } catch (error) {
+    console.error("Error sending OTP", error);
+    throw error; // Re-throw to handle in UI
+  }
+};
+
+export const verifyOtp = async ({ email, otp }) => {
+  const response = await axios.post(`${BASE_API_URL}/verify-otp`, { email, otp });
+  return response.data;
+};
+
+export const resetPassword = async ({ email, newPassword }) => {
+  const response = await axios.post(`${BASE_API_URL}/reset-password`, {
+    email,
+    newPassword,
+  });
+  return response.data;
+};
+
+
 export const confirmReviewRequest = async (data) => {
   try {
     console.log('datta',data);
@@ -74,20 +98,13 @@ export const assignSubOrganizerRole = async (data) => {
 };
 
 export const changePassword = async (data) => {
-  try {
-    const token = localStorage.getItem('jwt');
-    const response = await axios.post(
-      `${BASE_API_URL}/change-password`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
+ try {
+    console.log('datta',data);
+    
+    const response = await axios.post(`${BASE_API_URL}/update-password`, data);
+    return response.data; 
   } catch (error) {
-    console.error('Error changing password', error);
-    throw error;
+    console.error("Error changing password  ", error);
+    throw error; // Handle error accordingly
   }
 };

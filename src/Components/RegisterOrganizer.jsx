@@ -98,7 +98,7 @@ const RegisterOrganizer = () => {
             alt="Register"
             className="w-48 h-48 md:w-60 md:h-60 object-contain rounded-2xl shadow-lg mb-4 border-4 border-white"
           />
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">Academic Portal</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">ConfHub</h3>
           <p className="text-white/90 mb-4 text-center text-xs md:text-sm">Join ConfHub and streamline your research journey!</p>
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2 bg-white/10 rounded-lg p-2">

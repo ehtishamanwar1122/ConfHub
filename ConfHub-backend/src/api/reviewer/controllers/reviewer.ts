@@ -255,13 +255,35 @@ await strapi.entityService.update('plugin::users-permissions.user', newUser.id, 
           },
         },});
         const paperTitle= updatedPaper.Paper_Title;
-        await sendEmail(
-          reviewerEmail,
-          'Review Submitted Sussessfully',
-          `Hello, your review for paper "${paperTitle}"  is recieved.`,
-          `<p>Hello,</p><p>Hello, Your review for paper <strong>${paperTitle}</strong> is recieved. `
-        );
-       
+    const textBody = `Hello ${reviewer.firstName + ' ' + reviewer.lastName || ''},
+
+Thank you for submitting your review for the following paper:
+
+Title: "${paperTitle}"
+Paper Id: "${updatedPaper.id}"
+We have received your review successfully. Your contribution is highly appreciated and plays a vital role in maintaining the quality of the conference.
+
+Best regards,  
+The Organizing Committee`;
+
+const htmlBody = `
+  <p>Hello ${reviewer.firstName + ' ' + reviewer.lastName || ''},</p>
+  <p>Thank you for submitting your review for the following paper:</p>
+  <ul>
+    <li><strong>Title:</strong> "${paperTitle}"</li>
+  </ul>
+  <p>Your review has been received successfully.</p>
+  <p>We greatly appreciate your valuable contribution to the review process and the overall success of the conference.</p>
+  <p>Best regards,<br/>The Organizing Committee</p>
+`;
+
+await sendEmail(
+  reviewer.email,
+  `Review Submitted Successfully: "${paperTitle}"`,
+  textBody,
+  htmlBody
+);
+
         return ctx.send({
           message: "Request received successfully!",
          
