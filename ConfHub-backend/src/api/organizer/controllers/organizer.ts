@@ -1,7 +1,8 @@
 import { factories } from '@strapi/strapi';
 const sendEmail = require('../../email/email');
 const nodemailer = require('nodemailer');
-
+const bcrypt = require('bcryptjs');
+const otpStore = {};
 export default factories.createCoreController('api::organizer.organizer', ({ strapi }) => ({
     async registerOrganizer(ctx) {
       try {
@@ -572,14 +573,83 @@ async updateFinalDecision(ctx) {
     }
   
     try {
-      await sendEmail(
-        email,
-        'Your Paper Decision',
-        `Final decision for your submitted paper "${papertitle}" is "${decision}". Log in to your account and see details.`,
-        `<p>Hello,</p>
-         <p>The final decision for your submitted paper "<strong>${papertitle}</strong>" is "<strong>${decision}</strong>".</p>
-         <p>Please log in to your author account to view the detailed feedback and next steps.</p>`
-      );
+      
+    const paperTitle = paper.Paper_Title;
+    const paperID = paper.id;
+    const reviews = paper.review || [];
+
+    // Build the HTML reviews section
+    let reviewsHtml = '';
+    reviews.forEach((rev, index) => {
+      reviewsHtml += `
+        <h4>Review ${index + 1}</h4>
+        <ul>
+          <li><strong>Score:</strong> ${rev.Score}</li>
+          <li><strong>Significance:</strong> ${rev.significance}</li>
+          <li><strong>Originality:</strong> ${rev.originality}</li>
+          <li><strong>Clarity:</strong> ${rev.clarity}</li>
+          <li><strong>Technical Quality:</strong> ${rev.technical_quality}</li>
+          <li><strong>Presentation:</strong> ${rev.presentation}</li>
+          <li><strong>Novelty:</strong> ${rev.novelty}</li>
+          <li><strong>Reproducibility:</strong> ${rev.reproducibility}</li>
+          <li><strong>Writing Quality:</strong> ${rev.writing_quality}</li>
+          <li><strong>Related Work:</strong> ${rev.related_work}</li>
+          <li><strong>Experimental Validation:</strong> ${rev.experimental_validation}</li>
+          <li><strong>Recommendations:</strong> ${rev.Recommendations}</li>
+          <li><strong>Comments:</strong> ${rev.Comments}</li>
+        </ul>
+        <hr/>
+      `;
+    });
+
+    // Author info
+  //  const author = paper.submitted_by;
+    const email = author?.authorEmail;
+
+    if (!email) {
+      console.warn('Author email not found');
+      return ctx.throw(400, 'No email found for the paper author');
+    }
+
+    // Email Content
+    const emailSubject = `Final Decision for Your Paper: "${paperTitle}"`;
+
+    const emailText = `Dear Author,
+
+Your paper submission has been reviewed.
+
+Paper ID: ${paperID}
+Title: "${paperTitle}"
+Final Decision: ${decision}
+
+Please log in to your account to view detailed feedback.
+
+Best regards,
+The Organizing Committee`;
+
+    const emailHtml = `
+      <p>Dear Author,</p>
+      <p>Your paper submission has been reviewed and a final decision has been made.</p>
+      <ul>
+        <li><strong>Paper ID:</strong> ${paperID}</li>
+        <li><strong>Title:</strong> "${paperTitle}"</li>
+        <li><strong>Final Decision:</strong> <span style="color:blue;"><strong>${decision}</strong></span></li>
+      </ul>
+      <p><strong>Reviews:</strong></p>
+      ${reviewsHtml || '<p>No reviews available.</p>'}
+      <p>Thank you for your contribution.Please log in to your account to view detailed feedback.</p>
+      <p>Best regards,<br/>The Organizing Committee</p>
+    `;
+
+    await sendEmail(
+      email,
+      emailSubject,
+      emailText,
+      emailHtml
+    );
+
+    console.log(`Email sent to author ${email}`);
+
       console.log(`Email sent to author ${email}`);
     } catch (err) {
       console.error(`Failed to send email to ${email}`, err);
@@ -700,7 +770,7 @@ The Organizing Committee`;
           <li><strong>Title:</strong> "${paperTitle}"</li>
          
         </ul>
-        <p>You can now <a href="https://your-reviewer-portal.com/login" style="color:blue;">log in to your account</a> and begin the review process.</p>
+        <p>You can now log in to your account and begin the review process.</p>
         <p>Thank you,<br/>The Organizing Committee</p>
       `;
 
@@ -787,36 +857,105 @@ The Organizing Committee`;
     console.error('Assignment error:', error);
     return ctx.internalServerError('Failed to assign reviewers.');
   }
-}
+},
 
-    async changePassword(ctx) {
-      const userId = ctx.state.user?.id; // Authenticated user
-      const { currentPassword, newPassword, confirmNewPassword } = ctx.request.body;
-      if (!userId) {
-        return ctx.unauthorized('User not authenticated');
-      }
-      if (!currentPassword || !newPassword || !confirmNewPassword) {
-        return ctx.badRequest('All fields are required');
-      }
-      if (newPassword !== confirmNewPassword) {
-        return ctx.badRequest('New passwords do not match');
-      }
-      // Fetch user
-      const user = await strapi.query('plugin::users-permissions.user').findOne({ where: { id: userId } });
+  async changePassword(ctx) {
+    const {
+      userId,
+      userType,
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    } = ctx.request.body;
+
+    if (!userId || !userType || !currentPassword || !newPassword || !confirmNewPassword) {
+      return ctx.badRequest('Missing required fields');
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return ctx.badRequest('New passwords do not match');
+    }
+
+    try {
+      // 🔍 Find user by ID and Type
+      const user = await strapi.db.query('plugin::users-permissions.user').findOne({
+        where: {
+          id: userId,
+          Type: userType, // Type is a custom field in users-permissions user
+        },
+      });
+
       if (!user) {
-        return ctx.notFound('User not found');
+        return ctx.notFound('User not found or type mismatch');
       }
-      // Validate current password
-      const validPassword = await strapi.plugins['users-permissions'].services.user.validatePassword(currentPassword, user.password);
-      if (!validPassword) {
+
+      // 🔐 Check current password
+      const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordCorrect) {
         return ctx.badRequest('Current password is incorrect');
       }
-      // Update password
-      await strapi.entityService.update('plugin::users-permissions.user', userId, {
-        data: { password: newPassword },
+
+      // 🔐 Hash and update new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await strapi.db.query('plugin::users-permissions.user').update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
       });
-      ctx.send({ message: 'Password changed successfully' });
-    },
+
+      return ctx.send({ message: 'Password changed successfully' });
+    } catch (err) {
+      console.error('Password change error:', err);
+      return ctx.internalServerError('Failed to change password');
+    }
+  },
+
+ async sendOtp(ctx) {
+    const { email } = ctx.request.body;
+    const user = await strapi.db.query('plugin::users-permissions.user').findOne({ where: { email } });
+
+    if (!user) return ctx.throw(404, 'User not found');
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 }; // 5 min expiry
+
+    await sendEmail(email, 'Your OTP Code', `Your OTP is ${otp}`);
+
+    return ctx.send({ message: 'OTP sent' });
+  },
+
+
+   async verifyOtp(ctx) {
+    const { email, otp } = ctx.request.body;
+    const record = otpStore[email];
+
+    if (!record || record.otp !== otp || Date.now() > record.expires) {
+      return ctx.throw(400, 'Invalid or expired OTP');
+    }
+
+    return ctx.send({ message: 'OTP verified' });
+  },
+
+
+
+  
+   async resetPassword(ctx) {
+    const { email, newPassword } = ctx.request.body;
+    const user = await strapi.db.query('plugin::users-permissions.user').findOne({ where: { email } });
+
+    if (!user) return ctx.throw(404, 'User not found');
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await strapi.db.query('plugin::users-permissions.user').update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
+
+    delete otpStore[email]; // clear OTP
+
+    return ctx.send({ message: 'Password reset successful' });
+  }
+
+
 
 
   }));
