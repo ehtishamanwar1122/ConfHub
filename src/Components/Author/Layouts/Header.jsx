@@ -68,10 +68,10 @@ const Header = () => {
     return (
         <header className="bg-gray-100 p-4 flex justify-between items-center border-b border-gray-300">
             <div className="flex items-center relative">
-                <button onClick={toggleDropdown} className="text-xl text-gray-700 mr-4">
+                <button onClick={toggleDropdown} className="text-xl text-white mr-4">
                     <FaBars />
                 </button>
-                <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
+                <Link  className="text-2xl font-bold text-indigo-600 mr-5">
                                     <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
                 </Link>
 
@@ -112,7 +112,7 @@ const Header = () => {
                 </span>
                 <button
                     onClick={handleLogout}
-                    className="border border-blue-500 text-blue-500 py-2 px-4 rounded-lg hover:bg-gray-200"
+                    className="border border-blue-500 text-white py-2 px-4 rounded-lg hover:bg-gray-200"
                 >
                     Logout
                 </button>

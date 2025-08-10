@@ -92,53 +92,98 @@ const Dashboard = () => {
       
       <div className="main-page">
         {/* Conferences In Progress Section */}
-          <section className="conference-list px-8 py-6">
-            <h2 className="text-2xl font-bold mb-4">Conferences In Progress</h2>
+<section className="conference-list px-8 py-6">
+  <div className="flex justify-between items-center mb-6">
+    <div className="relative">
+      <input
+        type="text"
+        placeholder="Search conferences by title"
+        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-64 text-sm"
+      />
+      <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <span className="text-sm text-gray-600">4 of 4 conferences</span>
+  </div>
 
-            {loading ? (
-              <p>Loading conferences...</p>
-            ) : conferences.length > 0 ? (
-              <div
-                className="overflow-x-auto"
-                // style={{
-                //   backgroundImage: `url(${dashboard_bg})`,
-                //   backgroundSize: 'cover',
-                //   backgroundPosition: 'center',
-                // }}
-              >
-                <table className="min-w-full table-auto border-collapse border border-gray-300 mt-6">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-4 py-2 text-left border-b">#</th>
-                      <th className="px-4 py-2 text-left border-b">Conference Title</th>
-                      <th className="px-4 py-2 text-left border-b">Description</th>
-                      <th className="px-4 py-2 text-left border-b">Conference Date</th>
-                      <th className="px-4 py-2 text-left border-b">Submitted Papers</th>
-                      <th className="px-4 py-2 text-left border-b">Paper Submission Deadline</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {conferences.map((conference, index) => (
-                      <tr
-                        key={conference.id}
-                        className="border-b hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleConferenceClick(conference.id)}
-                      >
-                        <td className="px-4 py-2">{index + 1}</td>
-                        <td className="px-4 py-2">{conference.Conference_title}</td>
-                        <td className="px-4 py-2">{conference.Description}</td>
-                        <td className="px-4 py-2">{conference.Start_date}</td>
-                        <td className="px-4 py-2">{conference.Papers.length}</td>
-                        <td className="px-4 py-2">{conference.Submission_deadline}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>No conferences in progress at the moment.</p>
-            )}
-          </section>
+  {loading ? (
+    <p>Loading conferences...</p>
+  ) : conferences.length > 0 ? (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <table className="min-w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Conference Title</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Description</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Start Date</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Submission Deadline</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Action</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-100">
+          {conferences.map((conference, index) => (
+            <tr
+              key={conference.id}
+              className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+              onClick={() => handleConferenceClick(conference.id)}
+            >
+              <td className="px-6 py-4">
+                <div className="flex items-center">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{conference.Conference_title}</div>
+                    <div className="flex items-center mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        Open
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="text-sm text-gray-900 max-w-xs">
+                  {conference.Description}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center text-sm text-gray-700">
+                  <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {conference.Start_date}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center text-sm text-gray-700">
+                  <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {conference.Submission_deadline}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <button 
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-150"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Handle submit paper action
+                  }}
+                >
+                  <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                  </svg>
+                  Submit Paper
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p>No conferences in progress at the moment.</p>
+  )}
+</section>
 
 
         {/* About Us Section */}
@@ -166,7 +211,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="service-image">
-              <img src="/path-to-conference-image.png" alt="Conference" />
+              <img src={dashboard_img1} alt="Conference" />
             </div>
           </div>
           <div className="service reverse">
@@ -178,7 +223,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="service-image">
-              <img src="/path-to-review-image.png" alt="Review Management" />
+              <img src={dashboard_img1} alt="Review Management" />
             </div>
           </div>
           <div className="service">
@@ -190,7 +235,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="service-image">
-              <img src="/path-to-publishing-image.png" alt="Publishing" />
+              <img src={dashboard_img1} alt="Publishing" />
             </div>
           </div>
         </section>
@@ -214,7 +259,7 @@ const Dashboard = () => {
 
         {/* Footer */}
         <footer className="footer">
-          <p>&copy; 2024 ConfHub. All rights reserved.</p>
+          <p>&copy; 2025 ConfHub. All rights reserved.</p>
         </footer>
       </div>
     </>

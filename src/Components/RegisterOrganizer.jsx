@@ -32,14 +32,57 @@ const RegisterOrganizer = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+  // Trim the value
+  const trimmedValue = value.trimStart(); // don't trim end so user can type naturally
+
+  // Check if value is all spaces
+  if (value.length > 0 && value.trim() === "") {
+    setError(`${name} cannot contain only spaces.`);
+  } else {
+    setError("");
+  }
+
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: trimmedValue,
+  }));
+
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      const cleanedData = {};
+  
+
+  // Email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    setError("Please enter a valid email address.");
+    return;
+  }
+
+  
+
+  // Password should not contain only spaces
+  if (formData.password.trim() === "") {
+    setError("Password cannot contains spaces.");
+    return;
+  }
+
+  // Password confirmation
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
+if (formData.password.includes(" ")) {
+  setError("Password cannot contain spaces.");
+  return;
+}
+
+  // All validations passed
+  setError("");
+  setFormData(cleanedData);
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;

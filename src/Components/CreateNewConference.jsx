@@ -43,12 +43,18 @@ const CreateConference = () => {
       setErrors(prev => ({ ...prev, [id]: '' }));
     }
   };
+// compute tomorrow's date in yyyy-mm-dd for the input min attribute
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+const minDateForInputs = tomorrow.toISOString().split('T')[0]; // e.g. "2025-08-07"
 
- const validateForm = () => {
+const validateForm = () => {
   const newErrors = {};
-  
+
   // Required fields
-  if (!formData.conferenceTitle.trim()) {
+  if (!formData.conferenceTitle || !formData.conferenceTitle.trim()) {
     newErrors.conferenceTitle = 'Conference title is required';
   }
   if (!formData.startDate) {
@@ -57,20 +63,49 @@ const CreateConference = () => {
   if (!formData.submissionDeadline) {
     newErrors.submissionDeadline = 'Submission deadline is required';
   }
-  
-  // Date validation
-  if (formData.startDate && formData.submissionDeadline) {
-    const startDate = new Date(formData.startDate);
-    const submissionDate = new Date(formData.submissionDeadline);
-    
-    if (submissionDate > startDate) {
-      newErrors.submissionDeadline = 'Submission deadline must be before conference date';
+
+  // Only run date validations if both provided (or individually as needed)
+  // Normalize dates to date-only (midnight) to avoid time-of-day timezone issues
+  const toDateOnly = (dateStr) => {
+    const d = new Date(dateStr);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // date-only today
+
+  if (formData.startDate) {
+    const conferenceDate = toDateOnly(formData.startDate);
+
+    // Conference cannot be today or in the past
+    if (conferenceDate.getTime() <= today.getTime()) {
+      newErrors.startDate = 'Conference date must be after today';
     }
   }
-  
+
+  if (formData.submissionDeadline) {
+    const submissionDate = toDateOnly(formData.submissionDeadline);
+
+    // Submission must be after today
+    if (submissionDate.getTime() <= today.getTime()) {
+      newErrors.submissionDeadline = 'Submission deadline must be after today';
+    }
+
+    // If conference date is present, submission must be strictly before conference
+    if (formData.startDate) {
+      const conferenceDate = toDateOnly(formData.startDate);
+      if (submissionDate.getTime() >= conferenceDate.getTime()) {
+        newErrors.submissionDeadline = 'Submission deadline must be before the conference date';
+      }
+    }
+  }
+
   setErrors(newErrors);
+  // Return boolean: valid if no errors
   return Object.keys(newErrors).length === 0;
 };
+
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -244,6 +279,7 @@ const CreateConference = () => {
                         <input
                           type="date"
                           id="startDate"
+                            min={minDateForInputs}
                           value={formData.startDate}
                           onChange={handleChange}
                           className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -315,6 +351,7 @@ const CreateConference = () => {
                         id="submissionDeadline"
                         value={formData.submissionDeadline}
                         onChange={handleChange}
+                          min={minDateForInputs}
                         className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                           errors.submissionDeadline ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                         }`}
