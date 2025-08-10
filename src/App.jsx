@@ -2,23 +2,23 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import RegisterOrganizer from "./components/RegisterOrganizer";
 import Dashboard from "./components/Dashboard";
-import OrganizerDashboard  from "./Components/OrganizerDashboard";
-import CreateConference from "./Components/CreateNewConference";
-import AdminDashboard from "./Components/Admin/AdminDashboard";
-import AdminConferenceManager from "./Components/Admin/AdminConferenceManager";
-import ConferenceDetails from "./Components/Conference/ConferenceDetails";
-import RegisterAuthor from "./Components/Author/AuthorRegistration";
-import AuthorDashboard from "./Components/Author/AuthorDashboard";
-import PaperSubmissionForm from "./Components/Author/SubmitPaper";
-import ManageReviewerRequests from "./Components/ManageReviewRequest";
-import ReviewerDashboard from "./Components/Reviewer/ReviewerDashboard";
-import ManageInvitations from "./Components/Reviewer/ManageInvitation";
-import SubmitReview from "./Components/Reviewer/SubmitReview";
+import OrganizerDashboard  from "./components/OrganizerDashboard";
+import CreateConference from "./components/CreateNewConference";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import AdminConferenceManager from "./components/Admin/AdminConferenceManager";
+import ConferenceDetails from "./components/Conference/ConferenceDetails";
+import RegisterAuthor from "./components/Author/AuthorRegistration";
+import AuthorDashboard from "./components/Author/AuthorDashboard";
+import PaperSubmissionForm from "./components/Author/SubmitPaper";
+import ManageReviewerRequests from "./components/ManageReviewRequest";
+import ReviewerDashboard from "./components/Reviewer/ReviewerDashboard";
+import ManageInvitations from "./components/Reviewer/ManageInvitation";
+import SubmitReview from "./components/Reviewer/SubmitReview";
 
-import OrgConfDetails from "./Components/Conference/OrgConfDetails";
-import AssignSubOrganizer from "./Components/AssignSubOrganizer";
-import SubOrganizerDashboard from './Components/SubOrganizer/SubOrganizerDashboard'
-import PaperReviewPage from "./Components/Author/PaperReview";
+import OrgConfDetails from "./components/Conference/OrgConfDetails";
+import AssignSubOrganizer from "./components/AssignSubOrganizer";
+import SubOrganizerDashboard from './components/SubOrganizer/SubOrganizerDashboard'
+import PaperReviewPage from "./components/Author/PaperReview";
 
 function App() {
   return (
