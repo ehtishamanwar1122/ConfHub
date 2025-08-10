@@ -3,12 +3,17 @@ import Layout from './Layouts/Layout';
 import { useNavigate } from "react-router-dom";
 import AssignSubOrganizer from './AssignSubOrganizer';
 import axios from 'axios';
+import { FaClipboardList, FaCheckCircle, FaUserPlus, FaEye } from 'react-icons/fa';
+import { MdPendingActions, MdDoneAll, MdAssignment } from 'react-icons/md';
 
-const Tab = ({ active, onClick, children }) => (
+const Tab = ({ active, onClick, icon: Icon, children }) => (
     <button
-        className={`py-2 px-4 rounded-full ${active ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} transition-colors`}
+        className={`flex items-center gap-2 py-2 px-4 rounded-full transition-all duration-200 ${
+            active ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
         onClick={onClick}
     >
+        {Icon && <Icon size={18} />}
         {children}
     </button>
 );
@@ -23,12 +28,12 @@ const OrganizerDashboard = () => {
     const [loading, setLoading] = useState(false);
 
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-    const organizerName= userDetails.username;
+    const organizerName = userDetails.username;
+
     useEffect(() => {
         const fetchConferences = async () => {
             try {
                 const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-                const organizerName= userDetails.username;
                 const organizerId = userDetails?.organizerId?.id;
                 const subOrganizerRoles = userDetails?.SubOrganizerRole || [];
                 const userId = userDetails?.id;
@@ -66,11 +71,12 @@ const OrganizerDashboard = () => {
         setSelectedConferenceId(conferenceId);
         setShowAssignModal(true);
     };
+
     useEffect(() => {
         const fetchReviews = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('http://localhost:1337/api/paper-reviews'); // Update with actual endpoint
+                const response = await axios.get('http://localhost:1337/api/paper-reviews');
                 setPaperReviews(response.data || []);
             } catch (error) {
                 console.error('Error fetching paper reviews:', error);
@@ -86,50 +92,53 @@ const OrganizerDashboard = () => {
     
     return (
         <Layout>
-            <h4 className="text-3xl font-semibold text-blue-600 text-center my-6 font-sans">Welcome <strong>{organizerName}</strong> in organizer dashboard</h4>
+            <h4 className="text-3xl font-semibold text-blue-700 text-center my-6 font-sans">
+                Welcome <strong>{organizerName}</strong> to your dashboard
+            </h4>
             <div className="p-6">
-                <div className="mb-6 flex gap-4">
-                    <Tab active={activeTab === 'inProgress'} onClick={() => setActiveTab('inProgress')}>
-                        In Progress Conferences
+                <div className="mb-6 flex gap-3 flex-wrap">
+                    <Tab active={activeTab === 'inProgress'} onClick={() => setActiveTab('inProgress')} icon={MdPendingActions}>
+                        In Progress
                     </Tab>
-                    <Tab active={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>
-                        Completed Conferences
+                    <Tab active={activeTab === 'completed'} onClick={() => setActiveTab('completed')} icon={MdDoneAll}>
+                        Completed
                     </Tab>
-                    <Tab active={activeTab === 'assignSubOrganizer'} onClick={() => setActiveTab('assignSubOrganizer')}>
+                    <Tab active={activeTab === 'assignSubOrganizer'} onClick={() => setActiveTab('assignSubOrganizer')} icon={FaUserPlus}>
                         Assign Sub-Organizers
                     </Tab>
-                    {/* <Tab active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')}>
+                    {/* <Tab active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} icon={FaClipboardList}>
                         Reviews
                     </Tab> */}
-
                 </div>
 
                 {activeTab === 'assignSubOrganizer' ? (
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-bold mb-6 text-blue-600">Assign Sub-Organizers</h2>
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                        <h2 className="text-xl font-bold mb-6 text-blue-600 flex items-center gap-2">
+                            <FaUserPlus /> Assign Sub-Organizers
+                        </h2>
                         {conferences.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                                     <thead className="bg-gray-100">
                                         <tr>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Conference Title</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Description</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Action</th>
+                                            <th className="py-3 px-4 text-left">Conference Title</th>
+                                            <th className="py-3 px-4 text-left">Description</th>
+                                            <th className="py-3 px-4 text-left">Status</th>
+                                            <th className="py-3 px-4 text-left">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {conferences.map((conference, index) => (
-                                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Conference_title}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Description}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Status}</td>
-                                                <td className="py-3 px-4 text-sm">
+                                            <tr key={index} className="border-b hover:bg-gray-50">
+                                                <td className="py-3 px-4">{conference.Conference_title}</td>
+                                                <td className="py-3 px-4">{conference.Description}</td>
+                                                <td className="py-3 px-4">{conference.Status}</td>
+                                                <td className="py-3 px-4">
                                                     <button
                                                         onClick={() => handleAssignSubOrganizer(conference.id)}
-                                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+                                                        className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                                                     >
-                                                        Assign Sub-Organizer
+                                                        <MdAssignment size={18} /> Assign
                                                     </button>
                                                 </td>
                                             </tr>
@@ -142,40 +151,41 @@ const OrganizerDashboard = () => {
                         )}
                     </div>
                 ) : (
-                    
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                          <h2 className="text-xl font-bold  text-blue-600">Conference Details</h2>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border-collapse">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                        <h2 className="text-xl font-bold text-blue-600 flex items-center gap-2">
+                            <FaClipboardList /> Conference Details
+                        </h2>
+                        <div className="overflow-x-auto mt-4">
+                            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Conference Title</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Description</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Submission Deadline</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Review Deadline</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Start Date</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Location</th>
-                                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+                                        <th className="py-3 px-4 text-left">Title</th>
+                                        <th className="py-3 px-4 text-left">Description</th>
+                                        <th className="py-3 px-4 text-left">Submission Deadline</th>
+                                        <th className="py-3 px-4 text-left">Review Deadline</th>
+                                        <th className="py-3 px-4 text-left">Status</th>
+                                        <th className="py-3 px-4 text-left">Start Date</th>
+                                        <th className="py-3 px-4 text-left">Location</th>
+                                        <th className="py-3 px-4 text-left">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredConferences.length > 0 ? (
                                         filteredConferences.map((conference, index) => (
-                                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Conference_title}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Description}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Submission_deadline}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Review_deadline}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Status}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Start_date}</td>
-                                                <td className="py-3 px-4 text-sm text-gray-700">{conference.Conference_location}</td>
-                                                <td className="py-3 px-4 text-sm">
+                                            <tr key={index} className="border-b hover:bg-gray-50">
+                                                <td className="py-3 px-4">{conference.Conference_title}</td>
+                                                <td className="py-3 px-4">{conference.Description}</td>
+                                                <td className="py-3 px-4">{conference.Submission_deadline}</td>
+                                                <td className="py-3 px-4">{conference.Review_deadline}</td>
+                                                <td className="py-3 px-4">{conference.Status}</td>
+                                                <td className="py-3 px-4">{conference.Start_date}</td>
+                                                <td className="py-3 px-4">{conference.Conference_location}</td>
+                                                <td className="py-3 px-4">
                                                     <button
                                                         onClick={() => handleCardClick(conference.id)}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
+                                                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
                                                     >
-                                                        View Details
+                                                        <FaEye /> View
                                                     </button>
                                                 </td>
                                             </tr>
@@ -198,62 +208,7 @@ const OrganizerDashboard = () => {
                         conferenceId={selectedConferenceId}
                         onClose={() => setShowAssignModal(false)}
                     />
-                )} 
-                {activeTab === 'reviews' && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-4 text-blue-600">Paper Reviews</h2>
-
-          {loading ? (
-            <p className="text-gray-600">Loading reviews...</p>
-          ) : (
-            <>
-              {paperReviews.length === 0 ? (
-                <p className="text-gray-600">No reviews available.</p>
-              ) : (
-                paperReviews.map((paper, idx) => ( 
-                  <div key={idx} className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{paper.title}</h3>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full bg-white border-collapse mb-2">
-                        <thead className="bg-gray-100">
-                          <tr>
-                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Reviewer</th>
-                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Review Summary</th>
-                            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Recommendation</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {paper.reviews.map((review, rIdx) => (
-                            <tr key={rIdx} className="border-b border-gray-200 hover:bg-gray-50">
-                              <td className="py-3 px-4 text-sm text-gray-700">{review.reviewer}</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">{review.summary}</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">{review.recommendation}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Organizer Decision Buttons */}
-                    <div className="mt-2">
-                      <button className="bg-green-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-green-600">
-                        Accept Paper
-                      </button>
-                      <button className="bg-yellow-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-yellow-600">
-                        Minor Revision
-                      </button>
-                      <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
-                        Reject Paper
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
-          )}
-        </div>
-      )}
-
+                )}
             </div>
         </Layout>
     );

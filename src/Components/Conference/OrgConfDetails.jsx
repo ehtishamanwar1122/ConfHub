@@ -7,6 +7,39 @@ import Header from "../Layouts/Header";
 import Footer from "./Footer";
 import axios from "axios";
 import { dashboard_bg } from "../../assets/Images";
+import { 
+  X, 
+  Eye, 
+  UserPlus, 
+  Calendar, 
+  Settings, 
+  CheckCircle, 
+  XCircle, 
+  FileText, 
+  Users, 
+  MessageCircle, 
+  ChevronDown, 
+  Star, 
+  Award,
+  Clock,
+  Edit3,
+  Save,
+  Plus,
+  Trash2,
+  Filter,
+  Search,
+  AlertCircle,
+  CheckCheck,
+  UserCheck,
+  Mail,
+  Calendar as CalendarIcon,
+  FileCheck,
+  Target,
+  BarChart3,
+  TrendingUp,
+  Activity,
+  Zap
+} from "lucide-react";
 
 const OrgConfDetails = () => {
   const [state, setState] = useState([]);
@@ -31,20 +64,21 @@ const OrgConfDetails = () => {
 
   // Default review criteria options
   const defaultReviewCriteria = [
-    { id: "significance", label: "Significance", enabled: true },
-    { id: "originality", label: "Originality", enabled: true },
-    { id: "presentation", label: "Presentation Quality", enabled: true },
-    { id: "technical_quality", label: "Technical Quality", enabled: false },
-    { id: "clarity", label: "Clarity", enabled: false },
-    { id: "novelty", label: "Novelty", enabled: false },
-    { id: "reproducibility", label: "Reproducibility", enabled: false },
-    { id: "related_work", label: "Related Work Coverage", enabled: false },
+    { id: "significance", label: "Significance", enabled: true, icon: Target },
+    { id: "originality", label: "Originality", enabled: true, icon: Zap },
+    { id: "presentation", label: "Presentation Quality", enabled: true, icon: FileText },
+    { id: "technical_quality", label: "Technical Quality", enabled: false, icon: Settings },
+    { id: "clarity", label: "Clarity", enabled: false, icon: Eye },
+    { id: "novelty", label: "Novelty", enabled: false, icon: Star },
+    { id: "reproducibility", label: "Reproducibility", enabled: false, icon: CheckCheck },
+    { id: "related_work", label: "Related Work Coverage", enabled: false, icon: FileCheck },
     {
       id: "experimental_validation",
       label: "Experimental Validation",
       enabled: false,
+      icon: BarChart3
     },
-    { id: "writing_quality", label: "Writing Quality", enabled: false },
+    { id: "writing_quality", label: "Writing Quality", enabled: false, icon: Edit3 },
   ];
   const [newReviewerInput, setNewReviewerInput] = useState("");
   const [newReviewerEmails, setNewReviewerEmails] = useState([]);
@@ -236,6 +270,7 @@ const OrgConfDetails = () => {
         label: newCustomField.trim(),
         enabled: true,
         isCustom: true,
+        icon: Plus
       };
       setReviewFormFields((prev) => [...prev, newField]);
       setNewCustomField("");
@@ -335,12 +370,19 @@ const OrgConfDetails = () => {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDateForInputs = tomorrow.toISOString().split("T")[0]; // e.g. "2025-08-07"
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+        <p className="text-gray-600 font-medium">Loading conference details...</p>
+      </div>
+    </div>
+  );
 
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {loading ? (
             <div className="flex justify-center items-center h-64">
@@ -349,117 +391,165 @@ const OrgConfDetails = () => {
           ) : conference.length > 0 ? (
             <>
               {/* Conference Info */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-100">
                 <div className="p-8">
                   {conference.map((conf) => (
-                    <div key={conf.id} className="space-y-6">
+                    <div key={conf.id} className="space-y-8">
                       <div className="flex justify-between items-start">
-                        <div>
-                          <h1 className="text-3xl font-bold text-gray-900">
+                        <div className="flex-1">
+                          <h1 className="text-4xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                             {conf.Conference_title}
                           </h1>
-                          <p className="mt-2 text-lg text-gray-600">
+                          <p className="mt-2 text-lg text-gray-600 leading-relaxed">
                             {conf.Description}
                           </p>
                         </div>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                          {conf.Status}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200">
+                            <Activity className="w-4 h-4 mr-2" />
+                            {conf.Status}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Inline section for organizer and dates */}
-                      <div className="flex flex-col sm:flex-row gap-6 ml-8">
-                        <div className="flex items-center gap-32">
+                      {/* Organizer and Date Section */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                            <Users className="w-6 h-6 text-white" />
+                          </div>
                           <div>
-                            <h3 className="text-sm font-medium text-gray-500">
+                            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                               Organizer
                             </h3>
-                            <p className="text-lg font-medium text-gray-900">
+                            <p className="text-lg font-semibold text-gray-900">
                               {conf.Organizer?.Organizer_FirstName}{" "}
                               {conf.Organizer?.Organizer_LastName}
                             </p>
                           </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <CalendarIcon className="w-6 h-6 text-white" />
+                          </div>
                           <div>
-                            <h3 className="text-sm font-medium text-gray-500">
+                            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                               Start Date
                             </h3>
-                            <p className="text-lg font-medium text-gray-900">
+                            <p className="text-lg font-semibold text-gray-900">
                               {conf.Start_date}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <h3 className="text-sm font-medium text-gray-500">
-                              Paper Submission Deadline
-                            </h3>
-                            <p className="text-lg mt-8 font-medium text-gray-900">
-                              {conf.Submission_deadline}
-                            </p>
-                          </div>
-                          <button
-                            onClick={openEditModal}
-                            className="text-sm font-medium text-white hover:text-black-800"
-                          >
-                            Edit
-                          </button>
-                        </div>
-
-                        {conf.Review_deadline ? (
+                      {/* Deadlines Section */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <h3 className="text-sm font-medium text-gray-500">
-                                Review Deadline
-                              </h3>
-                              <p className="text-lg pt-4 font-medium text-gray-900">
-                                {conf.Review_deadline}
-                              </p>
+                              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                                <Clock className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                                  Paper Submission Deadline
+                                </h3>
+                                <p className="text-lg font-semibold text-gray-900 mt-1">
+                                  {conf.Submission_deadline}
+                                </p>
+                              </div>
                             </div>
                             <button
-                              onClick={() => setShowReviewModal(true)}
-                              className="text-sm font-medium text-white hover:text-grey-800"
+                              onClick={openEditModal}
+                              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-700 hover:text-orange-800 bg-white hover:bg-orange-50 border border-orange-200 rounded-lg transition-all duration-200"
                             >
+                              <Edit3 className="w-4 h-4" />
                               Edit
                             </button>
                           </div>
-                        ) : (
-                          <div className="flex items-end">
-                            <button
-                              onClick={() => setShowReviewModal(true)}
-                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                            >
-                              Add Review Deadline
-                            </button>
-                          </div>
-                        )}
+                        </div>
+
+                        <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-6 rounded-xl border border-emerald-200">
+                          {conf.Review_deadline ? (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center">
+                                  <FileCheck className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                                    Review Deadline
+                                  </h3>
+                                  <p className="text-lg font-semibold text-gray-900 mt-1">
+                                    {conf.Review_deadline}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setShowReviewModal(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 hover:text-emerald-800 bg-white hover:bg-emerald-50 border border-emerald-200 rounded-lg transition-all duration-200"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                                Edit
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl flex items-center justify-center">
+                                  <AlertCircle className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                                    Review Deadline
+                                  </h3>
+                                  <p className="text-sm text-gray-400 mt-1">Not set</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setShowReviewModal(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+                              >
+                                <Plus className="w-4 h-4" />
+                                Add Review Deadline
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+                      {/* Review Form Configuration */}
+                      <div className="bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 p-6 rounded-xl border border-purple-200">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-800">
-                              Review Form Configuration
-                            </h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                              Customize the review criteria for submitted papers
-                            </p>
-                            <div className="mt-3">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {
-                                  reviewFormFields.filter((f) => f.enabled)
-                                    .length
-                                }{" "}
-                                criteria enabled
-                              </span>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+                              <Settings className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-800">
+                                Review Form Configuration
+                              </h3>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Customize the review criteria for submitted papers
+                              </p>
+                              <div className="mt-3">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border border-blue-200">
+                                  <Target className="w-3 h-3 mr-1" />
+                                  {
+                                    reviewFormFields.filter((f) => f.enabled)
+                                      .length
+                                  }{" "}
+                                  criteria enabled
+                                </span>
+                              </div>
                             </div>
                           </div>
                           <button
                             onClick={() => setShowReviewFormModal(true)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                            className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
                           >
+                            <Settings className="w-4 h-4" />
                             Configure Review Form
                           </button>
                         </div>
@@ -470,41 +560,37 @@ const OrgConfDetails = () => {
               </div>
 
               {/* Submitted Papers Section */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                 {/* Header and Sort Dropdown */}
-                <div className="px-6 py-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {submittedPapers.length} Papers Submitted
-                  </h3>
+                <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {submittedPapers.length} Papers Submitted
+                      </h3>
+                    </div>
 
-                  {/* Sleek Sort Control */}
-                  <div className="relative">
-                    <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-100 transition-colors duration-200">
-                      <span className="text-sm font-medium text-gray-600">
-                        Sort by
-                      </span>
-                      <div className="relative">
-                        <select
-                          value={sortOption}
-                          onChange={(e) => setSortOption(e.target.value)}
-                          className="appearance-none bg-white border border-gray-200 rounded-md px-3 py-1.5 pr-8 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer shadow-sm"
-                        >
-                          <option value="reviews">Most Reviews</option>
-                          <option value="submission">Submission Date</option>
-                        </select>
-                        <svg
-                          className="w-4 h-4 text-gray-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
+                    {/* Enhanced Sort Control */}
+                    <div className="relative">
+                      <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200">
+                        <Filter className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-600">
+                          Sort by
+                        </span>
+                        <div className="relative">
+                          <select
+                            value={sortOption}
+                            onChange={(e) => setSortOption(e.target.value)}
+                            className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer shadow-sm"
+                          >
+                            <option value="reviews">Most Reviews</option>
+                            <option value="submission">Submission Date</option>
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -527,74 +613,91 @@ const OrgConfDetails = () => {
                         .map((paper) => (
                           <div
                             key={paper.id}
-                            className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+                            className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 transform hover:-translate-y-1"
                           >
-                            {/* Title and ID Centered */}
-                            <div className="text-center mb-4">
-                              <h4 className="text-xl font-semibold text-gray-900">
-                                <strong>Paper title:</strong>{" "}
-                                {paper.Paper_Title}
-                              </h4>
-                              <p className="text-sm text-gray-500">
-                                ID: {paper.id || "N/A"}
+                            {/* Title and ID Section */}
+                            <div className="text-center mb-6 pb-4 border-b border-gray-100">
+                              <div className="flex items-center justify-center gap-3 mb-3">
+                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                                  <FileText className="w-4 h-4 text-white" />
+                                </div>
+                                <h4 className="text-xl font-bold text-gray-900">
+                                  {paper.Paper_Title}
+                                </h4>
+                              </div>
+                              <p className="text-sm text-gray-500 font-medium">
+                                Paper ID: #{paper.id || "N/A"}
                               </p>
                             </div>
 
-                            {/* Reviewer Badges Centered */}
-                            <div className="flex justify-center gap-4 mb-4">
-                              <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-white text-green-800">
-                                {paper.reviewRequestsConfirmed.length} Assigned
-                                reviewers
-                              </span>
-                              <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                {paper.review.length} Reviews submitted
-                              </span>
+                            {/* Status Badges */}
+                            <div className="flex justify-center gap-4 mb-6">
+                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200">
+                                <UserCheck className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm font-semibold text-blue-800">
+                                  {paper.reviewRequestsConfirmed.length} Assigned reviewers
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                                <span className="text-sm font-semibold text-green-800">
+                                  {paper.review.length} Reviews submitted
+                                </span>
+                              </div>
                             </div>
 
                             {/* Author and Submission Info */}
-                            <div className="text-sm text-gray-600 space-y-1">
-                              <p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
+                              <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 text-gray-400" />
                                 <strong>Author:</strong> {paper.Author || "N/A"}
-                              </p>
-                              <p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-gray-400" />
                                 <strong>Submitted:</strong>{" "}
-                                {new Date(
-                                  paper.submissionDate
-                                ).toLocaleDateString()}
-                              </p>
+                                {new Date(paper.submissionDate).toLocaleDateString()}
+                              </div>
                             </div>
 
                             {/* Abstract */}
-                            <p className="mt-3 text-sm text-gray-700 line-clamp-2">
-                              <strong>Abstract:</strong> {paper.Abstract}
-                            </p>
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+                              <div className="flex items-start gap-2">
+                                <FileText className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700 mb-1">Abstract:</p>
+                                  <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                                    {paper.Abstract}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
 
-                            {/* Buttons Row */}
-                            <div className="mt-5 flex flex-wrap justify-center gap-4">
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap justify-center gap-3">
                               <button
                                 onClick={() => handleAssignReviewers(paper.id)}
-                                className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                                className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105"
                               >
-                                Assign Reviewer to this paper
+                                <UserPlus className="w-4 h-4" />
+                                Assign Reviewer
                               </button>
 
                               {paper.finalDecisionByOrganizer ? (
-                                <span
-                                  onClick={() => handleShowReviews(paper.id)}
-                                  className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-purple-100 text-purple-800 cursor-pointer"
-                                >
-                                  Decision Submitted
-                                </span>
+                                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200 cursor-pointer hover:from-purple-200 hover:to-pink-200 transition-all duration-200">
+                                  <Award className="w-4 h-4" />
+                                  <span className="font-medium">Decision Submitted</span>
+                                </div>
                               ) : (
                                 <button
                                   onClick={() => handleShowReviews(paper.id)}
                                   disabled={paper.review.length === 0}
-                                  className={`inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                                  className={`inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg transition-all duration-200 ${
                                     paper.review.length === 0
-                                      ? "bg-gray-400 cursor-not-allowed"
-                                      : "bg-blue-600 hover:bg-blue-700"
+                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                      : "text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 transform hover:scale-105"
                                   }`}
                                 >
+                                  <Eye className="w-4 h-4" />
                                   View Reviews
                                 </button>
                               )}
@@ -603,24 +706,14 @@ const OrgConfDetails = () => {
                         ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <svg
-                        className="mx-auto h-12 w-12 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <FileText className="w-10 h-10 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         No papers submitted
                       </h3>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="text-gray-500">
                         Papers submitted to this conference will appear here.
                       </p>
                     </div>
@@ -629,60 +722,43 @@ const OrgConfDetails = () => {
               </div>
             </>
           ) : (
-            <div className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No conference found
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="text-gray-500">
                 There are no conferences available at the moment.
               </p>
             </div>
           )}
         </section>
 
-        {/* Existing modals remain unchanged */}
+        {/* Enhanced Review Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden border border-gray-200">
+              {/* Enhanced Header */}
+              <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-2xl font-bold">Paper Reviews</h2>
-                    <p className="text-indigo-100 mt-1">
-                      Review details for: {selectedPaper?.Paper_Title}
-                    </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold">Paper Reviews</h2>
+                      <p className="text-indigo-100 mt-1">
+                        Review details for: {selectedPaper?.Paper_Title}
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={handleCloseModal}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
                   >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="w-6 h-6" />
                   </button>
                 </div>
               </div>
@@ -694,55 +770,51 @@ const OrgConfDetails = () => {
                     {selectedReviews.map((reviews, index) => (
                       <div
                         key={index}
-                        className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200 shadow-sm"
+                        className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200 shadow-sm"
                       >
                         <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl flex items-center justify-center text-sm font-bold">
                               {index + 1}
                             </div>
                             Review {index + 1}
                           </h3>
-                          {/* <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                            Overall: {reviews.overall || 'N/A'}/10
-                          </div> */}
                         </div>
 
-                        {/* Metrics Grid */}
+                        {/* Enhanced Metrics Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                           {conference[0].reviewFormFields &&
                           conference[0].reviewFormFields.length > 0 ? (
                             conference[0].reviewFormFields.map(
-                              (field, index) => {
-                                // Assign colors based on index or field ID (optional logic to customize)
-                                const colorMap = [
-                                  "blue",
-                                  "green",
-                                  "orange",
-                                  "purple",
-                                  "red",
-                                  "teal",
+                              (field, fieldIndex) => {
+                                const colors = [
+                                  { bg: "from-blue-500 to-blue-600", text: "text-blue-600", dot: "bg-blue-500" },
+                                  { bg: "from-green-500 to-green-600", text: "text-green-600", dot: "bg-green-500" },
+                                  { bg: "from-orange-500 to-orange-600", text: "text-orange-600", dot: "bg-orange-500" },
+                                  { bg: "from-purple-500 to-purple-600", text: "text-purple-600", dot: "bg-purple-500" },
+                                  { bg: "from-red-500 to-red-600", text: "text-red-600", dot: "bg-red-500" },
+                                  { bg: "from-teal-500 to-teal-600", text: "text-teal-600", dot: "bg-teal-500" },
                                 ];
-                                const color = colorMap[index % colorMap.length];
+                                const color = colors[fieldIndex % colors.length];
+                                const IconComponent = field.icon || Target;
+                                
                                 return (
                                   <div
                                     key={field.id}
-                                    className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                                    className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
                                   >
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <div
-                                        className={`w-3 h-3 bg-${color}-500 rounded-full`}
-                                      ></div>
-                                      <span className="font-semibold text-gray-700">
+                                    <div className="flex items-center gap-2 mb-3">
+                                      <div className={`w-8 h-8 bg-gradient-to-r ${color.bg} rounded-lg flex items-center justify-center`}>
+                                        <IconComponent className="w-4 h-4 text-white" />
+                                      </div>
+                                      <span className="font-semibold text-gray-700 text-sm">
                                         {field.label}
                                       </span>
                                     </div>
-                                    <div
-                                      className={`text-2xl font-bold text-${color}-600`}
-                                    >
+                                    <div className={`text-2xl font-bold ${color.text}`}>
                                       {reviews[field.id] || "N/A"}
                                       {field.id !== "Recommendations" && (
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm text-gray-500 ml-1">
                                           /10
                                         </span>
                                       )}
@@ -753,54 +825,62 @@ const OrgConfDetails = () => {
                             )
                           ) : (
                             <>
-                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <Target className="w-4 h-4 text-white" />
+                                  </div>
                                   <span className="font-semibold text-gray-700">
                                     Significance
                                   </span>
                                 </div>
                                 <div className="text-2xl font-bold text-blue-600">
                                   {reviews.significance || "N/A"}
-                                  <span className="text-sm text-gray-500">
+                                  <span className="text-sm text-gray-500 ml-1">
                                     /10
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                                    <Zap className="w-4 h-4 text-white" />
+                                  </div>
                                   <span className="font-semibold text-gray-700">
                                     Originality
                                   </span>
                                 </div>
                                 <div className="text-2xl font-bold text-green-600">
                                   {reviews.originality || "N/A"}
-                                  <span className="text-sm text-gray-500">
+                                  <span className="text-sm text-gray-500 ml-1">
                                     /10
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                                    <FileText className="w-4 h-4 text-white" />
+                                  </div>
                                   <span className="font-semibold text-gray-700">
                                     Presentation
                                   </span>
                                 </div>
                                 <div className="text-2xl font-bold text-orange-600">
                                   {reviews.presentation || "N/A"}
-                                  <span className="text-sm text-gray-500">
+                                  <span className="text-sm text-gray-500 ml-1">
                                     /10
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <Award className="w-4 h-4 text-white" />
+                                  </div>
                                   <span className="font-semibold text-gray-700">
                                     Recommendation
                                   </span>
@@ -813,25 +893,13 @@ const OrgConfDetails = () => {
                           )}
                         </div>
 
-                        {/* Comments Section */}
+                        {/* Enhanced Comments Section */}
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                           <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <svg
-                              className="w-5 h-5 text-gray-600"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-2.9-.471L8 21l1.529-1.529A8.956 8.956 0 0121 12z"
-                              />
-                            </svg>
+                            <MessageCircle className="w-5 h-5 text-gray-600" />
                             Reviewer Comments
                           </h4>
-                          <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500">
                             <p className="text-gray-700 leading-relaxed">
                               {reviews.Comments || "No comments available"}
                             </p>
@@ -841,20 +909,10 @@ const OrgConfDetails = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <svg
-                      className="w-16 h-16 text-gray-400 mx-auto mb-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <FileText className="w-10 h-10 text-gray-400" />
+                    </div>
                     <p className="text-gray-500 text-lg">
                       No reviews available for this paper.
                     </p>
@@ -862,64 +920,21 @@ const OrgConfDetails = () => {
                 )}
               </div>
 
-              {/* Decision Buttons Footer */}
-              <div className="bg-gray-50 p-6 border-t">
+              {/* Enhanced Decision Buttons Footer */}
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 border-t border-gray-200">
                 <div className="flex justify-center space-x-4">
                   <button
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
                     onClick={() => handleDecision("Accept")}
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <CheckCircle className="w-5 h-5" />
                     Accept Paper
                   </button>
-                  {/* <button
-                   className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-                   onClick={() => handleDecision("Minor Revision")}
-                 >
-                   <svg
-                     className="w-5 h-5"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24"
-                   >
-                     <path
-                       strokeLinecap="round"
-                       strokeLinejoin="round"
-                       strokeWidth={2}
-                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                     />
-                   </svg>
-                   Minor Revision
-                 </button> */}
                   <button
-                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
                     onClick={() => handleDecision("Reject")}
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <XCircle className="w-5 h-5" />
                     Reject Paper
                   </button>
                 </div>
@@ -928,37 +943,31 @@ const OrgConfDetails = () => {
           </div>
         )}
 
+        {/* Enhanced Edit Deadline Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200">
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xl font-bold">
-                      Edit Submission Deadline
-                    </h3>
-                    <p className="text-blue-100 text-sm mt-1">
-                      Update the paper submission deadline
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                      <Edit3 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold">
+                        Edit Submission Deadline
+                      </h3>
+                      <p className="text-blue-100 text-sm mt-1">
+                        Update the paper submission deadline
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={closeEditModal}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -966,7 +975,8 @@ const OrgConfDetails = () => {
               {/* Content */}
               <div className="p-6">
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <Calendar className="w-4 h-4" />
                     New Submission Deadline
                   </label>
                   <input
@@ -974,7 +984,7 @@ const OrgConfDetails = () => {
                     value={newDeadline}
                     min={minDateForInputs}
                     onChange={(e) => setNewDeadline(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
                   />
                 </div>
 
@@ -1027,14 +1037,16 @@ const OrgConfDetails = () => {
                         );
                       }
                     }}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
+                    <Save className="w-4 h-4" />
                     Save Changes
                   </button>
                   <button
                     onClick={closeEditModal}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                   >
+                    <X className="w-4 h-4" />
                     Cancel
                   </button>
                 </div>
@@ -1043,35 +1055,29 @@ const OrgConfDetails = () => {
           </div>
         )}
 
+        {/* Enhanced Review Deadline Modal */}
         {showReviewModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200">
               {/* Header */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xl font-bold">Set Review Deadline</h3>
-                    <p className="text-purple-100 text-sm mt-1">
-                      Configure the deadline for paper reviews
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold">Set Review Deadline</h3>
+                      <p className="text-purple-100 text-sm mt-1">
+                        Configure the deadline for paper reviews
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowReviewModal(false)}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -1079,7 +1085,8 @@ const OrgConfDetails = () => {
               {/* Content */}
               <div className="p-6">
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <Calendar className="w-4 h-4" />
                     Review Deadline Date
                   </label>
                   <input
@@ -1087,21 +1094,23 @@ const OrgConfDetails = () => {
                     value={reviewDeadline}
                     min={minDateForInputs}
                     onChange={(e) => setReviewDeadline(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex gap-3">
                   <button
                     onClick={handleReviewDeadlineSubmit}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
+                    <Save className="w-4 h-4" />
                     Save Deadline
                   </button>
                   <button
                     onClick={() => setShowReviewModal(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                   >
+                    <X className="w-4 h-4" />
                     Cancel
                   </button>
                 </div>
@@ -1110,39 +1119,32 @@ const OrgConfDetails = () => {
           </div>
         )}
 
-        {/* New Review Form Fields Modal */}
+        {/* Enhanced Review Form Fields Modal */}
         {showReviewFormModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-gray-200">
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-white text-2xl font-bold">
-                      Configure Review Form
-                    </h2>
-                    <p className="text-blue-100 mt-1">
-                      Customize the criteria reviewers will use to evaluate
-                      papers
-                    </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                      <Settings className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-white text-2xl font-bold">
+                        Configure Review Form
+                      </h2>
+                      <p className="text-blue-100 mt-1">
+                        Customize the criteria reviewers will use to evaluate
+                        papers
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowReviewFormModal(false)}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
                   >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="w-6 h-6" />
                   </button>
                 </div>
               </div>
@@ -1152,110 +1154,52 @@ const OrgConfDetails = () => {
                 {/* Standard Criteria Section */}
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg
-                      className="w-5 h-5 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
                     Standard Review Criteria
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {reviewFormFields
                       .filter((field) => !field.isCustom)
-                      .map((field) => (
-                        <label
-                          key={field.id}
-                          className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={field.enabled}
-                            onChange={() =>
-                              handleReviewFormFieldToggle(field.id)
-                            }
-                            className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                          />
-                          <span className="text-gray-700 font-medium">
-                            {field.label}
-                          </span>
-                        </label>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Custom Criteria Section */}
-                <div className="mb-6">
-                  {/* <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Custom Review Criteria
-                  </h3> */}
-
-                  {/* Add Custom Field Input */}
-                  {/* <div className="flex gap-3 mb-4">
-                    <input
-                      type="text"
-                      value={newCustomField}
-                      onChange={(e) => setNewCustomField(e.target.value)}
-                      placeholder="Enter custom criteria name..."
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddCustomField()}
-                    />
-                    <button
-                      onClick={handleAddCustomField}
-                      disabled={!newCustomField.trim()}
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-6 py-3 rounded-xl transition-colors font-medium disabled:cursor-not-allowed"
-                    >
-                      Add Criteria
-                    </button>
-                  </div> */}
-
-                  {/* Custom Fields List */}
-                  {/* {reviewFormFields.filter(field => field.isCustom).length > 0 && (
-                    <div className="space-y-3">
-                      {reviewFormFields.filter(field => field.isCustom).map((field) => (
-                        <div key={field.id} className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
-                          <label className="flex items-center gap-3 cursor-pointer">
+                      .map((field) => {
+                        const IconComponent = field.icon || Target;
+                        return (
+                          <label
+                            key={field.id}
+                            className="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 cursor-pointer border border-gray-200 hover:border-blue-200"
+                          >
                             <input
                               type="checkbox"
                               checked={field.enabled}
-                              onChange={() => handleReviewFormFieldToggle(field.id)}
-                              className="w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                              onChange={() =>
+                                handleReviewFormFieldToggle(field.id)
+                              }
+                              className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                             />
-                            <span className="text-gray-700 font-medium">{field.label}</span>
-                            <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">Custom</span>
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                              <IconComponent className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-gray-700 font-medium">
+                              {field.label}
+                            </span>
                           </label>
-                          <button
-                            onClick={() => handleRemoveCustomField(field.id)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )} */}
+                        );
+                      })}
+                  </div>
                 </div>
 
                 {/* Summary Section */}
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-2">
-                    Configuration Summary
-                  </h4>
-                  <p className="text-blue-700 text-sm">
-                    <span className="font-medium">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-blue-800 text-lg">
+                      Configuration Summary
+                    </h4>
+                  </div>
+                  <p className="text-blue-700">
+                    <span className="font-semibold text-xl">
                       {reviewFormFields.filter((f) => f.enabled).length}
                     </span>{" "}
                     criteria will be included in the review form. Reviewers will
@@ -1265,90 +1209,110 @@ const OrgConfDetails = () => {
               </div>
 
               {/* Footer */}
-              <div className="bg-gray-50 p-6 flex justify-end gap-3 border-t">
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 flex justify-end gap-3 border-t border-gray-200">
                 <button
                   onClick={() => setShowReviewFormModal(false)}
-                  className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                  className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium flex items-center gap-2"
                 >
+                  <X className="w-4 h-4" />
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveReviewFormFields}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl flex items-center gap-2"
                 >
+                  <Save className="w-4 h-4" />
                   Save Configuration
                 </button>
               </div>
             </div>
           </div>
         )}
-        {/* assign reviewer to paper modal */}
+
+        {/* Enhanced Assign Reviewer Modal */}
         {isAssignModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden border border-gray-200">
               {/* Header */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      Assign Reviewer
-                    </h2>
-                    <p className="text-indigo-100 mt-1">
-                      Paper: {assignPaper?.Paper_Title}
-                    </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                      <UserPlus className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white">
+                        Assign Reviewer
+                      </h2>
+                      <p className="text-indigo-100 mt-1">
+                        Paper: {assignPaper?.Paper_Title}
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setIsAssignModalOpen(false)}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
                   >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="w-6 h-6" />
                   </button>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-4">
-                <p>
-                  <strong>Paper ID:</strong> {assignPaper?.id}
-                </p>
-                <p>
-                  <strong>Author:</strong> {assignPaper?.Author}
-                </p>{" "}
-                {/* Adjust according to your field name */}
+              <div className="p-6 space-y-6">
+                {/* Paper Info */}
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-gray-500" />
+                      <strong>Paper ID:</strong> #{assignPaper?.id}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-gray-500" />
+                      <strong>Author:</strong> {assignPaper?.Author}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Already Assigned Reviewers */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <UserCheck className="w-4 h-4" />
                     Already Assigned Reviewers
                   </label>
                   {assignPaper?.reviewRequestsConfirmed?.length > 0 ? (
-                    <ul className="space-y-1 text-sm text-gray-800 list-disc list-inside">
+                    <div className="space-y-2">
                       {assignPaper.reviewRequestsConfirmed.map((rev, index) => (
-                        <li key={index}>
-                          {rev.firstName} {rev.lastName} —{" "}
-                          <span className="text-gray-500">{rev.email}</span>
-                        </li>
+                        <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                            <UserCheck className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">
+                              {rev.firstName} {rev.lastName}
+                            </p>
+                            <p className="text-sm text-gray-500">{rev.email}</p>
+                          </div>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   ) : (
-                    <p className="text-sm text-gray-500 italic">
-                      No reviewers assigned yet.
-                    </p>
+                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <Users className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <p className="text-sm text-gray-500 italic">
+                        No reviewers assigned yet.
+                      </p>
+                    </div>
                   )}
                 </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Reviewers
+
+                {/* Select Existing Reviewers */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <Users className="w-4 h-4" />
+                    Select Existing Reviewers
                   </label>
                   <Select
                     isMulti
@@ -1357,11 +1321,22 @@ const OrgConfDetails = () => {
                     onChange={handleReviewerChange}
                     className="text-sm"
                     classNamePrefix="react-select"
-                    placeholder="Choose reviewers..."
+                    placeholder="Choose reviewers from database..."
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        borderRadius: '12px',
+                        borderColor: '#e5e7eb',
+                        padding: '4px',
+                      }),
+                    }}
                   />
                 </div>
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                {/* Add New Reviewer */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                    <Mail className="w-4 h-4" />
                     Add New Reviewer (Email)
                   </label>
                   <input
@@ -1382,36 +1357,59 @@ const OrgConfDetails = () => {
                       }
                     }}
                     placeholder="Type email and press Enter or comma"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
                   />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Press Enter or comma after each email to add it
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {newReviewerEmails.map((email, index) => (
-                    <span
-                      key={index}
-                      className="bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
-                    >
-                      {email}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setNewReviewerEmails((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          )
-                        }
-                        className="text-red-500 hover:text-red-700 font-bold"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-6 text-right">
+
+                {/* New Reviewer Email Tags */}
+                {newReviewerEmails.length > 0 && (
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                      New Reviewers to Add:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {newReviewerEmails.map((email, index) => (
+                        <span
+                          key={index}
+                          className="flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-3 py-2 rounded-lg border border-green-200 text-sm font-medium"
+                        >
+                          <Mail className="w-3 h-3" />
+                          {email}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setNewReviewerEmails((prev) =>
+                                prev.filter((_, i) => i !== index)
+                              )
+                            }
+                            className="text-red-500 hover:text-red-700 ml-1"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => setIsAssignModalOpen(false)}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
                   <button
                     onClick={handleConfirmAssign}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105"
                   >
-                    Confirm Assign
+                    <UserPlus className="w-4 h-4" />
+                    Confirm Assignment
                   </button>
                 </div>
               </div>
