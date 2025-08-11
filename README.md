@@ -86,7 +86,7 @@ confhub/
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/confhub.git
+git clone https://github.com/ehtishamanwar1122/confhub.git
 cd confhub
 ```
 
