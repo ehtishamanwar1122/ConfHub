@@ -1,31 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { 
-  FiHome, 
-  FiInfo, 
-  FiSettings, 
-  FiMail, 
-  FiSearch, 
-  FiCalendar, 
-  FiClock, 
-  FiDownload,
-  FiArrowRight,
-  FiUsers,
-  FiBookOpen,
-  FiAward,
-  FiSend
-} from "react-icons/fi";
-import { 
-  HiSparkles, 
-  HiLocationMarker 
-} from "react-icons/hi";
-import { 
-  BsGlobe, 
-  BsPeople, 
-  BsFileEarmarkText 
-} from "react-icons/bs";
-
+import { dashboard_img1 } from "../assets/Images";
+import { Conference_Management_System } from "../assets/Images";
+import { ConfHub } from "../assets/Images";
+import { dashboard_bg } from "../assets/Images";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [conferences, setConferences] = useState([]);
@@ -37,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchConferences = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/conferences', {
+        const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/conferences', {
           params: {
             filters: {
               requestStatus: {
@@ -255,104 +234,115 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
-            <div className="relative w-full sm:w-96">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search conferences by title..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/80 backdrop-blur-md border border-sky-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-300"
-              />
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <span className="bg-gradient-to-r from-sky-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium">
-                {filteredConferences.length}
-              </span>
-              <span>of {conferences.length} conferences</span>
-            </div>
-          </div>
+      
+      <div className="main-page">
+        {/* Conferences In Progress Section */}
+<section className="conference-list px-8 py-6">
+  <div className="flex justify-between items-center mb-6">
+    <div className="relative">
+      <input
+        type="text"
+        placeholder="Search conferences by title"
+        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-64 text-sm"
+      />
+      <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <span className="text-sm text-gray-600">4 of 4 conferences</span>
+  </div>
 
-          {/* Conferences Grid */}
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="relative">
-                <div className="w-16 h-16 border-4 border-sky-200 rounded-full animate-spin"></div>
-                <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-              </div>
-            </div>
-          ) : filteredConferences.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredConferences.map((conference, index) => (
-                <div
-                  key={conference.id}
-                  className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-sky-100 hover:border-pink-200 cursor-pointer"
-                  onClick={() => handleConferenceClick(conference.id)}
-                >
-                  {/* Conference Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-sky-400 to-pink-400 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-                      {index + 1}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+  {loading ? (
+    <p>Loading conferences...</p>
+  ) : conferences.length > 0 ? (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <table className="min-w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Conference Title</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Description</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Start Date</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Submission Deadline</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Action</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-100">
+          {conferences.map((conference, index) => (
+            <tr
+              key={conference.id}
+              className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+              onClick={() => handleConferenceClick(conference.id)}
+            >
+              <td className="px-6 py-4">
+                <div className="flex items-center">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{conference.Conference_title}</div>
+                    <div className="flex items-center mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                         Open
                       </span>
                     </div>
                   </div>
-
-                  {/* Conference Title */}
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-sky-600 transition-colors duration-300">
-                    {conference.Conference_title}
-                  </h3>
-
-                  {/* Conference Description */}
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-3">
-                    {conference.Description}
-                  </p>
-
-                  {/* Conference Details */}
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FiCalendar className="w-4 h-4 mr-3 text-sky-500" />
-                      <span>Start Date: {conference.Start_date}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FiClock className="w-4 h-4 mr-3 text-pink-500" />
-                      <span>Deadline: {conference.Submission_deadline}</span>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <button 
-                    className="w-full bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-600 hover:to-pink-600 text-white py-3 rounded-xl font-semibold transition-all duration-300 transform group-hover:scale-105 shadow-lg hover:shadow-xl"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Handle submit paper action
-                    }}
-                  >
-                    <span className="flex items-center justify-center space-x-2">
-                      <FiDownload className="w-4 h-4" />
-                      <span>Submit Paper</span>
-                    </span>
-                  </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <div className="w-24 h-24 bg-gradient-to-r from-sky-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FiSearch className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No conferences found</h3>
-              <p className="text-gray-600">Try adjusting your search terms or check back later for new conferences.</p>
-            </div>
-          )}
-        </div>
-      </section>
+              </td>
+              <td className="px-6 py-4">
+                <div className="text-sm text-gray-900 max-w-xs">
+                  {conference.Description}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center text-sm text-gray-700">
+                  <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {conference.Start_date}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center text-sm text-gray-700">
+                  <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {conference.Submission_deadline}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <button 
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-150"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Handle submit paper action
+                  }}
+                >
+                  <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                  </svg>
+                  Submit Paper
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p>No conferences in progress at the moment.</p>
+  )}
+</section>
+
+
+        {/* About Us Section */}
+        <section className="about-us">
+          <div className="about-content">
+            <h2>About Us</h2>
+            <p>
+              Our platform streamlines the management of university-level
+              conferences, providing tools for organizers to efficiently manage
+              tracks, sessions, and submissions. We focus on collaboration,
+              simplicity, and success in academic events.
+            </p>
+          </div>
+        </section>
 
       {/* About Section */}
       <section id="about" className="py-20 bg-gradient-to-r from-sky-50 to-pink-50">

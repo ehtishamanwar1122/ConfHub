@@ -1,26 +1,19 @@
 export default [
   'strapi::logger',
   'strapi::errors',
-  {
-    name: 'strapi::security',
-    config: {
-      contentSecurityPolicy: {
-        useDefaults: true,
-        directives: {
-          'connect-src': ["'self'", 'https:'],
-          'img-src': ["'self'", 'data:', 'blob:', 'market-assets.strapi.io'],
-          'media-src': ["'self'", 'data:', 'blob:', 'market-assets.strapi.io'],
-          upgradeInsecureRequests: null,
-        },
-      },
-    },
-  },
+  'strapi::security',
   {
     name: 'strapi::cors',
     config: {
       enabled: true,
-      headers: '*',
-      origin: ['*'], // We'll update this later with your frontend URL
+      origin: [
+        'https://confhubb.netlify.app', // your Netlify frontend
+        'https://amused-fulfillment-production.up.railway.app' // backend
+      ],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+      keepHeaderOnError: true,
+      credentials: true, // allow cookies/tokens if needed
     },
   },
   'strapi::poweredBy',

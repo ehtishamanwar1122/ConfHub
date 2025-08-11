@@ -89,7 +89,7 @@ const AuthorDashboard = () => {
         const fetchAuthorData = async () => {
             try {
                 const conferenceResponse = await axios.get(
-                    'http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&populate[Papers][populate]=submitted_by'
+                    'https://amused-fulfillment-production.up.railway.app/api/conferences?filters[requestStatus][$eq]=approved&populate[Papers][populate]=submitted_by'
                 );
                 console.log('recentt', conferenceResponse.data.data);
                 
@@ -112,7 +112,7 @@ const AuthorDashboard = () => {
                 console.log('Filtered Recent Conferences', filteredConferences);
 
                 const papersResponse = await axios.get(
-                    `http://localhost:1337/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*`
+                    `https://amused-fulfillment-production.up.railway.app/api/papers?filters[submitted_by][id][$eq]=${authorId}&populate=*`
                 );
                 setSubmittedPapers(papersResponse.data?.data);
                 setLoading(false);
