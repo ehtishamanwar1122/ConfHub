@@ -102,7 +102,7 @@ const OrgConfDetails = () => {
   useEffect(() => {
     const fetchReviewers = async () => {
       try {
-        const response = await axios.get(`http://localhost:1337/api/reviewers`);
+        const response = await axios.get(`https://amused-fulfillment-production.up.railway.app/api/reviewers`);
         const reviewerData = response.data.data.map((r) => ({
           id: r.id,
           name: r.firstName + r.lastName,
@@ -137,7 +137,7 @@ const OrgConfDetails = () => {
     const fetchConferenceDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:1337/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*&populate[Organizer][populate]=*`
+          `https://amused-fulfillment-production.up.railway.app/api/conferences?filters[id][$eq]=${id}&populate[Papers][populate]=*&populate[Organizer][populate]=*`
         );
         confData = response.data.data;
         setConference(confData);
@@ -196,7 +196,7 @@ const OrgConfDetails = () => {
       console.log("payy", payload);
 
       const response = await axios.post(
-        "http://localhost:1337/api/organizers/final-decision",
+        "https://amused-fulfillment-production.up.railway.app/api/organizers/final-decision",
         payload
       );
 
@@ -239,7 +239,7 @@ const OrgConfDetails = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:1337/api/conferences/updateReviewDeadline",
+        "https://amused-fulfillment-production.up.railway.app/api/conferences/updateReviewDeadline",
         payload
       );
 
@@ -292,7 +292,7 @@ const OrgConfDetails = () => {
 
       // Replace with your actual API endpoint
       const response = await axios.post(
-        "http://localhost:1337/api/organizers/updateReviewFormFields",
+        "https://amused-fulfillment-production.up.railway.app/api/organizers/updateReviewFormFields",
         payload
       );
 
@@ -340,7 +340,7 @@ const OrgConfDetails = () => {
     console.log("Payload to send:", payload);
 
     axios
-      .post("http://localhost:1337/api/organizers/assign-reviewers", payload)
+      .post("https://amused-fulfillment-production.up.railway.app/api/organizers/assign-reviewers", payload)
       .then((res) => {
         console.log("Reviewers assigned successfully", res.data);
         setSelectedExistingReviewers([]);
@@ -1019,7 +1019,7 @@ const OrgConfDetails = () => {
                           Submission_deadline: newDeadline,
                         };
                         const response = await axios.post(
-                          "http://localhost:1337/api/conferences/updateSubmissiondate",
+                          "https://amused-fulfillment-production.up.railway.app/api/conferences/updateSubmissiondate",
                           payload
                         );
 

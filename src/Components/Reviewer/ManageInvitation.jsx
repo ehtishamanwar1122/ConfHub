@@ -11,10 +11,10 @@ const ManageInvitations = () => {
   useEffect(() => {
     const fetchInvitationsData = async () => {
       try {
-        const activeResponse = await axios.get('http://localhost:1337/api/invitations/active');
+        const activeResponse = await axios.get('https://amused-fulfillment-production.up.railway.app/api/invitations/active');
         setActiveInvitations(activeResponse.data);
 
-        const pendingResponse = await axios.get('http://localhost:1337/api/invitations/pending');
+        const pendingResponse = await axios.get('https://amused-fulfillment-production.up.railway.app/api/invitations/pending');
         setPendingInvitations(pendingResponse.data);
 
         setLoading(false);

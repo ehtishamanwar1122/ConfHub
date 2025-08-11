@@ -12,7 +12,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchOrganizers = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/organizers');
+        const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/organizers');
         const allRequests = response.data.data;
 
         const pending = allRequests.filter(req => req.reqStatus === 'pending');
