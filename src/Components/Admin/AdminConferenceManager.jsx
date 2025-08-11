@@ -32,7 +32,7 @@ const AdminConferenceManager = () => {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const response = await axios.put('http://localhost:1337/api/conference/update-status', {
+      const response = await axios.put('https://amused-fulfillment-production.up.railway.app/api/conference/update-status', {
         id,
         status,
       });

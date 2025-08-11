@@ -34,7 +34,7 @@ const AdminDashboard = () => {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const response = await axios.put('http://localhost:1337/api/organizers/update-status', {
+      const response = await axios.put('https://amused-fulfillment-production.up.railway.app/api/organizers/update-status', {
         id,
         status,
       });

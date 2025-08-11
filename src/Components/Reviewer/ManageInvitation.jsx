@@ -29,7 +29,7 @@ const ManageInvitations = () => {
 
   const handleApprove = async (invitationId) => {
     try {
-      await axios.post(`http://localhost:1337/api/invitations/approve/${invitationId}`);
+      await axios.post(`https://amused-fulfillment-production.up.railway.app/api/invitations/approve/${invitationId}`);
       const updatedPending = pendingInvitations.filter(invite => invite.id !== invitationId);
       setPendingInvitations(updatedPending);
       alert('Invitation approved successfully!');
