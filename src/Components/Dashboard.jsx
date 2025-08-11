@@ -76,7 +76,7 @@ const Dashboard = () => {
               <img src={Conference_Management_System} alt="Conference illustration" />
             </h1>
             <p>
-              From testing managing program committees to publishing proceedings, our
+              From managing program committees to publishing proceedings, our
               ConfHub system has got you covered. Professionalism has perfected
               managing a well-organized conference from scratch.
             </p>
