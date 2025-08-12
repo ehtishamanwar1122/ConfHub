@@ -28,9 +28,10 @@ const ConferenceDetails = () => {
     fetchConferenceDetails();
   }, [id]);
 
-  const handleJoinConference = () => {
-    navigate("/register");
-  };
+ const handleJoinConference = (confId) => {
+  localStorage.setItem("selectedConferenceId", confId);
+  navigate("/login");
+};
 
   if (loading) {
     return (
@@ -115,7 +116,7 @@ const ConferenceDetails = () => {
                       login to your existing Author account.
                     </p>
                     <button
-                      onClick={handleJoinConference}
+                      onClick={() => handleJoinConference(conf.id)}
                       className="bg-gradient-to-r from-blue-600 to-pink-500 text-white font-medium py-2 px-6 rounded-lg hover:from-blue-700 hover:to-pink-600 transition-all"
                     >
                       Join Conference

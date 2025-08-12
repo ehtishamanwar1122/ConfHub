@@ -8,6 +8,7 @@ const CreateConference = () => {
   const [formData, setFormData] = useState({
     conferenceTitle: '',
     conferenceDescription: '',
+    conferenceTopics:'',
     startDate: '',
     conferenceTime: '',
     conferenceLocation: '',
@@ -153,6 +154,14 @@ const validateForm = () => {
       if (!formData.conferenceTitle.trim()) {
         basicErrors.conferenceTitle = 'Conference title is required';
       }
+       if (!formData.conferenceDescription || formData.conferenceDescription.trim() === '') {
+    basicErrors.conferenceDescription = 'Conference description is required';
+  }
+
+  // Validate Conference Topics
+  if (!formData.conferenceTopics || formData.conferenceTopics.trim() === '') {
+    basicErrors.conferenceTopics = 'Conference topics are required';
+  }
       if (!formData.startDate) {
         basicErrors.startDate = 'Conference date is required';
       }
@@ -256,21 +265,57 @@ const validateForm = () => {
                         </p>
                       )}
                     </div>
+  
+<div>
+  <label htmlFor="conferenceDescription" className="block text-sm font-medium text-gray-700 mb-2">
+    Conference Description *
+  </label>
+  <textarea
+    id="conferenceDescription"
+    rows="4"
+    placeholder="Describe your conference, its themes, and objectives"
+    value={formData.conferenceDescription}
+    onChange={handleChange}
+    className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[100px] ${
+      errors.conferenceDescription ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+    }`}
+  />
+  {errors.conferenceDescription && (
+    <p className="mt-2 text-sm text-red-600 flex items-center">
+      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+      </svg>
+      {errors.conferenceDescription}
+    </p>
+  )}
+</div>
 
-                    <div>
-                      <label htmlFor="conferenceDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                        Conference Description
-                      </label>
-                      <textarea
-                        id="conferenceDescription"
-                        rows="4"
-                        placeholder="Describe your conference, its themes, and objectives"
-                        value={formData.conferenceDescription}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                      />
-                    </div>
-
+<div>
+  <label htmlFor="conferenceTopics" className="block text-sm font-medium text-gray-700 mb-2">
+    Conference Topics *
+  </label>
+  <textarea
+    id="conferenceTopics"
+    rows="3"
+    placeholder="Enter topics separated by commas or new lines&#10;e.g., Machine Learning, Data Science, AI Ethics"
+    value={formData.conferenceTopics}
+    onChange={handleChange}
+    className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical min-h-[80px] ${
+      errors.conferenceTopics ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+    }`}
+  />
+  {errors.conferenceTopics && (
+    <p className="mt-2 text-sm text-red-600 flex items-center">
+      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+      </svg>
+      {errors.conferenceTopics}
+    </p>
+  )}
+  <p className="mt-2 text-sm text-gray-500">
+    List main topics for paper submissions. This helps authors identify relevant conferences.
+  </p>
+</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">

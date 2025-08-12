@@ -42,6 +42,11 @@
       "relation": "manyToMany",
       "target": "api::paper.paper",
       "mappedBy": "submitted_by"
+    },
+    "selected_conferences": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::conference.conference"
     }
   }
 }

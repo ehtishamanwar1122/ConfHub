@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ConfHub } from '../../assets/Images';
 import RoleSwitcherButton from '../RoleSwitcher'; // Import the new button component
 import ChangePasswordModal from '../ChangePasswordModal';
+import { LogOut } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -101,12 +102,7 @@ if (usertype?.Type === 'reviewer') {
                     Create New Conference
                   </Link>
                 )}
-                <Link
-                  to="#"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Manage Conferences
-                </Link>
+                
                 <Link
                   to="/ManageReviewerRequests"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -115,16 +111,11 @@ if (usertype?.Type === 'reviewer') {
                 </Link>
                 <Link
                   to="/Settings"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-not-allowed"
                 >
                   Settings
                 </Link>
-                <Link
-                  to="/Help"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Help
-                </Link>
+              
                 <button
                   className="block w-full text-left px-4 py-2 bg-white text-black hover:bg-gray-100"
                   onClick={() => { setShowChangePasswordModal(true); setDropdownVisible(false); }}
@@ -146,12 +137,13 @@ if (usertype?.Type === 'reviewer') {
             <span className="text-gray-600 text-xl mr-5">
               <FaBell />
             </span>
-            <button
-              onClick={handleLogout}
-              className="border bg-inherit border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-gray-200"
-            >
-              Logout
-            </button>
+          <button
+  onClick={handleLogout}
+  className="flex items-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+  <LogOut className="h-5 w-5" />
+  Logout
+</button>
           </div>
         </header>
         <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />

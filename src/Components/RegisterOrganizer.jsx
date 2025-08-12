@@ -65,10 +65,10 @@ const RegisterOrganizer = () => {
   
 
   // Password should not contain only spaces
-  if (formData.password.trim() === "") {
-    setError("Password cannot contains spaces.");
-    return;
-  }
+  // if (formData.password.trim() === "") {
+  //   setError("Password cannot contains spaces.");
+  //   return;
+  // }
 
   // Password confirmation
   if (formData.password !== formData.confirmPassword) {
@@ -89,6 +89,7 @@ if (formData.password.includes(" ")) {
     }
     setLoading(true);
     setError(null);
+      const selectedConferenceId = localStorage.getItem("selectedConferenceId");
     try {
       const response =
         userType === "author"
@@ -101,6 +102,7 @@ if (formData.password.includes(" ")) {
               biography: formData.biography,
               researchInterests: formData.researchInterests,
               password: formData.password,
+              ...(selectedConferenceId && { selectedConferenceId: Number(selectedConferenceId) }),
             })
           : userType === "organizer"
           ? await registerOrganizer({
@@ -135,7 +137,7 @@ if (formData.password.includes(" ")) {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-cyan-100 px-2">
       <div className="w-full max-w-4xl flex flex-col md:flex-row shadow-xl rounded-2xl overflow-hidden border border-gray-200 bg-white">
         {/* Left Side - Image & Highlights */}
-        <div className="hidden md:flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-purple-600 p-6 w-1/2 relative">
+        <div className="hidden md:flex flex-col justify-center items-center bg-gradient-to-r from-sky-400  to-purple-400 p-6 w-1/2 relative">
           <img
             src={LoginPageImage}
             alt="Register"
@@ -179,10 +181,10 @@ if (formData.password.includes(" ")) {
             </div>
             <div className="flex mb-3 sm:mb-4 gap-2">
               <button onClick={() => navigate("/login")}
-                className="flex-1 py-2 text-xs font-semibold rounded bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">
+                className="flex-1 py-2 text-xs font-semibold rounded bg-gradient-to-r from-sky-400  to-purple-400 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">
                 Login
               </button>
-              <button className="flex-1 py-2 text-xs font-semibold rounded bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow">
+              <button className="flex-1 py-2 text-xs font-semibold rounded bg-gradient-to-r from-sky-400  to-purple-400 text-white shadow">
                 Register
               </button>
             </div>

@@ -6,6 +6,10 @@ import "./ConferenceDetails.css";
 import Header from "../Layouts/Header";
 import Footer from "./Footer";
 import axios from "axios";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { dashboard_bg } from "../../assets/Images";
 import { 
   X, 
@@ -61,6 +65,14 @@ const OrgConfDetails = () => {
   const [showReviewFormModal, setShowReviewFormModal] = useState(false);
   const [reviewFormFields, setReviewFormFields] = useState([]);
   const [newCustomField, setNewCustomField] = useState("");
+   const [acceptedPapersCount, setAcceptedPapersCount] = useState(0);
+
+
+  const [searchTerm, setSearchTerm] = useState('');
+const [currentPage, setCurrentPage] = useState(1);
+const [pageSize, setPageSize] = useState(10);
+const [activeTab, setActiveTab] = useState('remaining');
+
 
   // Default review criteria options
   const defaultReviewCriteria = [
@@ -88,6 +100,7 @@ const OrgConfDetails = () => {
   const [sortOption, setSortOption] = useState("reviews");
   const [selectedExistingReviewer, setSelectedExistingReviewer] = useState("");
   const [newReviewerEmail, setNewReviewerEmail] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
   const [existingReviewers, setExistingReviewers] = useState([
     // Replace with dynamic data if needed
     { id: 1, name: "John Doe", email: "john@example.com" },
@@ -95,7 +108,7 @@ const OrgConfDetails = () => {
   ]);
   const [selectedExistingReviewers, setSelectedExistingReviewers] = useState(
     []
-  );
+  );const [statusDropdowns, setStatusDropdowns] = useState({});
 
   const [reviewers, setReviewers] = useState([]);
 
@@ -147,6 +160,10 @@ const OrgConfDetails = () => {
         if (confData.length > 0) {
           const papers = confData[0].Papers || []; // No `.data` here
           setSubmittedPapers(papers);
+console.log('paa',papers);
+const acceptedPapers = papers.filter(paper => paper.finalDecisionByOrganizer === 'Accept');
+setAcceptedPapersCount(acceptedPapers.length);
+console.log(`Number of accepted papers: ${acceptedPapersCount}`); 
 
           // Initialize review form fields from conference data or use defaults
           const existingFields = [
@@ -254,6 +271,29 @@ const OrgConfDetails = () => {
     }
   };
 
+  const updateConferenceStatus = async () => {
+    setIsUpdating(true);
+
+    const payload = {
+      id: conference[0].id,
+      status: "completed",
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:1337/api/conferences/updateConferenceStatus",
+        payload
+      );
+
+      if (response.status === 200) {
+        navigate("/OrganizerDashboard");
+      }
+    } catch (error) {
+      console.error("Error updating conference status:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   // New functions for review form fields management
   const handleReviewFormFieldToggle = (id) => {
     const updatedFields = reviewFormFields.map((field) =>
@@ -410,6 +450,21 @@ const OrgConfDetails = () => {
                             {conf.Status}
                           </span>
                         </div>
+                       {conf.Status !== "completed" && (
+  <button
+    onClick={updateConferenceStatus}
+    disabled={isUpdating}
+    className={`inline-flex items-center px-4 py-2 ${
+      isUpdating ? "bg-gray-500" : "bg-green-600 hover:bg-green-700"
+    } text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-200`}
+  >
+    <CheckCircle className="w-4 h-4 mr-2" />
+    {isUpdating ? "Updating…" : "Mark as Completed"}
+  </button>
+)}
+
+
+
                       </div>
 
                       {/* Organizer and Date Section */}
@@ -460,6 +515,7 @@ const OrgConfDetails = () => {
                                 </p>
                               </div>
                             </div>
+                             {conf.Status !== "completed" && (
                             <button
                               onClick={openEditModal}
                               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-700 hover:text-orange-800 bg-white hover:bg-orange-50 border border-orange-200 rounded-lg transition-all duration-200"
@@ -467,6 +523,7 @@ const OrgConfDetails = () => {
                               <Edit3 className="w-4 h-4" />
                               Edit
                             </button>
+                             )}
                           </div>
                         </div>
 
@@ -486,6 +543,7 @@ const OrgConfDetails = () => {
                                   </p>
                                 </div>
                               </div>
+                               {conf.Status !== "completed" && (
                               <button
                                 onClick={() => setShowReviewModal(true)}
                                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 hover:text-emerald-800 bg-white hover:bg-emerald-50 border border-emerald-200 rounded-lg transition-all duration-200"
@@ -493,6 +551,7 @@ const OrgConfDetails = () => {
                                 <Edit3 className="w-4 h-4" />
                                 Edit
                               </button>
+                               )}
                             </div>
                           ) : (
                             <div className="flex items-center justify-between">
@@ -507,6 +566,7 @@ const OrgConfDetails = () => {
                                   <p className="text-sm text-gray-400 mt-1">Not set</p>
                                 </div>
                               </div>
+                               {conf.Status !== "completed" && (
                               <button
                                 onClick={() => setShowReviewModal(true)}
                                 className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
@@ -514,12 +574,14 @@ const OrgConfDetails = () => {
                                 <Plus className="w-4 h-4" />
                                 Add Review Deadline
                               </button>
+                               )}
                             </div>
                           )}
                         </div>
                       </div>
 
                       {/* Review Form Configuration */}
+                       {conf.Status !== "completed" && (
                       <div className="bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 p-6 rounded-xl border border-purple-200">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                           <div className="flex items-center gap-4">
@@ -554,6 +616,7 @@ const OrgConfDetails = () => {
                           </button>
                         </div>
                       </div>
+                       )}
                     </div>
                   ))}
                 </div>
@@ -561,165 +624,355 @@ const OrgConfDetails = () => {
 
               {/* Submitted Papers Section */}
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                {/* Header and Sort Dropdown */}
-                <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {submittedPapers.length} Papers Submitted
-                      </h3>
-                    </div>
+  {/* Header, Tabs, and Controls */}
+  <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+  
+      <div className="flex justify-between items-center bg-white shadow-lg rounded-xl p-6 md:p-8 mb-10">
+        {/* Submitted Papers - Left Corner */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {submittedPapers.length} Papers Submitted
+          </h3>
+        </div>
 
-                    {/* Enhanced Sort Control */}
-                    <div className="relative">
-                      <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200">
-                        <Filter className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm font-medium text-gray-600">
-                          Sort by
-                        </span>
-                        <div className="relative">
-                          <select
-                            value={sortOption}
-                            onChange={(e) => setSortOption(e.target.value)}
-                            className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer shadow-sm"
-                          >
-                            <option value="reviews">Most Reviews</option>
-                            <option value="submission">Submission Date</option>
-                          </select>
-                          <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
-                        </div>
-                      </div>
+        {/* Accepted Papers - Right Corner */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {acceptedPapersCount} Papers accepted
+          </h3>
+        </div>
+      </div>
+    
+
+    {/* Tabs */}
+    {/* Tabs */}
+<div className="flex space-x-2 bg-gray-100 p-1 rounded-xl mb-4">
+  <button
+    onClick={() => {
+      setActiveTab('remaining');
+      setCurrentPage(1);
+    }}
+    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl transition-all duration-200 ${
+      activeTab === 'remaining'
+        ? 'bg-white text-blue-700 shadow-lg'
+        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+    }`}
+  >
+    <Clock className="w-5 h-5" />
+    Decision Remaining ({submittedPapers.filter(p => !p.finalDecisionByOrganizer || p.finalDecisionByOrganizer.trim() === '').length})
+  </button>
+  <button
+    onClick={() => {
+      setActiveTab('submitted');
+      setCurrentPage(1);
+    }}
+    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl transition-all duration-200 ${
+      activeTab === 'submitted'
+        ? 'bg-white text-green-700 shadow-lg'
+        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+    }`}
+  >
+    <Award className="w-5 h-5" />
+    Decision Submitted ({submittedPapers.filter(p => p.finalDecisionByOrganizer && p.finalDecisionByOrganizer.trim() !== '').length})
+  </button>
+</div>
+
+    {/* Search and Controls */}
+    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+      {/* Search Bar */}
+      <div className="relative flex-1 max-w-md">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by title, author, or ID..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      {/* Sort and Page Size Controls */}
+      <div className="flex items-center gap-4">
+        {/* Sort Control */}
+        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-600">Sort by</span>
+          <div className="relative">
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="appearance-none bg-transparent border-none text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-6"
+            >
+              <option value="reviews">Most Reviews</option>
+              <option value="submission">Submission Date</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none absolute right-0 top-1/2 -translate-y-1/2" />
+          </div>
+        </div>
+
+        {/* Page Size Control */}
+        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+          <span className="text-sm font-medium text-gray-600">Show</span>
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="appearance-none bg-transparent border-none text-sm font-medium text-gray-800 focus:outline-none cursor-pointer"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="p-6">
+    {(() => {
+      // Filtering and pagination logic, which you already have.
+      const filteredPapers = submittedPapers.filter(paper => {
+        const matchesSearch = 
+          paper.Paper_Title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          paper.Author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          paper.id?.toString().includes(searchTerm);
+
+        const hasDecision = paper.finalDecisionByOrganizer && paper.finalDecisionByOrganizer.trim() !== '';
+        
+        if (activeTab === 'remaining') {
+          return matchesSearch && !hasDecision;
+        } else {
+          return matchesSearch && hasDecision;
+        }
+      }).sort((a, b) => {
+        if (sortOption === "reviews") {
+          return b.review.length - a.review.length;
+        } else {
+          return new Date(a.submissionDate) - new Date(b.submissionDate);
+        }
+      });
+      
+      const totalPages = Math.ceil(filteredPapers.length / pageSize);
+      const startIndex = (currentPage - 1) * pageSize;
+      const paginatedPapers = filteredPapers.slice(startIndex, startIndex + pageSize);
+
+      return filteredPapers.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 gap-6">
+            {paginatedPapers.map((paper) => (
+              <div
+                key={paper.id}
+                className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 transform hover:-translate-y-1"
+              >
+                {/* Title and ID Section */}
+                <div className="text-center mb-6 pb-4 border-b border-gray-100">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-white" />
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900">
+                      {paper.Paper_Title}
+                    </h4>
+                  </div>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Paper ID: #{paper.id || "N/A"}
+                  </p>
+                  <h4
+                    className={`text-xl font-bold ${
+                      paper.finalDecisionByOrganizer === "Accept"
+                        ? "text-green-600"
+                        : paper.finalDecisionByOrganizer === "Reject"
+                        ? "text-red-600"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {paper.finalDecisionByOrganizer}ed
+                  </h4>
+                </div>
+
+                {/* Status Badges */}
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200">
+                    <UserCheck className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-semibold text-blue-800">
+                      {paper.reviewRequestsConfirmed?.length || 0} Assigned
+                      reviewers
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-semibold text-green-800">
+                      {paper.review?.length || 0} Reviews submitted
+                    </span>
+                  </div>
+                </div>
+
+                {/* Author and Submission Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <strong>Author:</strong> {paper.Author || "N/A"}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <strong>Submitted:</strong>{" "}
+                    {new Date(paper.submissionDate).toLocaleDateString()}
+                  </div>
+                </div>
+
+                {/* Abstract */}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+                  <div className="flex items-start gap-2">
+                    <FileText className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">
+                        Abstract:
+                      </p>
+                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                        {paper.Abstract}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6">
-                  {submittedPapers.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6">
-                      {[...submittedPapers]
-                        .sort((a, b) => {
-                          if (sortOption === "reviews") {
-                            return b.review.length - a.review.length;
-                          } else {
-                            return (
-                              new Date(a.submissionDate) -
-                              new Date(b.submissionDate)
-                            );
-                          }
-                        })
-                        .map((paper) => (
-                          <div
-                            key={paper.id}
-                            className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 transform hover:-translate-y-1"
-                          >
-                            {/* Title and ID Section */}
-                            <div className="text-center mb-6 pb-4 border-b border-gray-100">
-                              <div className="flex items-center justify-center gap-3 mb-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                                  <FileText className="w-4 h-4 text-white" />
-                                </div>
-                                <h4 className="text-xl font-bold text-gray-900">
-                                  {paper.Paper_Title}
-                                </h4>
-                              </div>
-                              <p className="text-sm text-gray-500 font-medium">
-                                Paper ID: #{paper.id || "N/A"}
-                              </p>
-                            </div>
+                {/* Action Buttons */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button
+                    onClick={() => handleAssignReviewers(paper.id)}
+                    className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Assign Reviewer
+                  </button>
 
-                            {/* Status Badges */}
-                            <div className="flex justify-center gap-4 mb-6">
-                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200">
-                                <UserCheck className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm font-semibold text-blue-800">
-                                  {paper.reviewRequestsConfirmed.length} Assigned reviewers
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200">
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                                <span className="text-sm font-semibold text-green-800">
-                                  {paper.review.length} Reviews submitted
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Author and Submission Info */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-gray-400" />
-                                <strong>Author:</strong> {paper.Author || "N/A"}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-gray-400" />
-                                <strong>Submitted:</strong>{" "}
-                                {new Date(paper.submissionDate).toLocaleDateString()}
-                              </div>
-                            </div>
-
-                            {/* Abstract */}
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
-                              <div className="flex items-start gap-2">
-                                <FileText className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                  <p className="text-sm font-medium text-gray-700 mb-1">Abstract:</p>
-                                  <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                                    {paper.Abstract}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex flex-wrap justify-center gap-3">
-                              <button
-                                onClick={() => handleAssignReviewers(paper.id)}
-                                className="inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105"
-                              >
-                                <UserPlus className="w-4 h-4" />
-                                Assign Reviewer
-                              </button>
-
-                              {paper.finalDecisionByOrganizer ? (
-                                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200 cursor-pointer hover:from-purple-200 hover:to-pink-200 transition-all duration-200">
-                                  <Award className="w-4 h-4" />
-                                  <span className="font-medium">Decision Submitted</span>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => handleShowReviews(paper.id)}
-                                  disabled={paper.review.length === 0}
-                                  className={`inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg transition-all duration-200 ${
-                                    paper.review.length === 0
-                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                      : "text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 transform hover:scale-105"
-                                  }`}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  View Reviews
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                  {paper.finalDecisionByOrganizer ? (
+                    <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200 cursor-pointer hover:from-purple-200 hover:to-pink-200 transition-all duration-200">
+                      <Award className="w-4 h-4" />
+                      <span className="font-medium" onClick={() => handleShowReviews(paper.id)}>Decision Submitted</span>
                     </div>
                   ) : (
-                    <div className="text-center py-16">
-                      <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <FileText className="w-10 h-10 text-gray-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        No papers submitted
-                      </h3>
-                      <p className="text-gray-500">
-                        Papers submitted to this conference will appear here.
-                      </p>
-                    </div>
+                    <button
+                      onClick={() => handleShowReviews(paper.id)}
+                      disabled={!paper.review || paper.review.length === 0}
+                      className={`inline-flex items-center gap-2 px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-lg transition-all duration-200 ${
+                        !paper.review || paper.review.length === 0
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 transform hover:scale-105"
+                      }`}
+                    >
+                      <Eye className="w-4 h-4" />
+                      View Reviews
+                    </button>
                   )}
                 </div>
               </div>
+            ))}
+          </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 mt-6">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing {startIndex + 1} to{" "}
+                  {Math.min(startIndex + pageSize, filteredPapers.length)} of{" "}
+                  {filteredPapers.length} papers
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {[...Array(totalPages)].map((_, idx) => {
+                      const page = idx + 1;
+                      const isCurrentPage = page === currentPage;
+                      const shouldShow =
+                        page === 1 ||
+                        page === totalPages ||
+                        Math.abs(page - currentPage) <= 1;
+
+                      if (!shouldShow) {
+                        if (
+                          page === currentPage - 2 ||
+                          page === currentPage + 2
+                        ) {
+                          return (
+                            <span
+                              key={page}
+                              className="px-2 py-1 text-gray-400"
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      }
+
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                            isCurrentPage
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-600 hover:bg-white hover:text-gray-900"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <FileText className="w-10 h-10 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No papers submitted
+          </h3>
+          <p className="text-gray-500">
+            Papers submitted to this conference will appear here.
+          </p>
+        </div>
+      );
+    })()}
+  </div>
+</div>
             </>
           ) : (
             <div className="text-center py-16">
@@ -732,7 +985,7 @@ const OrgConfDetails = () => {
               <p className="text-gray-500">
                 There are no conferences available at the moment.
               </p>
-            </div>
+            </div> 
           )}
         </section>
 
@@ -943,7 +1196,7 @@ const OrgConfDetails = () => {
           </div>
         )}
 
-        {/* Enhanced Edit Deadline Modal */}
+        {/* Enhanced Edit submission Deadline Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200">

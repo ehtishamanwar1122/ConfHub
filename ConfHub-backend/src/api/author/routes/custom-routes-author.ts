@@ -24,5 +24,13 @@ export default {
           auth: false, // Disable authentication for this specific endpoint (if needed)
         },
       },
+       {
+        method: 'POST',
+        path: '/author/updateSelectedConferences', // Custom endpoint for registration
+        handler: 'author.updateSelectedConferences',
+        config: {
+          auth: false, // Disable authentication for this specific endpoint (if needed)
+        },
+      },
     ],
   };

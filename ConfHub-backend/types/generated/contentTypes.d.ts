@@ -401,6 +401,10 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     researchInterest: Schema.Attribute.String;
+    selected_conferences: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::conference.conference'
+    >;
     submittedPapers: Schema.Attribute.Relation<
       'manyToMany',
       'api::paper.paper'
@@ -433,6 +437,7 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
     Conference_location: Schema.Attribute.String;
     Conference_time: Schema.Attribute.Time;
     Conference_title: Schema.Attribute.String & Schema.Attribute.Required;
+    Conference_Topics: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -446,8 +451,7 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
     Organizer: Schema.Attribute.Relation<
       'manyToOne',
       'api::organizer.organizer'
-    > &
-      Schema.Attribute.Required;
+    >;
     Papers: Schema.Attribute.Relation<'oneToMany', 'api::paper.paper'>;
     publishedAt: Schema.Attribute.DateTime;
     requestStatus: Schema.Attribute.Enumeration<

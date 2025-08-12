@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ConfHub } from "../../../assets/Images";
 import RoleSwitcherButton from '../../RoleSwitcher'; // Import RoleSwitcherButton
 import ChangePasswordModal from '../../ChangePasswordModal';
+import { LogOut } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -93,24 +94,25 @@ const Header = () => {
             </div>
 
             {/* Role Switcher */}
-            <div className="flex items-center ml-auto mr-2 text-base">
+            {/* <div className="flex items-center ml-auto mr-2 text-base">
                 <RoleSwitcherButton
                     roles={['Admin', 'Author', 'Organizer', 'Reviewer', 'Guest', 'SubOrganizer']}
                     onRoleSelect={handleRoleChange}
                 />
-            </div>
+            </div> */}
 
             {/* Notification and Logout */}
             <div className="flex items-center">
                 <span className="text-xl text-gray-600 mr-5">
                     <FaBell />
                 </span>
-                <button
-                    onClick={handleLogout}
-                    className="border border-blue-500 text-blue-500 py-2 px-4 rounded-md bg-transparent hover:bg-gray-100"
-                >
-                    Logout
-                </button>
+               <button
+  onClick={handleLogout}
+  className="flex items-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+  <LogOut className="h-5 w-5" />
+  Logout
+</button>
             </div>
             <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
         </header>

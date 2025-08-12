@@ -25,6 +25,17 @@ export const registerAuthor = async (data) => {
       throw error; // Handle error accordingly
     }
   };
+    export const updateSelectedConferences = async (data) => {
+    try {
+      console.log('datta',data);
+      
+      const response = await axios.post(`${BASE_API_URL}/updateSelectedConferences`, data);
+      return response.data; // Return the response data (e.g., success message, etc.)
+    } catch (error) {
+      console.error("Error login author", error);
+      throw error; // Handle error accordingly
+    }
+  };
   export const submitPaper = async (data) => {
     try {
       console.log('datta-=-',data);

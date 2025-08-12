@@ -10,7 +10,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
         
         try {
             // Destructure the fields directly from the request body
-            const { firstName, lastName, email, alternativeContact, country,biography,researchInterests, password } = ctx.request.body;
+            const { firstName, lastName, email, alternativeContact, country,biography,researchInterests, password ,selectedConferenceId} = ctx.request.body;
       
             // Validation (optional)
             if (!firstName || !lastName || !email || !password ) {
@@ -58,6 +58,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                   biography:biography,
                   researchInterest:researchInterests,
                   UserID: newUser.id,
+                   selected_conferences:selectedConferenceId,
                 },
               });
              console.log('in condition when  author that were created when multiple author in submitted paper ');
@@ -92,6 +93,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
               biography:biography,
               researchInterest:researchInterests,
               UserID: newUser.id,
+              selected_conferences:selectedConferenceId,
             },
           });
           await strapi.entityService.update(
@@ -154,6 +156,12 @@ export default factories.createCoreController('api::author.author', ({ strapi })
                 // Password doesn't match
                 return ctx.badRequest('Invalid credentials');
               }
+             const jwtService = strapi.plugin('users-permissions').service('jwt');
+    const token = jwtService.issue({
+      id: user.id,
+      username: user.username,
+      role: user.Type,
+    });
           
               const completeUser = await strapi.entityService.findOne(
                 'plugin::users-permissions.user',
@@ -165,6 +173,7 @@ export default factories.createCoreController('api::author.author', ({ strapi })
               return ctx.send({
                 message: 'Login successful',
                 user: completeUser,
+                jwt: token,
               });
             } catch (err) {
               console.error("Error during password validation:", err);
@@ -365,8 +374,58 @@ await sendEmail(
       } catch (error) {
           ctx.throw(500, 'An error occurred while submitting the paper', error);
       }
+  },
+   async updateSelectedConferences(ctx) {
+  const { conferenceId, authorId } = ctx.request.body;
+
+  try {
+    // 1️⃣ Fetch author with current selected_conferences
+    const author = await strapi.db.query("api::author.author").findOne({
+      where: { id: authorId },
+      populate: ["selected_conferences"],
+    });
+
+    if (!author) {
+      return ctx.notFound("Author not found");
+    }
+
+    // 2️⃣ Check if conference already exists in selected_conferences
+    const alreadyExists = author.selected_conferences.some(
+      (conf) => conf.id === conferenceId
+    );
+
+    if (alreadyExists) {
+      return ctx.send({
+        message: "Conference already selected for this author",
+      });
+    }
+
+    // 3️⃣ Add new conference to existing list
+    const updatedConferences = [
+      ...author.selected_conferences.map((conf) => conf.id),
+      conferenceId,
+    ];
+
+    // 4️⃣ Update author record
+    const updatedAuthor = await strapi.db.query("api::author.author").update({
+      where: { id: authorId },
+      data: {
+        selected_conferences: updatedConferences,
+      },
+      populate: ["selected_conferences"],
+    });
+
+    return ctx.send({
+      message: "Selected conference updated successfully",
+      data: updatedAuthor,
+    });
+
+  } catch (err) {
+    console.error("Error updating selected conferences:", err);
+    return ctx.internalServerError("Error updating selected conferences.");
   }
-  
+}
+
       
       
     

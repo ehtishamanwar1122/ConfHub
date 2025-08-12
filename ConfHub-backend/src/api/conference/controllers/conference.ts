@@ -1,7 +1,7 @@
 /**
  * conference controller
  */
-
+const sendEmail = require('../../email/email');
 import { factories } from '@strapi/strapi'
 const nodemailer = require('nodemailer');
 export default factories.createCoreController('api::conference.conference', ({ strapi }) => ({
@@ -13,6 +13,7 @@ export default factories.createCoreController('api::conference.conference', ({ s
             const {
                 conferenceTitle,
                 conferenceDescription,
+                conferenceTopics,
                 startDate,
                 conferenceTime,
                 conferenceLocation,
@@ -54,6 +55,7 @@ export default factories.createCoreController('api::conference.conference', ({ s
                 data: {
                     Conference_title: conferenceTitle,
                     Description:conferenceDescription,
+                    Conference_Topics:conferenceTopics,
                   Start_date:startDate,
                   Submission_deadline:submissionDeadline,
                   Organizer: organizerId,
@@ -249,6 +251,95 @@ console.log('Conference Title:', conferenceTitle);
           ctx.send({ message: 'review deadline added', data: updated });
         } catch (err) {
           ctx.internalServerError('Failed to update submission deadline');
+        }
+      },
+       async updateConferenceStatus(ctx) {
+        try {
+          const { id, status } = ctx.request.body;
+    console.log('confo', ctx.request.body);
+    
+          if (!id || !status) {
+            return ctx.badRequest('Missing required fields: id and status');
+          }
+    
+          // Update the organizer's status
+          const updatedConference = await strapi.entityService.update('api::conference.conference', id, {
+            data: {
+              
+              Status:status,
+            },
+          });
+         console.log('up dat coff',updatedConference);
+         
+          if (!updatedConference) {
+            return ctx.notFound('conference not found');
+          }
+          // Fetch the conference and populate the organizer relationship
+const conference = await strapi.entityService.findOne('api::conference.conference', id, {
+  populate: ['Organizer']  // Ensure 'organizer' relation is populated
+});
+
+if (!conference || !(conference as any).Organizer) {
+  return ctx.badRequest('Organizer not found for this conference');
+}
+
+// Extract organizer details
+const organizerId = (conference as any).Organizer.id;
+const organizerEmail = (conference as any).Organizer.Organizer_Email;
+
+// Fetch the conference title separately (optional)
+const conferenceTitle = conference.Conference_title;
+
+console.log('Organizer ID:', organizerId);
+console.log('Organizer Email:', organizerEmail);
+console.log('Conference Title:', conferenceTitle);
+
+      
+          // const transporter = nodemailer.createTransport({
+          //   service: 'gmail',
+          //   auth: {
+          //     user: 'mudassiralishah555@gmail.com',  // Your Gmail address
+          //     pass: 'mfrm qmsz yiey pgzp',   // Your Gmail password (or App Password if 2FA is enabled)
+          //   },
+          // });
+          
+          // // Function to send email
+          // const sendEmail = async (to, subject, text, html) => {
+          //   const mailOptions = {
+          //     from: 'mudassiralishah555@gmail.com',    // Sender address
+          //     to,                              // Recipient address
+          //     subject,                         // Subject line
+          //     text,                            // Plain text body
+          //     html,                            // HTML body
+          //   };
+          
+          //   try {
+          //     await transporter.sendMail(mailOptions);
+          //     console.log('Email sent successfully');
+          //   } catch (error) {
+          //     console.error('Error sending email:', error);
+          //   }
+          // };
+          await sendEmail(
+            organizerEmail,
+            'Your Conference Status Has Been Updated',
+            `Your conference "${conferenceTitle}" on ConfHub has been updated to the status: ${status}.`,
+            `<p>Hello,</p>
+             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on ConfHub has been updated to <strong>${status}</strong>.</p>
+             
+             <p>If you have any questions, feel free to contact our support team.</p>
+             <p>Best regards,<br>ConfHub Team</p>`
+        );
+        
+      
+          // Respond with the updated organizer
+          ctx.send({
+            message: 'Status updated successfully',
+            organizer: updatedConference,
+          });
+        } catch (error) {
+          console.error('Error updating organizer status:', error);
+          ctx.internalServerError('An error occurred while updating status');
         }
       },
     
