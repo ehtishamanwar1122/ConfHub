@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from './Layouts/Layout';
-
+import axios from "axios";
 const PaperReviewPage = () => {
-  const { paperId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [reviewData, setReviewData] = useState(null);
   const [loading, setLoading] = useState(true);
-  // const dummyReviews = {
+  
   //   1: {
   //     paperTitle: "AI in Healthcare",
   //     conference: "International AI Conference",
@@ -44,13 +44,13 @@ const PaperReviewPage = () => {
   useEffect(() => {
     const fetchReview = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/api/papers?filters[id][$eq]=${paperId}&populate=review&populate=SubmittedTo `);
-        if (!response.ok) {
-          throw new Error('Failed to fetch review');
-        }
+        
+          const response = await axios.get(
+  `https://amused-fulfillment-production.up.railway.app/api/papers?filters[id][$eq]=${id}&populate=review&populate=SubmittedTo`
+); 
         const data = await response.json();
         setReviewData(data.data);
-        console.log('dd',data.data);
+       // console.log('dd',data.data);
         
       } catch (error) {
         console.error('Error fetching review:', error);
@@ -61,7 +61,7 @@ const PaperReviewPage = () => {
     };
 
     fetchReview();
-  }, [paperId]);
+  }, [id]);
   const calculateOverallScore = (scores) => {
     if (!scores) return 'N/A';
   
@@ -109,11 +109,11 @@ const PaperReviewPage = () => {
   return (
     <Layout>
     <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Paper Title: {reviewData[0]?.Paper_Title}</h2>
+      <h2 className="text-xl  mb-6 text-center">Paper Title: {reviewData[0]?.Paper_Title}</h2>
   
       <div className="space-y-6">
-        <h3 className="text-3xl font-bold mb-6 text-center">Conference: {reviewData[0]?.SubmittedTo?.Conference_title}</h3>
-       <h2 className="text-3xl font-bold mb-6 text-center">Final Decision By Organizer: {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</h2>
+        <h3 className="text-xl mb-6 text-center">Conference: {reviewData[0]?.SubmittedTo?.Conference_title}</h3>
+       <h2 className="text-3xl  text-blue-500 font-bold mb-6 text-center">Final Decision By Organizer: {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</h2>
         {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <p><span className="font-semibold">Conference:</span> {reviewData[0]?.SubmittedTo?.Conference_title}</p>
           <p><span className="font-semibold">Final Decision By Organizer: </span> {reviewData[0]?.finalDecisionByOrganizer || 'N/A'}</p>
