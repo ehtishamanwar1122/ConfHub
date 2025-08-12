@@ -140,6 +140,7 @@ const AuthorDashboard = () => {
                 "Added localStorage conference ID to selectedConferences:",
                 localConferenceId
               );
+
             }
           }
 

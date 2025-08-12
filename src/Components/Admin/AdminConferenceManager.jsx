@@ -11,7 +11,7 @@ const AdminConferenceManager = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/conferences?populate=*');
+        const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/conferences?populate=*');
         const allRequests = response.data.data;
 
         // Separate pending and completed requests
@@ -32,7 +32,7 @@ const AdminConferenceManager = () => {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const response = await axios.put('http://localhost:1337/api/conference/update-status', {
+      const response = await axios.put('https://amused-fulfillment-production.up.railway.app/api/conference/update-status', {
         id,
         status,
       });
