@@ -57,7 +57,7 @@ const OrganizerDashboard = () => {
 
 
                 // Fetch conferences where requestStatus is approved and they are for the current organizer
-                const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[Organizer][$eq]=${organizerId}&populate=*`);
+                const response = await axios.get(`https://amused-fulfillment-production.up.railway.app/api/conferences?filters[requestStatus][$eq]=approved&filters[Organizer][$eq]=${organizerId}&populate=*`);
 
                 setConferences(response.data.data);
                 
@@ -117,23 +117,22 @@ const OrganizerDashboard = () => {
     }, [activeTab, searchTerm, pageSize]);
 
 
-//         const fetchReviews = async () => {
-//             setLoading(true);
-//             try {
-//                 const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/paper-reviews');
-//                 setPaperReviews(response.data || []);
-//             } catch (error) {
-//                 console.error('Error fetching paper reviews:', error);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
+        const fetchReviews = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/paper-reviews');
+                setPaperReviews(response.data || []);
+            } catch (error) {
+                console.error('Error fetching paper reviews:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
     
-//         if (activeTab === 'reviews') {
-//             fetchReviews();
-//         }
-//     }, [activeTab]);
- 
+        if (activeTab === 'reviews') {
+            fetchReviews();
+        }
+   
     return (
         <Layout>
             <h4 className="text-3xl font-semibold text-blue-700 text-center my-6 font-sans">

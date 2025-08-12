@@ -281,7 +281,7 @@ console.log(`Number of accepted papers: ${acceptedPapersCount}`);
 
     try {
       const response = await axios.post(
-        "http://localhost:1337/api/conferences/updateConferenceStatus",
+        "https://amused-fulfillment-production.up.railway.app/api/conferences/updateConferenceStatus",
         payload
       );
 
