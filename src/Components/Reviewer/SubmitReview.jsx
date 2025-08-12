@@ -3,7 +3,7 @@ import axios from "axios";
 import Layout from "./Layouts/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import { submitReview } from "../../Services/reviewerService";
-
+import { Edit3, Send, Loader2 } from 'lucide-react';
 // Rating options
 const ratingOptions = [
   { label: "Strongly Disagree", value: 0 },
@@ -72,22 +72,22 @@ const SubmitReview = () => {
   }, [id]);
 
   // Fetch existing review
-  useEffect(() => {
-    const fetchExistingReview = async () => {
-      if (!reviewerId || !id) return;
-      try {
-        const res = await axios.get(
-          `https://amused-fulfillment-production.up.railway.app/api/reviews?filters[paperId][$eq]=${id}&filters[reviewerId][$eq]=${reviewerId}&populate=*`
-        );
-        if (res.data.data.length > 0) {
-          setExistingReview(res.data.data[0].attributes);
-        }
-      } catch (err) {
-        console.error("Error fetching existing review:", err);
-      }
-    };
-    fetchExistingReview();
-  }, [reviewerId, id]);
+  // useEffect(() => {
+  //   const fetchExistingReview = async () => {
+  //     if (!reviewerId || !id) return;
+  //     try {
+  //       const res = await axios.get(
+  //         `https://amused-fulfillment-production.up.railway.app/api/reviews?filters[paperId][$eq]=${id}&filters[reviewerId][$eq]=${reviewerId}&populate=*`
+  //       );
+  //       if (res.data.data.length > 0) {
+  //         setExistingReview(res.data.data[0].attributes);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching existing review:", err);
+  //     }
+  //   };
+  //   fetchExistingReview();
+  // }, [reviewerId, id]);
 
   // Handle dynamic score change
   const handleScoreChange = (fieldId, value) => {
@@ -126,6 +126,9 @@ const SubmitReview = () => {
     try {
       await submitReview(reviewData);
       setSuccessMessage("Review submitted successfully.");
+       setTimeout(() => {
+    navigate("/ReviewerDashboard");
+  }, 1500);
     } catch (err) {
       console.error(err);
       setErrorMessage("An error occurred while submitting the review.");
@@ -152,52 +155,69 @@ const SubmitReview = () => {
             <p className="text-gray-500">Loading paper details...</p>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <h3 className="text-lg font-semibold mb-2">
-              Rate the Following (Based on Agreement)
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {reviewFields.map((field) => (
-                <ScoreSelect
-                  key={field.id}
-                  label={field.label}
-                  value={dynamicScores[field.id] || ""}
-                  onChange={(value) => handleScoreChange(field.id, value)}
-                />
-              ))}
-            </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6 p-6 bg-white rounded-lg shadow-xl">
+  <h3 className="text-xl font-bold text-gray-800 mb-2">
+    Rate the Following (Based on Agreement)
+  </h3>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {reviewFields.map((field) => (
+      <ScoreSelect
+        key={field.id}
+        label={field.label}
+        value={dynamicScores[field.id] || ""}
+        onChange={(value) => handleScoreChange(field.id, value)}
+      />
+    ))}
+  </div>
 
-            <SelectField
-              label="Recommendation"
-              value={recommendation}
-              onChange={setRecommendation}
-              options={["Accept", "Minor Revision", "Major Revision", "Reject"]}
-            />
+  <SelectField
+    label="Recommendation"
+    value={recommendation}
+    onChange={setRecommendation}
+    options={["Accept", "Minor Revision", "Major Revision", "Reject"]}
+  />
 
-            <div>
-              <label className="block font-medium mb-1">Review Comments</label>
-              <textarea
-                className="w-full border border-gray-300 rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={reviewComments}
-                onChange={(e) => setReviewComments(e.target.value)}
-                placeholder="Write your detailed comments..."
-                rows={5}
-              />
-            </div>
+<div>
+  <label htmlFor="reviewComments" className="block text-sm font-medium text-gray-700 mb-1">
+    Review Comments
+  </label>
+  <div className="relative">
+    <textarea
+      id="reviewComments"
+      className="w-full min-h-[120px] max-h-[300px] border border-gray-300 rounded-md p-3 text-base focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 resize-y"
+      value={reviewComments}
+      onChange={(e) => setReviewComments(e.target.value)}
+      placeholder="Write your detailed comments..."
+      rows={5}
+    />
+    <span className="absolute top-3 right-3 text-gray-400">
+      <Edit3 className="w-5 h-5" />
+    </span>
+  </div>
+</div>
 
-            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
-            {successMessage && <p className="text-green-600 text-sm">{successMessage}</p>}
+  {errorMessage && <p className="text-red-500 text-sm mt-4">{errorMessage}</p>}
+  {successMessage && <p className="text-green-600 text-sm mt-4">{successMessage}</p>}
 
-            <button
-  type="submit"
-  disabled={loading || successMessage} // disable on success too
-  className={`w-full mt-4 bg-blue-600 text-white py-3 rounded-md font-semibold transition duration-200 ${
-    loading || successMessage ? "opacity-60 cursor-not-allowed" : "hover:bg-blue-700"
-  }`}
->
-  {loading ? "Submitting..." : "Submit Review"}
-</button>
-          </form>
+  <button
+    type="submit"
+    disabled={loading || successMessage}
+    className={`w-full flex items-center justify-center gap-2 mt-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-md shadow-md hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+  >
+    {loading ? (
+      <>
+        <Loader2 className="animate-spin h-5 w-5" />
+        Submitting...
+      </>
+    ) : (
+      <>
+        <Send className="h-5 w-5" />
+        Submit Review
+      </>
+    )}
+  </button>
+</form>
         </div>
       </div>
     </Layout>

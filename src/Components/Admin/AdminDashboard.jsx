@@ -8,7 +8,14 @@ const AdminDashboard = () => {
   const [completedRequests, setCompletedRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('pending');
   const [loading, setLoading] = useState(true);
+const [loadingStates, setLoadingStates] = useState({});
 
+const setButtonLoading = (index, action, isLoading) => {
+  setLoadingStates(prev => ({
+    ...prev,
+    [`${index}-${action}`]: isLoading
+  }));
+};
   useEffect(() => {
     const fetchOrganizers = async () => {
       try {
@@ -46,31 +53,36 @@ const AdminDashboard = () => {
   };
 
   const handleApprove = async (index) => {
-    const organizer = organizers[index];
-    try {
-      await updateRequestStatus(organizer.id, 'approved');
-      const updatedOrganizers = [...organizers];
-      updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
-      setCompletedRequests([...completedRequests, { ...organizer, reqStatus: 'approved' }]);
-    } catch (error) {
-      console.error('Error approving request:', error);
-    }
-  };
+  const organizer = organizers[index];
+  setButtonLoading(index, 'approve', true);
+  try {
+    await updateRequestStatus(organizer.id, 'approved');
+    const updatedOrganizers = [...organizers];
+    updatedOrganizers.splice(index, 1);
+    setOrganizers(updatedOrganizers);
+    setCompletedRequests([...completedRequests, { ...organizer, reqStatus: 'approved' }]);
+  } catch (error) {
+    console.error('Error approving request:', error);
+  } finally {
+    setButtonLoading(index, 'approve', false);
+  }
+};
 
-  const handleReject = async (index) => {
-    const organizer = organizers[index];
-    try {
-      await updateRequestStatus(organizer.id, 'rejected');
-      const updatedOrganizers = [...organizers];
-      updatedOrganizers.splice(index, 1);
-      setOrganizers(updatedOrganizers);
-      setCompletedRequests([...completedRequests, { ...organizer, reqStatus: 'rejected' }]);
-    } catch (error) {
-      console.error('Error rejecting request:', error);
-    }
-  };
-
+const handleReject = async (index) => {
+  const organizer = organizers[index];
+  setButtonLoading(index, 'reject', true);
+  try {
+    await updateRequestStatus(organizer.id, 'rejected');
+    const updatedOrganizers = [...organizers];
+    updatedOrganizers.splice(index, 1);
+    setOrganizers(updatedOrganizers);
+    setCompletedRequests([...completedRequests, { ...organizer, reqStatus: 'rejected' }]);
+  } catch (error) {
+    console.error('Error rejecting request:', error);
+  } finally {
+    setButtonLoading(index, 'reject', false);
+  }
+};
   const renderRequests = () => {
     const requestsToRender = activeTab === 'pending' ? organizers : completedRequests;
 
@@ -95,10 +107,10 @@ const AdminDashboard = () => {
               <th className="px-6 py-3 text-left">Email</th>
               <th className="px-6 py-3 text-left">Affiliation</th>
               <th className="px-6 py-3 text-left">Department</th>
-              {activeTab === 'completed' && (
+              {activeTab === "completed" && (
                 <th className="px-6 py-3 text-left">Status</th>
               )}
-              {activeTab === 'pending' && (
+              {activeTab === "pending" && (
                 <th className="px-6 py-3 text-left">Actions</th>
               )}
             </tr>
@@ -112,22 +124,36 @@ const AdminDashboard = () => {
                 <td className="px-6 py-4">{organizer.Organizer_Email}</td>
                 <td className="px-6 py-4">{organizer.Affiliation}</td>
                 <td className="px-6 py-4">{organizer.Department}</td>
-                {activeTab === 'completed' && (
-                  <td className="px-6 py-4 capitalize">{organizer.reqStatus}</td>
+                {activeTab === "completed" && (
+                  <td className="px-6 py-4 capitalize">
+                    {organizer.reqStatus}
+                  </td>
                 )}
-                {activeTab === 'pending' && (
+                {activeTab === "pending" && (
                   <td className="px-6 py-4 space-x-2">
                     <button
-                      className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+                      className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => handleApprove(index)}
+                      disabled={
+                        loadingStates[`${index}-approve`] ||
+                        loadingStates[`${index}-reject`]
+                      }
                     >
-                      Approve
+                      {loadingStates[`${index}-approve`]
+                        ? "Approving..."
+                        : "Approve"}
                     </button>
                     <button
-                      className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                      className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => handleReject(index)}
+                      disabled={
+                        loadingStates[`${index}-approve`] ||
+                        loadingStates[`${index}-reject`]
+                      }
                     >
-                      Reject
+                      {loadingStates[`${index}-reject`]
+                        ? "Rejecting..."
+                        : "Reject"}
                     </button>
                   </td>
                 )}

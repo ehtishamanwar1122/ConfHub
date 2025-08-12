@@ -146,6 +146,14 @@ function App() {
     </ProtectedRoute>
   }
 />
+<Route
+  path="/paper-review/:id"
+  element={
+    <ProtectedRoute allowedRoles={["author"]}>
+      <PaperReviewPage />
+    </ProtectedRoute>
+  }
+/>
 
 <Route
   path="/orgConferenceDetails/:id"

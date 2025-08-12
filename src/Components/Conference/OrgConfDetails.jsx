@@ -661,7 +661,7 @@ console.log(`Number of accepted papers: ${acceptedPapersCount}`);
     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl transition-all duration-200 ${
       activeTab === 'remaining'
         ? 'bg-white text-blue-700 shadow-lg'
-        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+        : 'text-gray-600 bg-gray-300 hover:bg-gray-400 hover:text-gray-900'
     }`}
   >
     <Clock className="w-5 h-5" />
@@ -675,7 +675,7 @@ console.log(`Number of accepted papers: ${acceptedPapersCount}`);
     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl transition-all duration-200 ${
       activeTab === 'submitted'
         ? 'bg-white text-green-700 shadow-lg'
-        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+        : 'text-gray-600 bg-gray-200 hover:bg-gray-400 hover:text-gray-900'
     }`}
   >
     <Award className="w-5 h-5" />
@@ -798,7 +798,7 @@ console.log(`Number of accepted papers: ${acceptedPapersCount}`);
                         : "text-gray-900"
                     }`}
                   >
-                    {paper.finalDecisionByOrganizer}ed
+                    {paper.finalDecisionByOrganizer}
                   </h4>
                 </div>
 
@@ -1484,191 +1484,195 @@ console.log(`Number of accepted papers: ${acceptedPapersCount}`);
 
         {/* Enhanced Assign Reviewer Modal */}
         {isAssignModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden border border-gray-200">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                      <UserPlus className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">
-                        Assign Reviewer
-                      </h2>
-                      <p className="text-indigo-100 mt-1">
-                        Paper: {assignPaper?.Paper_Title}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsAssignModalOpen(false)}
-                    className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col border border-gray-200">
+      {/* Header - Fixed */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex-shrink-0 rounded-3xl">
+        <div className="flex justify-between items-start gap-4 flex-wrap">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <UserPlus className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-white mb-1">
+                Assign Reviewer
+              </h2>
+              <p className="text-indigo-100 text-sm leading-relaxed break-words overflow-wrap-anywhere">
+                {assignPaper?.Paper_Title}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsAssignModalOpen(false)}
+            className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200 flex-shrink-0"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6 space-y-6">
+          {/* Paper Info */}
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-gray-500" />
+                <strong>Paper ID:</strong> #{assignPaper?.id}
               </div>
-
-              {/* Content */}
-              <div className="p-6 space-y-6">
-                {/* Paper Info */}
-                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-gray-500" />
-                      <strong>Paper ID:</strong> #{assignPaper?.id}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-gray-500" />
-                      <strong>Author:</strong> {assignPaper?.Author}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Already Assigned Reviewers */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                    <UserCheck className="w-4 h-4" />
-                    Already Assigned Reviewers
-                  </label>
-                  {assignPaper?.reviewRequestsConfirmed?.length > 0 ? (
-                    <div className="space-y-2">
-                      {assignPaper.reviewRequestsConfirmed.map((rev, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                            <UserCheck className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-900">
-                              {rev.firstName} {rev.lastName}
-                            </p>
-                            <p className="text-sm text-gray-500">{rev.email}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <Users className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <p className="text-sm text-gray-500 italic">
-                        No reviewers assigned yet.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Select Existing Reviewers */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                    <Users className="w-4 h-4" />
-                    Select Existing Reviewers
-                  </label>
-                  <Select
-                    isMulti
-                    options={filteredReviewerOptions}
-                    value={selectedExistingReviewers}
-                    onChange={handleReviewerChange}
-                    className="text-sm"
-                    classNamePrefix="react-select"
-                    placeholder="Choose reviewers from database..."
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        borderRadius: '12px',
-                        borderColor: '#e5e7eb',
-                        padding: '4px',
-                      }),
-                    }}
-                  />
-                </div>
-
-                {/* Add New Reviewer */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                    <Mail className="w-4 h-4" />
-                    Add New Reviewer (Email)
-                  </label>
-                  <input
-                    type="email"
-                    value={newReviewerInput}
-                    onChange={(e) => setNewReviewerInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (
-                        (e.key === "Enter" || e.key === ",") &&
-                        newReviewerInput.trim()
-                      ) {
-                        e.preventDefault();
-                        setNewReviewerEmails((prev) => [
-                          ...prev,
-                          newReviewerInput.trim(),
-                        ]);
-                        setNewReviewerInput("");
-                      }
-                    }}
-                    placeholder="Type email and press Enter or comma"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Press Enter or comma after each email to add it
-                  </p>
-                </div>
-
-                {/* New Reviewer Email Tags */}
-                {newReviewerEmails.length > 0 && (
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                      New Reviewers to Add:
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {newReviewerEmails.map((email, index) => (
-                        <span
-                          key={index}
-                          className="flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-3 py-2 rounded-lg border border-green-200 text-sm font-medium"
-                        >
-                          <Mail className="w-3 h-3" />
-                          {email}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setNewReviewerEmails((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              )
-                            }
-                            className="text-red-500 hover:text-red-700 ml-1"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
-                  <button
-                    onClick={() => setIsAssignModalOpen(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <X className="w-4 h-4" />
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleConfirmAssign}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Confirm Assignment
-                  </button>
-                </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-gray-500" />
+                <strong>Author:</strong> {assignPaper?.Author}
               </div>
             </div>
           </div>
-        )}
+
+          {/* Already Assigned Reviewers */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <UserCheck className="w-4 h-4" />
+              Already Assigned Reviewers
+            </label>
+            {assignPaper?.reviewRequestsConfirmed?.length > 0 ? (
+              <div className="space-y-2">
+                {assignPaper.reviewRequestsConfirmed.map((rev, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                      <UserCheck className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">
+                        {rev.firstName} {rev.lastName}
+                      </p>
+                      <p className="text-sm text-gray-500">{rev.email}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Users className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-500 italic">
+                  No reviewers assigned yet.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Select Existing Reviewers */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <Users className="w-4 h-4" />
+              Select Existing Reviewers
+            </label>
+            <Select
+              isMulti
+              options={filteredReviewerOptions}
+              value={selectedExistingReviewers}
+              onChange={handleReviewerChange}
+              className="text-sm"
+              classNamePrefix="react-select"
+              placeholder="Choose reviewers from database..."
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '12px',
+                  borderColor: '#e5e7eb',
+                  padding: '4px',
+                }),
+              }}
+            />
+          </div>
+
+          {/* Add New Reviewer */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <Mail className="w-4 h-4" />
+              Add New Reviewer (Email)
+            </label>
+            <input
+              type="email"
+              value={newReviewerInput}
+              onChange={(e) => setNewReviewerInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (
+                  (e.key === "Enter" || e.key === ",") &&
+                  newReviewerInput.trim()
+                ) {
+                  e.preventDefault();
+                  setNewReviewerEmails((prev) => [
+                    ...prev,
+                    newReviewerInput.trim(),
+                  ]);
+                  setNewReviewerInput("");
+                }
+              }}
+              placeholder="Type email and press Enter or comma"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Press Enter or comma after each email to add it
+            </p>
+          </div>
+
+          {/* New Reviewer Email Tags */}
+          {newReviewerEmails.length > 0 && (
+            <div>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                New Reviewers to Add:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {newReviewerEmails.map((email, index) => (
+                  <span
+                    key={index}
+                    className="flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-3 py-2 rounded-lg border border-green-200 text-sm font-medium"
+                  >
+                    <Mail className="w-3 h-3" />
+                    {email}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNewReviewerEmails((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="text-red-500 hover:text-red-700 ml-1"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer - Fixed */}
+      <div className="p-6 border-t border-gray-200 flex-shrink-0">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsAssignModalOpen(false)}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmAssign}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transform hover:scale-105"
+          >
+            <UserPlus className="w-4 h-4" />
+            Confirm Assignment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </div>
       <Footer />
     </>

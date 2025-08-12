@@ -7,7 +7,14 @@ const AdminConferenceManager = () => {
   const [completedRequests, setCompletedRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('pending');
   const [loading, setLoading] = useState(true);
+const [loadingStates, setLoadingStates] = useState({});
 
+const setButtonLoading = (index, action, isLoading) => {
+  setLoadingStates(prev => ({
+    ...prev,
+    [`${index}-${action}`]: isLoading
+  }));
+};
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -44,29 +51,34 @@ const AdminConferenceManager = () => {
   };
 
   const handleApprove = async (index) => {
-    const conference = conferences[index];
-    try {
-      await updateRequestStatus(conference.id, 'approved');
-      const updatedConferences = [...conferences];
-      updatedConferences.splice(index, 1);
-      setConferences(updatedConferences);
-    } catch (error) {
-      console.error('Error approving request:', error);
-    }
-  };
+  const conference = conferences[index];
+  setButtonLoading(index, 'approve', true);
+  try {
+    await updateRequestStatus(conference.id, 'approved');
+    const updatedConferences = [...conferences];
+    updatedConferences.splice(index, 1);
+    setConferences(updatedConferences);
+  } catch (error) {
+    console.error('Error approving request:', error);
+  } finally {
+    setButtonLoading(index, 'approve', false);
+  }
+};
 
-  const handleReject = async (index) => {
-    const conference = conferences[index];
-    try {
-      await updateRequestStatus(conference.id, 'rejected');
-      const updatedConferences = [...conferences];
-      updatedConferences.splice(index, 1);
-      setConferences(updatedConferences);
-    } catch (error) {
-      console.error('Error rejecting request:', error);
-    }
-  };
-
+const handleReject = async (index) => {
+  const conference = conferences[index];
+  setButtonLoading(index, 'reject', true);
+  try {
+    await updateRequestStatus(conference.id, 'rejected');
+    const updatedConferences = [...conferences];
+    updatedConferences.splice(index, 1);
+    setConferences(updatedConferences);
+  } catch (error) {
+    console.error('Error rejecting request:', error);
+  } finally {
+    setButtonLoading(index, 'reject', false);
+  }
+};
   const renderRequests = () => {
     const requestsToRender = activeTab === 'pending' ? conferences : completedRequests;
 
@@ -88,10 +100,14 @@ const AdminConferenceManager = () => {
               <th className="px-4 py-2 text-left border-b">Organizer Name</th>
               <th className="px-4 py-2 text-left border-b">Date</th>
               <th className="px-4 py-2 text-left border-b">Time</th>
-              <th className="px-4 py-2 text-left border-b">Submission Deadline</th>
+              <th className="px-4 py-2 text-left border-b">
+                Submission Deadline
+              </th>
               <th className="px-4 py-2 text-left border-b">Review Deadline</th>
               <th className="px-4 py-2 text-left border-b">Status</th>
-              {activeTab === 'pending' && <th className="px-4 py-2 text-left border-b">Actions</th>}
+              {activeTab === "pending" && (
+                <th className="px-4 py-2 text-left border-b">Actions</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -99,25 +115,40 @@ const AdminConferenceManager = () => {
               <tr key={conference.id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-2">{index + 1}</td>
                 <td className="px-4 py-2">{conference.Conference_title}</td>
-                <td className="px-4 py-2">{conference.Organizer?.Organizer_FirstName} {conference.Organizer?.Organizer_LastName}</td>
+                <td className="px-4 py-2">
+                  {conference.Organizer?.Organizer_FirstName}{" "}
+                  {conference.Organizer?.Organizer_LastName}
+                </td>
                 <td className="px-4 py-2">{conference.Start_date}</td>
                 <td className="px-4 py-2">{conference.Conference_time}</td>
                 <td className="px-4 py-2">{conference.Submission_deadline}</td>
                 <td className="px-4 py-2">{conference.Review_deadline}</td>
                 <td className="px-4 py-2">{conference.requestStatus}</td>
-                {activeTab === 'pending' && (
+                {activeTab === "pending" && (
                   <td className="px-4 py-2">
                     <button
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => handleApprove(index)}
+                      disabled={
+                        loadingStates[`${index}-approve`] ||
+                        loadingStates[`${index}-reject`]
+                      }
                     >
-                      Approve
+                      {loadingStates[`${index}-approve`]
+                        ? "Approving..."
+                        : "Approve"}
                     </button>
                     <button
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => handleReject(index)}
+                      disabled={
+                        loadingStates[`${index}-approve`] ||
+                        loadingStates[`${index}-reject`]
+                      }
                     >
-                      Reject
+                      {loadingStates[`${index}-reject`]
+                        ? "Rejecting..."
+                        : "Reject"}
                     </button>
                   </td>
                 )}

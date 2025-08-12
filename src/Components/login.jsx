@@ -77,8 +77,8 @@ const [confirmPassword, setConfirmPassword] = useState("");
         throw new Error("Invalid role selected. Please select a valid role and try again.");
       }
     } catch (error) {
-      console.error("Login failed", error.response?.data?.message || error.message);
-      alert("Login failed: " + (error.response?.data?.message));
+      console.error("Login failed", error.response?.data?.error.message );
+      alert("Login failed: " + (error.response?.data?.error.message));
     } finally {
       setIsLoading(false);
     }
