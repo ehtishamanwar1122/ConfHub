@@ -132,6 +132,12 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           // Password doesn't match
           return ctx.badRequest('Invalid credentials');
         }
+          const jwtService = strapi.plugin('users-permissions').service('jwt');
+    const token = jwtService.issue({
+      id: user.id,
+      username: user.username,
+      role: user.Type,
+    });
     
         const completeUser = await strapi.entityService.findOne(
           'plugin::users-permissions.user',
@@ -143,6 +149,7 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
         return ctx.send({
           message: 'Login successful',
           user: completeUser,
+          jwt: token,
         });
       } catch (err) {
         console.error("Error during password validation:", err);
@@ -187,9 +194,16 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           // Password doesn't match
           return ctx.badRequest('Invalid credentials');
         }
+          const jwtService = strapi.plugin('users-permissions').service('jwt');
+    const token = jwtService.issue({
+      id: user.id,
+      username: user.username,
+      role: user.Type,
+    });
         return ctx.send({
           message: 'Login successful',
           user: user,
+          jwt: token,
         });
       } catch (err) {
         console.error("Error during password validation:", err);

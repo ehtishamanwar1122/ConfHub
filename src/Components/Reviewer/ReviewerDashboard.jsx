@@ -29,7 +29,7 @@ const ReviewerDashboard = () => {
   const storedUser = JSON.parse(localStorage.getItem("userDetails"));
   const userId = storedUser?.id;
   const reviewerId = storedUser?.reviewerId?.id;
-
+const username=storedUser.username
   useEffect(() => {
     const fetchData = async () => {
       if (!userId || !reviewerId) return;
@@ -298,9 +298,9 @@ const ReviewerDashboard = () => {
             Reviewer Dashboard
           </h1>
           <p className="text-gray-600 flex items-center gap-2">
-            <FiUser className="text-blue-600" />
-            Welcome back! Manage your review assignments and track your progress.
-          </p>
+  <FiUser className="text-blue-600" />
+  Welcome back! <span className="text-blue-600 font-bold text-lg">{username}</span> Manage your review assignments and track your progress.
+</p>
         </div>
 
         {/* Stats Cards */}

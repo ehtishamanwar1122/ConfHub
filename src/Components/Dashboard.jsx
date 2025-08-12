@@ -35,16 +35,29 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+
+  {/* Add these state variables at the top of your component */}
+const [currentPage, setCurrentPage] = useState(1);
+const [pageSize, setPageSize] = useState(10);
+
+
+
+
   // Fetch conferences in progress and approved by admin
   useEffect(() => {
     const fetchConferences = async () => {
       try {
+
         const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/conferences', {
+
           params: {
             filters: {
               requestStatus: {
                 $eq: 'approved',
               },
+              Status: {
+        $ne: 'completed', // ✅ not equal filter
+      },
             },
             populate: '*',  // This will populate all related fields
           },
@@ -75,8 +88,15 @@ const Dashboard = () => {
     conference.Conference_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+{/* Calculate pagination values */}
+const totalItems = filteredConferences.length;
+const totalPages = Math.ceil(totalItems / pageSize);
+const startIndex = (currentPage - 1) * pageSize;
+const endIndex = startIndex + pageSize;
+const currentPageData = filteredConferences.slice(startIndex, endIndex);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-pink-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-purple-50">
+
       {/* Navigation */}
       <nav className="relative bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -160,7 +180,9 @@ const Dashboard = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-sky-400/20 via-pink-400/20 to-purple-400/20"></div>
+
+        <div className="absolute inset-0 bg-gradient-to-r from-sky-400/20  to-purple-400/20"></div>
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Hero Text */}
@@ -195,7 +217,9 @@ const Dashboard = () => {
               </div>
 
               {/* Stats */}
-              <div className="flex items-center space-x-8 pt-8">
+
+              {/* <div className="flex items-center space-x-8 pt-8">
+
                 <div className="text-center">
                   <div className="text-2xl font-bold text-sky-600">500+</div>
                   <div className="text-sm text-gray-600">Conferences</div>
@@ -208,7 +232,9 @@ const Dashboard = () => {
                   <div className="text-2xl font-bold text-purple-600">50+</div>
                   <div className="text-sm text-gray-600">Universities</div>
                 </div>
-              </div>
+
+              </div> */}
+
             </div>
 
             {/* Hero Image */}
@@ -240,6 +266,7 @@ const Dashboard = () => {
         </div>
       </section>
 
+
       {/* Conferences Section */}
       <section className="py-20 bg-white/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -256,6 +283,7 @@ const Dashboard = () => {
               Join leading conferences and contribute to the academic community with cutting-edge research and innovations.
             </p>
           </div>
+
 
           {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -277,7 +305,9 @@ const Dashboard = () => {
             </div>
           </div>
 
-       {/* Conferences Table */}
+
+    {/* Conferences Table */}
+
 {loading ? (
   <div className="flex justify-center items-center py-20">
     <div className="relative">
@@ -286,61 +316,156 @@ const Dashboard = () => {
     </div>
   </div>
 ) : (
-  <div className="overflow-x-auto mt-4">
-    <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-      <thead className="bg-gray-100">
-        <tr>
-          <th className="py-3 px-4 text-left">#</th>
-          <th className="py-3 px-4 text-left">Title</th>
-          <th className="py-3 px-4 text-left">Description</th>
-          <th className="py-3 px-4 text-left">Submission Deadline</th>
-          <th className="py-3 px-4 text-left">Review Deadline</th>
-          <th className="py-3 px-4 text-left">Status</th>
-          <th className="py-3 px-4 text-left">Start Date</th>
-          <th className="py-3 px-4 text-left">Location</th>
-          <th className="py-3 px-4 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredConferences.length > 0 ? (
-          filteredConferences.map((conference, index) => (
-            <tr key={conference.id} className="border-b hover:bg-gray-50 transition-colors">
-              <td className="py-3 px-4">{index + 1}</td>
-              <td className="py-3 px-4 font-semibold">{conference.Conference_title}</td>
-              <td className="py-3 px-4">{conference.Description}</td>
-              <td className="py-3 px-4">{conference.Submission_deadline}</td>
-              <td className="py-3 px-4">{conference.Review_deadline}</td>
-              <td className="py-3 px-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  conference.Status === "inProgress"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-600"
-                }`}>
-                  {conference.Status}
-                </span>
-              </td>
-              <td className="py-3 px-4">{conference.Start_date}</td>
-              <td className="py-3 px-4">{conference.Conference_location}</td>
-              <td className="py-3 px-4">
-                <button
-                  onClick={() => handleConferenceClick(conference.id)}
-                  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  <FaEye /> View
-                </button>
+
+  <>
+    {/* Page Size Selector */}
+    <div className="flex justify-between items-center mb-4">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-600">Show:</span>
+        <select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+          className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+        <span className="text-sm text-gray-600">entries</span>
+      </div>
+      
+      {/* Results Info */}
+      {/* <div className="text-sm text-gray-600">
+        Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} entries
+      </div> */}
+    </div>
+
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+        <thead className="bg-gray-100">
+          <tr>
+           
+            <th className="py-3 px-4 text-left">Conference Title</th>
+            {/* <th className="py-3 px-4 text-left">Description</th> */}
+            <th className="py-3 px-4 text-left">Start Date</th>
+            <th className="py-3 px-4 text-left">Submission Deadline</th>
+            <th className="py-3 px-4 text-left">Review Deadline</th>
+            <th className="py-3 px-4 text-left">Status</th>
+            <th className="py-3 px-4 text-left">Conference Topics</th>
+            {/* <th className="py-3 px-4 text-left">Location</th> */}
+            <th className="py-3 px-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentPageData.length > 0 ? (
+            currentPageData.map((conference, index) => (
+              <tr key={conference.id} className="border-b cursor-pointer transition-all duration-300
+    hover:bg-gradient-to-r hover:from-sky-200 "
+    onClick={() => handleConferenceClick(conference.id)}>
+                
+                <td className="py-3 px-4 font-semibold">{conference.Conference_title}</td>
+                {/* <td className="py-3 px-4">{conference.Description}</td> */}
+                 <td className="py-3 px-4">{conference.Start_date}</td>
+                <td className="py-3 px-4">{conference.Submission_deadline}</td>
+                <td className="py-3 px-4">{conference.Review_deadline}</td>
+                <td className="py-3 px-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    conference.Status === "inProgress"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-blue-600"
+                  }`}>
+                    {conference.Status}
+                  </span>
+                </td>
+                <td className="py-3 px-4">{conference.Conference_Topics}</td>
+               
+                {/* <td className="py-3 px-4">{conference.Conference_location}</td> */}
+                <td className="py-3 px-4">
+                  <button
+                    onClick={() => handleConferenceClick(conference.id)}
+                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <FaEye /> View
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="9" className="py-4 text-center text-gray-600">
+                No conferences found
               </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="9" className="py-4 text-center text-gray-600">
-              No conferences found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Pagination Controls */}
+    {totalPages > 1 && (
+      <div className="flex justify-center items-center mt-6 space-x-2">
+        {/* Previous Button */}
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`px-3 py-2 rounded-lg ${
+            currentPage === 1
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          Previous
+        </button>
+
+        {/* Page Numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+          // Show first page, last page, current page, and pages around current
+          const showPage = page === 1 || 
+                          page === totalPages || 
+                          Math.abs(page - currentPage) <= 1;
+          
+          if (!showPage && page !== 2 && page !== totalPages - 1) {
+            // Show ellipsis for gaps
+            if (page === currentPage - 2 || page === currentPage + 2) {
+              return <span key={page} className="px-2 py-2 text-gray-400">...</span>;
+            }
+            return null;
+          }
+
+          return (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-2 rounded-lg ${
+                currentPage === page
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {page}
+            </button>
+          );
+        })}
+
+        {/* Next Button */}
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-2 rounded-lg ${
+            currentPage === totalPages
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    )}
+  </>
+
 )}
 
         </div>

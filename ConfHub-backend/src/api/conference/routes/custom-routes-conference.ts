@@ -28,5 +28,11 @@ export default {
         handler: 'conference.updateReviewDeadline',
        
       },
+       {
+        method: 'POST',
+        path: '/conferences/updateConferenceStatus',
+        handler: 'conference.updateConferenceStatus',
+       
+      },
     ],
   };

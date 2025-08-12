@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ConfHub } from "../../../assets/Images";
 import RoleSwitcherButton from '../../RoleSwitcher'; // Import the new button component
 import ChangePasswordModal from '../../ChangePasswordModal';
+import { LogOut } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -68,10 +69,10 @@ const Header = () => {
     return (
         <header className="bg-gray-100 p-4 flex justify-between items-center border-b border-gray-300">
             <div className="flex items-center relative">
-                <button onClick={toggleDropdown} className="text-xl text-white mr-4">
+                <button onClick={toggleDropdown} className="text-xl text-black mr-4">
                     <FaBars />
                 </button>
-                <Link  className="text-2xl font-bold text-indigo-600 mr-5">
+                <Link  className="text-4xl font-bold text-indigo-600 mr-5">
                                     <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
                 </Link>
 
@@ -110,12 +111,13 @@ const Header = () => {
                 <span className="text-xl text-gray-700 mr-4">
                     <FaBell />
                 </span>
-                <button
-                    onClick={handleLogout}
-                    className="border border-blue-500 text-white py-2 px-4 rounded-lg hover:bg-gray-200"
-                >
-                    Logout
-                </button>
+              <button
+  onClick={handleLogout}
+  className="flex items-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+  <LogOut className="h-5 w-5" />
+  Logout
+</button>
             </div>
             <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
         </header>

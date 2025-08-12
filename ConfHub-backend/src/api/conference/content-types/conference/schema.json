@@ -73,8 +73,7 @@
     "Organizer": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::organizer.organizer",
-      "required": true
+      "target": "api::organizer.organizer"
     },
     "Papers": {
       "type": "relation",
@@ -85,13 +84,14 @@
     "AssignedSubOrganizer": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "plugin::users-permissions.user",
-      "required": false
+      "target": "plugin::users-permissions.user"
     },
     "reviewFormFields": {
-  "type": "json",
-  "required": false
-}
-
+      "type": "json",
+      "required": false
+    },
+    "Conference_Topics": {
+      "type": "text"
+    }
   }
 }

@@ -4,6 +4,7 @@ import { FaBars, FaBell } from 'react-icons/fa';
 import { ConfHub } from '../../../assets/Images';
 import RoleSwitcherButton from '../../RoleSwitcher';
 import ChangePasswordModal from '../../ChangePasswordModal';
+import { LogOut } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -97,12 +98,13 @@ const Header = () => {
                 <span className="text-xl text-gray-700 mr-4">
                     <FaBell />
                 </span>
-                <button
-                    onClick={handleLogout}
-                    className="border border-blue-500 text-blue-500 py-2 px-4 rounded-lg hover:bg-gray-200"
-                >
-                    Logout
-                </button>
+               <button
+  onClick={handleLogout}
+  className="flex items-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+  <LogOut className="h-5 w-5" />
+  Logout
+</button>
             </div>
             <ChangePasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
         </header>
