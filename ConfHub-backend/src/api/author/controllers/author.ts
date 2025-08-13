@@ -262,7 +262,7 @@ const authorEmail = author.authorEmail
                 });
                 newAuthorIds.push({ id: newAuthor.id });
                 try {
-                  const registerUrl = 'http://localhost:5173/register';
+                  const registerUrl = 'https://confhubb.netlify.app/register';
                   await sendEmail(
                     author,
                     'You have been added as a Co-Author in Confhub',

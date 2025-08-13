@@ -127,7 +127,8 @@ if (formData.password.includes(" ")) {
       navigate("/login");
     } catch (err) {
       console.error(`Error during ${userType} registration:`, err);
-      setError("Registration failed. Please try again.");
+      setError(err.response?.data?.error.message);
+      alert("registration failed: " + (err.response?.data?.error.message));
     } finally {
       setLoading(false);
     }

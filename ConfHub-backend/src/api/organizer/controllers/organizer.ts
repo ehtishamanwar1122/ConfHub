@@ -236,7 +236,7 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           // Get the linked user from the organizer
           const linkedUser = (updatedOrganizer as any).UserID?.id;
           const userEmail = (updatedOrganizer as any).UserID?.email;
-      const loginUrl = 'http://localhost:5173/login';
+      const loginUrl = 'https://confhubb.netlify.app/login';
           console.log('linedd',linkedUser);
           
           // Update the user's status (confirmed: true, blocked: false)
@@ -846,7 +846,7 @@ The Organizing Committee`;
           <li><strong>Paper ID:</strong> ${paperId}</li>
           <li><strong>Title:</strong> "${paperTitle}"</li>
         </ul>
-        <p>Please <a href="http://localhost:5173/register" style="color:blue;">register your reviewer account</a> to begin the review process.</p>
+        <p>Please <a href="https://confhubb.netlify.app/register" style="color:blue;">register your reviewer account</a> to begin the review process.</p>
         <p>Thank you,<br/>The Organizing Committee</p>
       `;
 

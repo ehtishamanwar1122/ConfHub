@@ -43,7 +43,7 @@ const ConferenceDetails = () => {
 
   return (
     <>
-      <Header />
+      
       <div className="bg-inherit py-10 min-h-screen">
         <div className="max-w-5xl mx-auto px-4">
           {conference && conference.length > 0 ? (
