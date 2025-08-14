@@ -44,6 +44,7 @@ const PaperReviewPage = () => {
   useEffect(() => {
     const fetchReview = async () => {
       try {
+        console.log('paper id',id);
         
           const response = await axios.get(
   `https://amused-fulfillment-production.up.railway.app/api/papers?filters[id][$eq]=${id}&populate=review&populate=SubmittedTo`

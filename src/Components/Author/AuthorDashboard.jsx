@@ -351,6 +351,9 @@ const AuthorDashboard = () => {
                   <table className="min-w-full bg-white border-collapse">
                     <thead className="bg-gray-100">
                       <tr>
+                         <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
+                          Paper ID
+                        </th>
                         <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
                           Paper Title
                         </th>
@@ -371,6 +374,9 @@ const AuthorDashboard = () => {
                           key={paper.id}
                           className="border-b border-gray-200 hover:bg-gray-50"
                         >
+                          <td className="py-3 px-4 text-sm text-gray-700">
+                            {paper.id}
+                          </td>
                           <td className="py-3 px-4 text-sm text-gray-700">
                             {paper.Paper_Title}
                           </td>
