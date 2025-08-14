@@ -8,39 +8,6 @@ const PaperReviewPage = () => {
   const [reviewData, setReviewData] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  //   1: {
-  //     paperTitle: "AI in Healthcare",
-  //     conference: "International AI Conference",
-  //     status: "Under Review",
-  //     reviewer: "Dr. John Smith",
-  //     comments: "The paper presents an innovative approach to AI diagnosis. However, methodology details are lacking.",
-  //     strengths: "Innovative approach to AI in healthcare.",
-  //     weaknesses: "Lack of methodology details and empirical data.",
-  //     scores: {
-  //       Originality: 8,
-  //       Significance: 7.5,
-  //       Presentation: 7,
-  //       Overall: 8,
-  //       Recommendation: "Strongly Recommend"
-  //     }
-  //   },
-  //   2: {
-  //     paperTitle: "Optimizing React Apps",
-  //     conference: "Web Development Expo",
-  //     status: "Accepted",
-  //     reviewer: "Prof. Sarah Lee",
-  //     comments: "Well-written and practical. Good use of case studies. Minor improvements needed in performance analysis.",
-  //     strengths: "Practical and well-written. Great case studies.",
-  //     weaknesses: "Minor performance analysis improvements needed.",
-  //     scores: {
-  //       Originality: 9,
-  //       Significance: 9.5,
-  //       Presentation: 9,
-  //       Overall: 9,
-  //       Recommendation: "Accept"
-  //     }
-  //   },
-  // };
   useEffect(() => {
     const fetchReview = async () => {
       try {
@@ -49,7 +16,7 @@ const PaperReviewPage = () => {
           const response = await axios.get(
   `https://amused-fulfillment-production.up.railway.app/api/papers?filters[id][$eq]=${id}&populate=review&populate=SubmittedTo`
 ); 
-        const data = await response.json();
+        const data = response.data;
         setReviewData(data.data);
        // console.log('dd',data.data);
         
