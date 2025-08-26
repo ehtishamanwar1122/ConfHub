@@ -107,7 +107,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
                 <HiSparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-pink-600 bg-clip-text text-transparent">
-                ConfHub
+                bzchair
               </span>
             </div>
 
@@ -201,7 +201,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
               </h1>
               
               <p className="text-lg lg:text-xl text-gray-600 leading-relaxed max-w-lg">
-                From managing program committees to publishing proceedings, our ConfHub system provides a professional solution for organizing successful conferences from start to finish.
+                From managing program committees to publishing proceedings, our bzchair system provides a professional solution for organizing successful conferences from start to finish.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -478,7 +478,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
             <div className="space-y-8">
               <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-md rounded-full px-4 py-2 text-sm font-medium text-sky-600 border border-sky-200">
                 <FiInfo className="w-4 h-4" />
-                <span>About ConfHub</span>
+                <span>About bzchair</span>
               </div>
               
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-800">
@@ -659,7 +659,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
                   <HiSparkles className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-sky-400 to-pink-400 bg-clip-text text-transparent">
-                  ConfHub
+                  bzchair
                 </span>
               </div>
               <p className="text-gray-400 leading-relaxed">
@@ -720,15 +720,15 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 text-gray-400">
                   <FiMail className="w-5 h-5 text-sky-400" />
-                  <span>info@confhub.com</span>
+                  <span>info@bzchair.com</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-400">
                   <HiLocationMarker className="w-5 h-5 text-pink-400" />
-                  <span>University District</span>
+                  <span>Capital University of Science and technology</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-400">
                   <BsGlobe className="w-5 h-5 text-purple-400" />
-                  <span>www.confhub.com</span>
+                  <span>www.bzchair.com</span>
                 </div>
               </div>
             </div>
@@ -738,7 +738,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
           <div className="border-t border-gray-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="text-gray-400 text-sm">
-                &copy; 2025 ConfHub. All rights reserved.
+                &copy; 2025 bzchair. All rights reserved.
               </div>
               <div className="flex items-center space-x-6 text-sm text-gray-400">
                 <a href="#" className="hover:text-white transition-colors duration-300">Privacy Policy</a>

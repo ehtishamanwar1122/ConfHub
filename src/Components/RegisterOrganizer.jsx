@@ -144,8 +144,8 @@ if (formData.password.includes(" ")) {
             alt="Register"
             className="w-48 h-48 md:w-60 md:h-60 object-contain rounded-2xl shadow-lg mb-4 border-4 border-white"
           />
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">ConfHub</h3>
-          <p className="text-white/90 mb-4 text-center text-xs md:text-sm">Join ConfHub and streamline your research journey!</p>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">bzchair</h3>
+          <p className="text-white/90 mb-4 text-center text-xs md:text-sm">Join bzchair and streamline your research journey!</p>
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2 bg-white/10 rounded-lg p-2">
               <span className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-blue-500 rounded-full">
@@ -177,7 +177,7 @@ if (formData.password.includes(" ")) {
         <div className="flex-1 flex flex-col justify-center items-center p-4 sm:p-6">
           <div className="w-full max-w-xs sm:max-w-sm">
             <div className="mb-4 sm:mb-6 text-center">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Register for ConfHub</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Sign up in bzchair</h2>
               <p className="text-gray-500 text-xs sm:text-sm">Create your account</p>
             </div>
             <div className="flex mb-3 sm:mb-4 gap-2">

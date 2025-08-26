@@ -143,7 +143,7 @@ const handleResetPassword = async () => {
             alt="Academic Login Portal"
             className="w-48 h-48 md:w-60 md:h-60 object-contain rounded-2xl shadow-lg mb-4 border-4 border-white"
           />
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">ConfHub</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 drop-shadow-lg">bzchair</h3>
           <p className="text-white/90 mb-4 text-center text-xs md:text-sm">Streamline your research and publication workflow</p>
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2 bg-white/10 rounded-lg p-2">
@@ -176,7 +176,7 @@ const handleResetPassword = async () => {
         <div className="flex-1 flex flex-col justify-center items-center p-4 sm:p-6">
           <div className="w-full max-w-xs sm:max-w-sm">
             <div className="mb-4 sm:mb-6 text-center">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Sign in to ConfHub</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Sign in to bzchair</h2>
               <p className="text-gray-500 text-xs sm:text-sm">Access your dashboard</p>
             </div>
             <form onSubmit={handleLoginClick} className="space-y-3 sm:space-y-4">
