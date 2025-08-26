@@ -265,10 +265,10 @@ const authorEmail = author.authorEmail
                   const registerUrl = 'http://localhost:5173/register';
                   await sendEmail(
                     author,
-                    'You have been added as a Co-Author in Confhub',
-                    `You have been added as a co-author for a paper submission in Confhub with paper title ${newPaper.Paper_Title}. Please register using this email (${author}) to access your paper.`,
+                    'You have been added as a Co-Author in bzchair',
+                    `You have been added as a co-author for a paper submission in bzchair with paper title ${newPaper.Paper_Title}. Please register using this email (${author}) to access your paper.`,
                     `<p>Hello,</p>
-                     <p>You have been added as a co-author for a paper submission in <strong>Confhub</strong> with paper title ${newPaper.Paper_Title}.</p>
+                     <p>You have been added as a co-author for a paper submission in <strong>bzchair</strong> with paper title ${newPaper.Paper_Title}.</p>
                      <p>Please <a href="${registerUrl}">register</a> using this email address (<strong>${author}</strong>) to view your paper and participate.</p>`
                 );
                   console.log(`Invitation email sent to ${author}`);

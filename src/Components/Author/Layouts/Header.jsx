@@ -72,9 +72,9 @@ const Header = () => {
                 <button onClick={toggleDropdown} className="text-xl text-black mr-4">
                     <FaBars />
                 </button>
-                <Link  className="text-4xl font-bold text-indigo-600 mr-5">
-                                    <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
-                </Link>
+               <span className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-pink-400 bg-clip-text text-transparent">
+                  bzchair
+                </span>
 
                 {/* Dropdown Menu */}
                 <div
@@ -101,7 +101,7 @@ const Header = () => {
             {hasSubOrganizerRole && (
     <div className="flex items-center ml-auto mr-2 text-base">
         <RoleSwitcherButton
-            roles={['Author', 'SubOrganizer']}
+            roles={['Author', 'TPC_Chair']}
             onRoleSelect={handleRoleChange}
         />
     </div>

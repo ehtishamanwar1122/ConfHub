@@ -100,10 +100,10 @@ export default factories.createCoreController('api::conference.conference', ({ s
               await sendEmail(
                 emailAddress,  // Pass the email string here
                 'Your Conference Request Has Been Received',
-                `Thank you for submitting your conference request on ConfHub. We have received your request to create "${conferenceTitle}" and it is currently under review. Our team will review the details, and you will be notified once it has been approved.`,
+                `Thank you for submitting your conference request on bzchair. We have received your request to create "${conferenceTitle}" and it is currently under review. Our team will review the details, and you will be notified once it has been approved.`,
                 `<p>Hello,</p>
-                 <p>Your request to create the conference "<strong>${conferenceTitle}</strong>" on ConfHub has been received. Please wait for the admin's approval. You will be notified once the review process is complete.</p>
-                 <p>Best regards,<br>ConfHub Team</p>`
+                 <p>Your request to create the conference "<strong>${conferenceTitle}</strong>" on bzchair has been received. Please wait for the admin's approval. You will be notified once the review process is complete.</p>
+                 <p>Best regards,<br>bzchair Team</p>`
               );
             } else {
               console.error('No organizer email found.');
@@ -191,12 +191,12 @@ console.log('Conference Title:', conferenceTitle);
           await sendEmail(
             organizerEmail,
             'Your Conference Status Has Been Updated',
-            `Your conference "${conferenceTitle}" on ConfHub has been updated to the status: ${status}.`,
+            `Your conference "${conferenceTitle}" on bzchair has been updated to the status: ${status}.`,
             `<p>Hello,</p>
-             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on ConfHub has been updated to <strong>${status}</strong>.</p>
+             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on bzchair has been updated to <strong>${status}</strong>.</p>
              <p>Please log in to your account to view further details.</p>
              <p>If you have any questions, feel free to contact our support team.</p>
-             <p>Best regards,<br>ConfHub Team</p>`
+             <p>Best regards,<br>bzchair Team</p>`
         );
         
       
@@ -323,12 +323,12 @@ console.log('Conference Title:', conferenceTitle);
           await sendEmail(
             organizerEmail,
             'Your Conference Status Has Been Updated',
-            `Your conference "${conferenceTitle}" on ConfHub has been updated to the status: ${status}.`,
+            `Your conference "${conferenceTitle}" on bzchair has been updated to the status: ${status}.`,
             `<p>Hello,</p>
-             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on ConfHub has been updated to <strong>${status}</strong>.</p>
+             <p>The status of your conference "<strong>${conferenceTitle}</strong>" on bzchair has been updated to <strong>${status}</strong>.</p>
              
              <p>If you have any questions, feel free to contact our support team.</p>
-             <p>Best regards,<br>ConfHub Team</p>`
+             <p>Best regards,<br>bzchair Team</p>`
         );
         
       

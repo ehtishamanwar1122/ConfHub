@@ -257,7 +257,7 @@ const AuthorDashboard = () => {
                 <p className="text-gray-600">
                   {debouncedConferenceSearch
                     ? "No conferences found matching your search."
-                    : "No conferences available. To submit paper in a conference you have to join conference from home page of ConfHub and then login to you author account"}
+                    : "No conferences available. To submit paper in a conference you have to join conference from home page of bzchair and then login to you author account"}
                 </p>
               ) : (
                 <div className="overflow-x-auto">

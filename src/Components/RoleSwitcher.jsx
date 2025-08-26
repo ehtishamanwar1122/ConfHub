@@ -24,7 +24,7 @@ const RoleSwitcherButton = ({ roles, onRoleSelect }) => {
             case 'Reviewer':
                 navigate('/ReviewerDashboard');
                 break;
-            case 'SubOrganizer':
+            case 'TPC_Chair':
                 navigate('/OrganizerDashboard');  // Add route for Sub-Organizer role
                 break;
             default:

@@ -69,8 +69,8 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
       await sendEmail(
         email,
         'Your Account has been created',
-        'Hello, Your request for an organizer account in Confhub has been received. Please wait for admin approval.',
-        `<p>Hello,</p><p>Your request for an organizer account in Confhub has been received. Please wait for the admin's approval to login.</p>`
+        'Hello, Your request for an organizer account in bzchair has been received. Please wait for admin approval.',
+        `<p>Hello,</p><p>Your request for an organizer account in bzchair has been received. Please wait for the admin's approval to login.</p>`
       );
   
         // Return the new organizer (without password)
@@ -249,8 +249,8 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
          await sendEmail(
         userEmail,
         'Your Account has been Approved',
-        'Hello, Your request for a organizer account in Confhub  has been approved by the admin. You can now log in to your account using the following link: ' + loginUrl,
-        `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been approved by the admin. You can now log in to your account using the following link:</p><a href="${loginUrl}">${loginUrl}</a>`
+        'Hello, Your request for a organizer account in bzchair  has been approved by the admin. You can now log in to your account using the following link: ' + loginUrl,
+        `<p>Hello,</p><p>Your request for a organizer account in bzchair  has been approved by the admin. You can now log in to your account using the following link:</p><a href="${loginUrl}">${loginUrl}</a>`
       );
         }
         if (status === 'rejected') {
@@ -258,8 +258,8 @@ export default factories.createCoreController('api::organizer.organizer', ({ str
           await sendEmail(
             userEmail,
             'Your Account has been Rejected',
-            'Hello, Your request for a organizer account in Confhub  has been rejected by the admin. ',
-            `<p>Hello,</p><p>Your request for a organizer account in Confhub  has been rejected by the admin </p>`
+            'Hello, Your request for a organizer account in bzchair  has been rejected by the admin. ',
+            `<p>Hello,</p><p>Your request for a organizer account in bzchair  has been rejected by the admin </p>`
           );
         }
     
@@ -467,10 +467,10 @@ const reviewerEmail=reviewer.email;
                 authorsUserIds.push(author.UserID.id);
                 await sendEmail(
                   author.UserID.email,
-                  'You have been assigned as a Sub-Organizer',
-                  `You have been assigned as a Sub-Organizer for "${conferenceName}" in Confhub log in to your account and see details by switching role.`,
+                  'You have been assigned as a TPC_Chair',
+                  `You have been assigned as a TPC_Chair for "${conferenceName}" in "bzchair" log in to your author account and see details by switching role.`,
                   `<p>Hello ${author.UserID.username},</p>
-                   <p>You have been assigned as a Sub-Organizer for the conference "<strong>${conferenceName}</strong>" in Confhub log in to your account and see details by switching role.</p>`
+                   <p>You have been assigned as a TPC_Chair for the conference "<strong>${conferenceName}</strong>" in "bzchair" log in to your author account and see details by switching role.</p>`
                 );
             } catch (error) {
                 console.error(`Error assigning role to author with user ID: ${author.UserID.id}`, error);
@@ -495,10 +495,10 @@ const reviewerEmail=reviewer.email;
                 reviewersUserIds.push(reviewer.UserID.id);
                 await sendEmail(
                   reviewer.UserID.email,
-                  'You have been assigned as a Sub-Organizer',
-                  `You have been assigned as a Sub-Organizer for "${conferenceName}" in Confhub log in to your account and see details by switching role.`,
+                  'You have been assigned as a TPC_Chair',
+                  `You have been assigned as a TPC_Chair for "${conferenceName}" in 'bzchair' log in to your author account and see details by switching role.`,
                   `<p>Hello ${reviewer.UserID.username},</p>
-                   <p>You have been assigned as a Sub-Organizer for the conference "<strong>${conferenceName}</strong>" in Confhub log in to your account and see details by switching role.</p>`
+                   <p>You have been assigned as a TPC_Chair for the conference "<strong>${conferenceName}</strong>" in bzchair log in to your reviewer account and see details by switching role.</p>`
                 );
             } catch (error) {
                 console.error(`Error assigning role to reviewer with ID: ${reviewer.UserID.id}`, error);
@@ -828,12 +828,12 @@ The Organizing Committee`;
 
       const textBody = `Hello,
 
-You have been assigned to review the following paper on ConfHub:
+You have been assigned to review the following paper on bzchair:
 
 Paper ID: ${paperId}
 Title: "${paperTitle}"
 
-Please register your reviewer account at ConfHub to begin the review process:
+Please register your reviewer account at bzchair to begin the review process:
 http://localhost:5173/register
 
 Thank you,
@@ -841,7 +841,7 @@ The Organizing Committee`;
 
       const htmlBody = `
         <p>Hello,</p>
-        <p>You have been assigned to review the following paper on <strong>ConfHub</strong>:</p>
+        <p>You have been assigned to review the following paper on <strong>bzchair</strong>:</p>
         <ul>
           <li><strong>Paper ID:</strong> ${paperId}</li>
           <li><strong>Title:</strong> "${paperTitle}"</li>

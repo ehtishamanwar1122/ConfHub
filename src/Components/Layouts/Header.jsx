@@ -72,9 +72,9 @@ const Header = () => {
 let availableRoles = [];
 
 if (usertype?.Type === 'reviewer') {
-    availableRoles = ['Reviewer', 'SubOrganizer'];
+    availableRoles = ['Reviewer', 'TPC_Chair'];
 } else if (usertype?.Type === 'author') {
-    availableRoles = ['Author', 'SubOrganizer'];
+    availableRoles = ['Author', 'TPC_Chair'];
 }
     return (
       <>
@@ -86,9 +86,9 @@ if (usertype?.Type === 'reviewer') {
             >
               <FaBars />
             </button>
-            <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
-              <img src={ConfHub} alt="ConfHub" style={{ height: "30px" }} />
-            </Link>
+            <span className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-pink-400 bg-clip-text text-transparent">
+                  bzchair
+                </span>
             {dropdownVisible && (
               <div
                 ref={dropdownRef}
