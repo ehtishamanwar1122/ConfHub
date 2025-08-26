@@ -147,7 +147,7 @@ const OrganizerDashboard = () => {
                         Completed
                     </Tab>
                     <Tab active={activeTab === 'assignSubOrganizer'} onClick={() => setActiveTab('assignSubOrganizer')} icon={FaUserPlus}>
-                        Assign Sub-Organizers
+                        Assign TPC Chair
                     </Tab>
                 </div>
 
@@ -197,7 +197,7 @@ const OrganizerDashboard = () => {
                 {!loading && activeTab === 'assignSubOrganizer' && (
                     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                         <h2 className="text-xl font-bold mb-6 text-blue-600 flex items-center gap-2">
-                            <FaUserPlus /> Assign Sub-Organizers
+                            <FaUserPlus /> Assign TPC Chair
                         </h2>
                         {paginatedConferences.length > 0 ? (
                             <div className="overflow-x-auto">

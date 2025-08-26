@@ -34,7 +34,7 @@ const Header = () => {
             const roles = ['Reviewer']; // Default role
 
             if (user.SubOrganizerRole && user.SubOrganizerRole.length > 0) {
-                roles.push('SubOrganizer');
+                roles.push('TPC_Chair');
             }
 
             setAvailableRoles(roles);
@@ -60,9 +60,9 @@ const Header = () => {
                 <button onClick={toggleDropdown} className="text-xl text-gray-700 mr-4">
                     <FaBars />
                 </button>
-                <Link to="/" className="text-2xl font-bold text-indigo-600 mr-5">
-                    <img src={ConfHub} alt="ConfHub" style={{ height: '30px' }} />
-                </Link>
+               <span className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-pink-400 bg-clip-text text-transparent">
+                  bzchair
+                </span>
 
                 <div
                     ref={dropdownRef}
@@ -95,9 +95,7 @@ const Header = () => {
 
             {/* Notification and Logout */}
             <div className="flex items-center">
-                <span className="text-xl text-gray-700 mr-4">
-                    <FaBell />
-                </span>
+                
                <button
   onClick={handleLogout}
   className="flex items-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
