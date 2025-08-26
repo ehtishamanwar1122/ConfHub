@@ -43,7 +43,7 @@ const OrganizerDashboard = () => {
                 const userId = userDetails?.id;
 
                 if (subOrganizerRoles.length > 0) {
-                    const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[AssignedSubOrganizer][id][$eq]=${userId}&populate=*`);
+                    const response = await axios.get(`https://amused-fulfillment-production.up.railway.app/api/conferences?filters[requestStatus][$eq]=approved&filters[AssignedSubOrganizer][id][$eq]=${userId}&populate=*`);
                     setConferences(response.data.data);
                     setLoading(false);
                     return;
@@ -55,8 +55,10 @@ const OrganizerDashboard = () => {
                     return;
                 }
 
+
                 // Fetch conferences where requestStatus is approved and they are for the current organizer
                 const response = await axios.get(`http://localhost:1337/api/conferences?filters[requestStatus][$eq]=approved&filters[Organizer][$eq]=${organizerId}&populate=*`);
+
                 setConferences(response.data.data);
                 
             } catch (error) {
@@ -110,9 +112,28 @@ const OrganizerDashboard = () => {
 
     // Reset to first page when changing tab or search term
     useEffect(() => {
+
         setCurrentPage(1);
     }, [activeTab, searchTerm, pageSize]);
 
+
+//         const fetchReviews = async () => {
+//             setLoading(true);
+//             try {
+//                 const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/paper-reviews');
+//                 setPaperReviews(response.data || []);
+//             } catch (error) {
+//                 console.error('Error fetching paper reviews:', error);
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+    
+//         if (activeTab === 'reviews') {
+//             fetchReviews();
+//         }
+//     }, [activeTab]);
+ 
     return (
         <Layout>
             <h4 className="text-3xl font-semibold text-blue-700 text-center my-6 font-sans">

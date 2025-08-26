@@ -35,9 +35,11 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+
   {/* Add these state variables at the top of your component */}
 const [currentPage, setCurrentPage] = useState(1);
 const [pageSize, setPageSize] = useState(10);
+
 
 
 
@@ -45,7 +47,9 @@ const [pageSize, setPageSize] = useState(10);
   useEffect(() => {
     const fetchConferences = async () => {
       try {
-      const response = await axios.get('http://localhost:1337/api/conferences', {
+
+        const response = await axios.get('https://amused-fulfillment-production.up.railway.app/api/conferences', {
+
           params: {
             filters: {
               requestStatus: {
@@ -83,6 +87,7 @@ const [pageSize, setPageSize] = useState(10);
   const filteredConferences = conferences.filter(conference =>
     conference.Conference_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 {/* Calculate pagination values */}
 const totalItems = filteredConferences.length;
 const totalPages = Math.ceil(totalItems / pageSize);
@@ -91,6 +96,7 @@ const endIndex = startIndex + pageSize;
 const currentPageData = filteredConferences.slice(startIndex, endIndex);
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-purple-50">
+
       {/* Navigation */}
       <nav className="relative bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -174,7 +180,9 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
+
         <div className="absolute inset-0 bg-gradient-to-r from-sky-400/20  to-purple-400/20"></div>
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Hero Text */}
@@ -209,7 +217,9 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
               </div>
 
               {/* Stats */}
+
               {/* <div className="flex items-center space-x-8 pt-8">
+
                 <div className="text-center">
                   <div className="text-2xl font-bold text-sky-600">500+</div>
                   <div className="text-sm text-gray-600">Conferences</div>
@@ -222,7 +232,9 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
                   <div className="text-2xl font-bold text-purple-600">50+</div>
                   <div className="text-sm text-gray-600">Universities</div>
                 </div>
+
               </div> */}
+
             </div>
 
             {/* Hero Image */}
@@ -254,6 +266,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
         </div>
       </section>
 
+
       {/* Conferences Section */}
       <section className="py-20 bg-white/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -270,6 +283,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
               Join leading conferences and contribute to the academic community with cutting-edge research and innovations.
             </p>
           </div>
+
 
           {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
@@ -291,7 +305,9 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
             </div>
           </div>
 
+
     {/* Conferences Table */}
+
 {loading ? (
   <div className="flex justify-center items-center py-20">
     <div className="relative">
@@ -300,6 +316,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
     </div>
   </div>
 ) : (
+
   <>
     {/* Page Size Selector */}
     <div className="flex justify-between items-center mb-4">
@@ -448,6 +465,7 @@ const currentPageData = filteredConferences.slice(startIndex, endIndex);
       </div>
     )}
   </>
+
 )}
 
         </div>
